@@ -1136,16 +1136,21 @@ function _jwtUser(token) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Try getUser() first (has user object in session), fall back to JWT decode
-  _user = sb.auth.getUser();
-  if (!_user) {
-    const session = sb.auth.getSession();
-    if (session?.access_token) _user = _jwtUser(session.access_token);
+  // Use SDK async getSession() with retry for timing safety
+  let session = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { data } = await _getClient().auth.getSession();
+    session = data?.session;
+    if (session?.access_token) break;
+    await new Promise(r => setTimeout(r, 150));
   }
-  if (!_user) {
+
+  if (!session?.access_token) {
     window.location.replace('login.html');
     return;
   }
+
+  _user = session.user;
   await loadPageData();
 });
 

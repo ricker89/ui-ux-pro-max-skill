@@ -15,26 +15,20 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 /* ── Load the official Supabase SDK from CDN synchronously ──
    We use a module-style import shim so it works in plain <script> tags. */
-if (typeof window._supabaseClient === 'undefined') {
-  // Will be set after SDK loads (see bottom of file)
-  window._supabaseClient = null;
-}
-
 /* ════════════════════════════════════════════════════════════════
-   BOOTSTRAP — creates the real client once the SDK is available
+   BOOTSTRAP — create the client immediately when this script runs.
+   Both CDN script tags are in <head> so window.supabase is available.
 ════════════════════════════════════════════════════════════════ */
-function _getClient() {
-  if (window._supabaseClient) return window._supabaseClient;
-  if (window.supabase?.createClient) {
-    window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storageKey: 'sb-session'   // single predictable key
-      }
-    });
+window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession:     true,
+    autoRefreshToken:   true,
+    detectSessionInUrl: true,
+    storageKey: `sb-${SUPABASE_URL.split('//')[1]}-auth-token`  // matches SDK default
   }
+});
+
+function _getClient() {
   return window._supabaseClient;
 }
 
@@ -95,23 +89,20 @@ const sb = {
 
     /* Returns session object synchronously from cache */
     getSession() {
-      // The SDK caches the session in memory after first load.
-      // For synchronous compat we return what's in localStorage directly.
       try {
-        const raw = localStorage.getItem('sb-session');
+        // SDK v2 default key: sb-{hostname}-auth-token
+        const key = `sb-${SUPABASE_URL.split('//')[1]}-auth-token`;
+        const raw = localStorage.getItem(key);
         if (raw) {
           const parsed = JSON.parse(raw);
-          // SDK v2 stores { currentSession, expiresAt } or { access_token, ... }
-          const session = parsed?.currentSession || parsed;
-          if (session?.access_token) return session;
+          if (parsed?.access_token) return parsed;
         }
-        // Fallback scan for any Supabase key
+        // Fallback: scan all localStorage keys
         for (const k of Object.keys(localStorage)) {
           if (!k.startsWith('sb-') || !k.includes('auth')) continue;
           try {
             const p = JSON.parse(localStorage.getItem(k));
-            const s = p?.currentSession || p;
-            if (s?.access_token) return s;
+            if (p?.access_token) return p;
           } catch {}
         }
       } catch {}

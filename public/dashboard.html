@@ -1340,10 +1340,15 @@ document.addEventListener('keydown', e => {
 async function bootDashboard() {
   dbg('boot start');
 
-  // Get session from the official SDK (handles all key formats + refresh)
-  const { data: sessionData } = await window._supabaseClient?.auth.getSession()
-    ?? { data: {} };
-  const session = sessionData?.session;
+  // getSession() is async and reads from localStorage + refreshes if needed.
+  // Retry once in case the client initialised slightly after DOMContentLoaded.
+  let session = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { data } = await _getClient().auth.getSession();
+    session = data?.session;
+    if (session?.access_token) break;
+    await new Promise(r => setTimeout(r, 150)); // short wait, then retry
+  }
 
   if (!session?.access_token) {
     dbg('no session — redirecting to login');
