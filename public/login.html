@@ -690,10 +690,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // If already signed in, redirect straight to dashboard
-  const user = sb.auth.getUser();
-  if (user) {
-    redirectAfterLogin();
-  }
+  // Disabled temporarily — dashboard blank page issue being debugged
+  // const user = sb.auth.getUser();
+  // if (user) { redirectAfterLogin(); }
 });
 
 /* ════════════════════════════════════════════════════════

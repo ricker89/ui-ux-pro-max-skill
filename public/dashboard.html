@@ -1347,14 +1347,25 @@ async function bootDashboard() {
     return;
   }
 
+  // Always make page visible — never leave a blank screen
+  document.body.classList.add('auth-ready');
+
   // Fetch business row
   try {
     const res = await fetch(`${SUPA_URL}/rest/v1/businesses?select=*&user_id=eq.${_userId}&limit=1`, {
       headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_token}`, Accept: 'application/json' }
     });
-    if (!res.ok) { dbg('biz fetch error: ' + res.status); return; }
+    if (!res.ok) {
+      dbg('biz fetch error: ' + res.status);
+      showBootError('Could not load your business data (error ' + res.status + '). Please refresh or log out and back in.');
+      return;
+    }
     const rows = await res.json();
-    if (!rows?.length) { dbg('no biz row'); return; }
+    if (!rows?.length) {
+      dbg('no biz row');
+      showBootError('No business profile found for your account. Please complete signup or contact support.');
+      return;
+    }
 
     _biz = rows[0];
     window._biz = _biz; // expose globally so topbar.js poll can find it
@@ -1365,14 +1376,24 @@ async function bootDashboard() {
       try { _flags = { ..._flags, ...JSON.parse(_biz.feature_flags) }; } catch(e) {}
     }
 
-    // Reveal page
-    document.body.classList.add('auth-ready');
-
     renderDashboard();
 
   } catch(e) {
     dbg('boot exception: ' + e);
+    showBootError('Unexpected error loading dashboard: ' + e.message + '. Please refresh the page.');
   }
+}
+
+function showBootError(msg) {
+  document.body.classList.add('auth-ready'); // always show page
+  const el = document.getElementById('heroBizName');
+  if (el) el.closest('section,div')?.insertAdjacentHTML('afterbegin',
+    `<div style="background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:16px 20px;
+      border-radius:12px;margin:24px;font-size:.95rem;font-weight:500;">
+      ⚠️ ${msg}<br><br>
+      <a href="login.html" style="color:#991b1b;text-decoration:underline;">Sign out and log in again</a>
+    </div>`
+  );
 }
 
 /* ── Render everything ──────────────────────────────────── */
