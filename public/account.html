@@ -227,7 +227,7 @@
         <div class="billing-plan">
           <div class="billing-plan-icon">⭐</div>
           <div>
-            <div class="billing-plan-name">HappyClientele — $97 / location / month</div>
+            <div class="billing-plan-name">HappyClientele — Per Location Subscription</div>
             <div class="billing-plan-price">
               <span id="billingLocCount">—</span> active location(s) &nbsp;·&nbsp;
               <span id="billingNext">—</span>
@@ -261,9 +261,9 @@
       <!-- ── Add-Location inline panel ── -->
       <div class="add-loc-panel" id="addLocPanel">
 
-        <!-- Step 1: Search Google Business -->
+        <!-- Step 1: Search & Add Google Business (single step) -->
         <div class="add-loc-step active" id="addLocStep1">
-          <div class="add-loc-panel-title">📍 Step 1: Find your Google Business</div>
+          <div class="add-loc-panel-title">📍 Find your Google Business</div>
           <p style="font-size:.84rem;color:var(--sub);margin-bottom:14px;">
             Search for your business name. This links your Google reviews and pre-fills your details.
           </p>
@@ -296,29 +296,8 @@
 
           <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
             <button class="btn-outline" onclick="closeAddLocPanel()">Cancel</button>
-            <button class="btn-save" id="newLocStep1Btn" onclick="addLocStep1Next()" disabled style="opacity:.4;cursor:not-allowed;">
-              Next: Subscribe →
-            </button>
-          </div>
-        </div>
-
-        <!-- Step 2: Subscribe -->
-        <div class="add-loc-step" id="addLocStep2">
-          <div class="add-loc-panel-title">💳 Step 2: Subscribe for this Location</div>
-          <p style="font-size:.84rem;color:var(--sub);margin-bottom:14px;">
-            Each location requires a separate $97/month subscription. You'll be redirected to Stripe to complete payment.
-          </p>
-
-          <div style="background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
-            <div id="addLocStep2Summary" style="font-size:.88rem;"></div>
-          </div>
-
-          <div id="newLocStep2Status" style="font-size:.82rem;min-height:18px;margin-bottom:10px;"></div>
-
-          <div style="display:flex;gap:10px;justify-content:flex-end;">
-            <button class="btn-outline" onclick="addLocStep2Back()">← Back</button>
-            <button class="btn-save" id="newLocStep2Btn" onclick="addLocStep2Subscribe()">
-              Subscribe for $97/mo →
+            <button class="btn-save" id="newLocStep1Btn" onclick="addLocSaveAndCheckout()" disabled style="opacity:.4;cursor:not-allowed;">
+              Add This Location
             </button>
           </div>
         </div>
@@ -619,7 +598,7 @@ function buildLocCard(loc) {
       </div>
     </div>
     <div class="loc-card-actions">
-      ${isPaymentPending ? `<button class="btn-loc-activate" onclick="resumePayment('${escH(loc.id)}')">Pay Now</button>` : ''}
+      ${isPaymentPending ? `<button class="btn-loc-activate" onclick="resumePayment('${escH(loc.id)}')">Activate</button>` : ''}
       <button class="btn-loc-delete" onclick="openDeleteLocModal('${escH(loc.id)}', '${escH(loc.biz_name||'')}')">Delete</button>
     </div>
   `;
@@ -643,7 +622,6 @@ function openAddLocPanel() {
   document.getElementById('addLocBtn').disabled = true;
   // Reset to step 1
   document.getElementById('addLocStep1').classList.add('active');
-  document.getElementById('addLocStep2').classList.remove('active');
   _newLocSelected = null;
   _newLocData = null;
   setVal('newLocSearchInput', '');
@@ -664,27 +642,12 @@ function closeAddLocPanel() {
   document.getElementById('addLocBtn').disabled = false;
 }
 
-function addLocStep1Next() {
+async function addLocSaveAndCheckout() {
   if (!_newLocSelected) return;
-  document.getElementById('addLocStep1').classList.remove('active');
-  document.getElementById('addLocStep2').classList.add('active');
-  document.getElementById('addLocStep2Summary').innerHTML =
-    `<strong>${escH(_newLocSelected.name)}</strong><br>
-     <span style="color:var(--sub);font-size:.82rem;">${escH(_newLocSelected.addr || '')}</span><br><br>
-     <span style="color:var(--sub);">$97/month subscription required for this location.</span>`;
-}
-
-function addLocStep2Back() {
-  document.getElementById('addLocStep2').classList.remove('active');
-  document.getElementById('addLocStep1').classList.add('active');
-}
-
-async function addLocStep2Subscribe() {
-  if (!_newLocSelected) return;
-  const btn    = document.getElementById('newLocStep2Btn');
-  const status = document.getElementById('newLocStep2Status');
+  const btn    = document.getElementById('newLocStep1Btn');
+  const status = document.getElementById('newLocStep1Status');
   btn.disabled = true;
-  btn.textContent = 'Creating location…';
+  btn.textContent = 'Adding location…';
   status.textContent = '';
 
   try {
@@ -709,11 +672,11 @@ async function addLocStep2Subscribe() {
       }
     } catch(ge) { console.warn('[addLoc] Google fetch failed:', ge); }
 
-    // 2. Generate unique slug
+    // 2. Generate unique slug (only among active/non-deleted locations)
     const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     const slug = await makeUniqueSlug(baseSlug);
 
-    // 3. Insert location row into Supabase
+    // 3. Insert location row into Supabase with pending_payment status
     btn.textContent = 'Saving location…';
     const { data: newLoc, error: insErr } = await _getClient()
       .from('locations')
@@ -735,7 +698,12 @@ async function addLocStep2Subscribe() {
 
     if (insErr) throw new Error(insErr.message);
 
-    // 4. Redirect to Stripe Checkout
+    // 4. Close panel & reload locations so the new card (with Activate button) is visible
+    closeAddLocPanel();
+    _locations = await loadLocations();
+    renderLocations(_locations);
+
+    // 5. Redirect to Stripe Checkout
     btn.textContent = 'Redirecting to Stripe…';
     const checkoutRes = await fetch(STRIPE_CHECKOUT_ENDPOINT, {
       method: 'POST',
@@ -752,12 +720,9 @@ async function addLocStep2Subscribe() {
     });
 
     if (!checkoutRes.ok) {
-      // If checkout API not configured yet, still save the location and show success
+      // Checkout API not ready — location is saved; user can click Activate later
       console.warn('[addLoc] Checkout endpoint not ready, location saved without payment');
-      showGlobalAlert('success', `Location "${name}" added! Complete billing setup to activate.`);
-      closeAddLocPanel();
-      _locations = await loadLocations();
-      renderLocations(_locations);
+      showGlobalAlert('success', `Location "${name}" added! Click Activate on its card to complete payment.`);
       return;
     }
 
@@ -770,22 +735,22 @@ async function addLocStep2Subscribe() {
     status.textContent = '✗ ' + (e.message || 'Failed — please try again.');
     status.style.color = 'var(--red)';
     btn.disabled = false;
-    btn.textContent = 'Subscribe for $97/mo →';
+    btn.textContent = 'Add This Location';
   }
 }
 
 async function makeUniqueSlug(base) {
-  // Check if slug exists, add suffix if needed
+  // Only check active (non-deleted) locations for slug conflicts
   const { data } = await _getClient()
-    .from('locations').select('slug').eq('slug', base).maybeSingle();
-  if (!data) return base; // unique, done
+    .from('locations').select('slug').eq('slug', base).is('deleted_at', null).maybeSingle();
+  if (!data) return base; // unique among active locations
 
-  // Try a, b, c, … suffixes
+  // Try a-, b-, c-, … suffixes
   const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
   for (const l of letters) {
-    const candidate = `${l}/${base}`;
+    const candidate = `${l}-${base}`;
     const { data: d2 } = await _getClient()
-      .from('locations').select('slug').eq('slug', candidate).maybeSingle();
+      .from('locations').select('slug').eq('slug', candidate).is('deleted_at', null).maybeSingle();
     if (!d2) return candidate;
   }
   // Final fallback: timestamp suffix
