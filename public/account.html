@@ -294,8 +294,9 @@
           <div id="newLocStep1Status" style="font-size:.82rem;min-height:18px;margin-top:8px;"></div>
 
           <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
-            <button class="btn-outline" onclick="closeAddLocPanel()">Cancel</button>
-            <button class="btn-save" id="newLocStep1Btn" onclick="addLocSaveAndCheckout()" disabled style="opacity:.4;cursor:not-allowed;">
+            <button class="btn-outline" id="newLocCancelBtn" onclick="closeAddLocPanel()">Cancel</button>
+            <!-- Submit button hidden — flow auto-triggers on business selection -->
+            <button class="btn-save" id="newLocStep1Btn" onclick="addLocSaveAndCheckout()" disabled style="display:none;">
               Add This Location
             </button>
           </div>
@@ -643,11 +644,12 @@ function closeAddLocPanel() {
 
 async function addLocSaveAndCheckout() {
   if (!_newLocSelected) return;
-  const btn    = document.getElementById('newLocStep1Btn');
-  const status = document.getElementById('newLocStep1Status');
-  btn.disabled = true;
-  btn.textContent = 'Adding location…';
+  const btn       = document.getElementById('newLocStep1Btn');   // hidden, kept for safety
+  const cancelBtn = document.getElementById('newLocCancelBtn');
+  const status    = document.getElementById('newLocStep1Status');
+  if (cancelBtn) { cancelBtn.disabled = true; cancelBtn.style.opacity = '.4'; }
   status.textContent = '';
+  status.style.color = '';
 
   try {
     const { placeId, name, addr } = _newLocSelected;
@@ -676,7 +678,8 @@ async function addLocSaveAndCheckout() {
     const slug = await makeUniqueSlug(baseSlug);
 
     // 3. Insert location row into Supabase with pending_payment status
-    btn.textContent = 'Saving location…';
+    status.textContent = 'Saving location…';
+    status.style.color = 'var(--sub)';
     const { data: newLoc, error: insErr } = await _getClient()
       .from('locations')
       .insert({
@@ -698,12 +701,12 @@ async function addLocSaveAndCheckout() {
     if (insErr) throw new Error(insErr.message);
 
     // 4. Close panel & reload locations so the new card (with Activate button) is visible
+    status.textContent = 'Opening Stripe…';
     closeAddLocPanel();
     _locations = await loadLocations();
     renderLocations(_locations);
 
-    // 5. Redirect to Stripe Checkout
-    btn.textContent = 'Redirecting to Stripe…';
+    // 5. Open Stripe Checkout in new tab
     const checkoutRes = await fetch(STRIPE_CHECKOUT_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -722,6 +725,7 @@ async function addLocSaveAndCheckout() {
       // Checkout API not ready — location is saved; user can click Activate later
       console.warn('[addLoc] Checkout endpoint not ready, location saved without payment');
       showGlobalAlert('success', `Location "${name}" added! Click Activate on its card to complete payment.`);
+      if (cancelBtn) { cancelBtn.disabled = false; cancelBtn.style.opacity = '1'; }
       return;
     }
 
@@ -733,8 +737,8 @@ async function addLocSaveAndCheckout() {
   } catch(e) {
     status.textContent = '✗ ' + (e.message || 'Failed — please try again.');
     status.style.color = 'var(--red)';
-    btn.disabled = false;
-    btn.textContent = 'Add This Location';
+    if (cancelBtn) { cancelBtn.disabled = false; cancelBtn.style.opacity = '1'; }
+    _newLocSelected = null;
   }
 }
 
@@ -923,15 +927,29 @@ function renderNewLocResults(suggestions) {
 }
 
 function selectNewLoc(placeId, name, addr) {
+  // Duplicate-place guard: check if this Google Place ID is already active
+  const alreadyExists = _locations.some(l => l.google_place_id === placeId && !l.deleted_at);
+  if (alreadyExists) {
+    const status = document.getElementById('newLocStep1Status');
+    status.textContent = '⚠️ This location has already been added to your account.';
+    status.style.color = 'var(--red)';
+    return;
+  }
+
   _newLocSelected = { placeId, name, addr };
   document.getElementById('newLocSearchInput').value = name;
   document.getElementById('newLocInpClear').classList.add('visible');
   closeNewLocDrop();
-  // Show confirmed preview
+
+  // Show confirmed preview briefly, then auto-trigger save
   document.getElementById('newLocSelectedName').textContent = name;
   document.getElementById('newLocSelectedAddr').textContent = addr;
   document.getElementById('newLocSelected').style.display = 'block';
+  document.getElementById('newLocStep1Status').textContent = '';
   updateNewLocNextBtn();
+
+  // Auto-proceed — no extra button click needed
+  addLocSaveAndCheckout();
 }
 
 function closeNewLocDrop() {
