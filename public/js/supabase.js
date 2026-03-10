@@ -24,7 +24,17 @@ const sb = (() => {
   });
 
   function _sessionKey() {
-    return `sb-${SUPABASE_URL.split('//')[1].split('.')[0]}-auth-token`;
+    // Supabase SDK stores session with full hostname in key
+    // e.g. sb-dbbryatmoxlzifsurxrm.supabase.co-auth-token
+    const host = SUPABASE_URL.split('//')[1]; // dbbryatmoxlzifsurxrm.supabase.co
+    const ref  = host.split('.')[0];          // dbbryatmoxlzifsurxrm
+    // Return both formats; _getToken tries exact first then fallback scan
+    return `sb-${host}-auth-token`;
+  }
+
+  function _sessionKeyShort() {
+    const ref = SUPABASE_URL.split('//')[1].split('.')[0];
+    return `sb-${ref}-auth-token`;
   }
 
   // Decode user ID from JWT sub claim — reliable fallback when session.user is missing
@@ -36,13 +46,15 @@ const sb = (() => {
 
   function _getToken() {
     try {
-      // Try exact key first (matches _saveSession)
-      const exact = localStorage.getItem(_sessionKey());
-      if (exact) {
-        const s = JSON.parse(exact);
-        if (s?.access_token) return s.access_token;
+      // Try both key formats (long hostname + short ref)
+      for (const k of [_sessionKey(), _sessionKeyShort()]) {
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          const s = JSON.parse(raw);
+          if (s?.access_token) return s.access_token;
+        }
       }
-      // Fallback: search for any supabase-like auth key
+      // Fallback: scan all localStorage keys for any supabase auth token
       const key = Object.keys(localStorage).find(k =>
         (k.includes('supabase') || k.startsWith('sb-')) && k.includes('auth')
       );
@@ -304,22 +316,30 @@ async function requireAuth(redirectTo = 'login.html') {
   return user;
 }
 
-/* Load the current user's business profile from Supabase */
+/* Load the current user's business profile from Supabase.
+   Does NOT filter by user_id in the URL — RLS policy "businesses: own rows"
+   already restricts reads to auth.uid() rows. Passing user_id=eq.X in the
+   URL while the token might be stale/anon causes silent empty results. */
 async function loadBusiness(userId) {
   try {
-    // Use array mode to avoid 406 when row is missing
-    const url = `${SUPABASE_URL}/rest/v1/businesses?select=*&user_id=eq.${userId}&limit=1`;
+    const token = _getToken();
+    const url   = `${SUPABASE_URL}/rest/v1/businesses?select=*&limit=1`;
     const r = await fetch(url, {
       headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${_getToken() || SUPABASE_ANON_KEY}`,
-        'Accept': 'application/json'
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${token || SUPABASE_ANON_KEY}`,
+        'Accept':        'application/json'
       }
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      console.warn('[loadBusiness] fetch failed:', r.status, await r.text().catch(()=>''));
+      return null;
+    }
     const rows = await r.json();
+    console.log('[loadBusiness] rows returned:', rows.length, rows[0]?.biz_name || '—');
     return (rows && rows.length > 0) ? rows[0] : null;
-  } catch {
+  } catch(e) {
+    console.warn('[loadBusiness] exception:', e);
     return null;
   }
 }
@@ -329,16 +349,17 @@ async function saveBusiness(userId, data) {
   return sb.db.upsert('businesses', { user_id: userId, ...data }, 'user_id');
 }
 
-/* Load current user's account row */
+/* Load current user's account row.
+   Same pattern: no user_id URL filter, rely on RLS. */
 async function loadAccount(userId) {
   try {
-    // Use array mode (no single header) to avoid 406 when row is missing
-    const url = `${SUPABASE_URL}/rest/v1/accounts?select=*&user_id=eq.${userId}&limit=1`;
+    const token = _getToken();
+    const url   = `${SUPABASE_URL}/rest/v1/accounts?select=*&limit=1`;
     const r = await fetch(url, {
       headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${_getToken() || SUPABASE_ANON_KEY}`,
-        'Accept': 'application/json'
+        'apikey':        SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${token || SUPABASE_ANON_KEY}`,
+        'Accept':        'application/json'
       }
     });
     if (!r.ok) return null;

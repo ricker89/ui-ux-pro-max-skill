@@ -1368,10 +1368,10 @@ async function bootDashboard() {
   // Always make page visible — never leave a blank screen
   document.body.classList.add('auth-ready');
 
-  // Fetch business row
+  // Fetch business row — no user_id filter in URL, RLS handles it
   try {
-    dbg('fetching biz for userId: ' + _userId);
-    const res = await fetch(`${SUPA_URL}/rest/v1/businesses?select=*&user_id=eq.${_userId}&limit=1`, {
+    dbg('fetching biz, userId=' + _userId);
+    const res = await fetch(`${SUPA_URL}/rest/v1/businesses?select=*&limit=1`, {
       headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_token}`, Accept: 'application/json' }
     });
     if (!res.ok) {
