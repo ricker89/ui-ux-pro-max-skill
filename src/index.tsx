@@ -161,10 +161,46 @@ app.post('/api/delete-account', async (c) => {
 app.get('/api/health', (c) => c.json({ status: 'ok', version: '5.8' }))
 
 // ══════════════════════════════════════════════════════════════════
-//  STATIC FILE SERVING
-//  Delegate all non-API requests to Cloudflare Pages ASSETS binding
+//  CLEAN URL ROUTING
+//  /login → login.html, /dashboard → dashboard.html etc.
+//  Handled as 200 rewrites (URL stays clean, no redirect loop)
 // ══════════════════════════════════════════════════════════════════
+const cleanUrls: Record<string, string> = {
+  '/login':          '/login.html',
+  '/signup':         '/signup.html',
+  '/dashboard':      '/dashboard.html',
+  '/account':        '/account.html',
+  '/welcome':        '/welcome.html',
+  '/funnel':         '/funnel.html',
+  '/menu':           '/menu.html',
+  '/wifi':           '/wifi.html',
+  '/feedback':       '/feedback.html',
+  '/thankyou':       '/thankyou.html',
+  '/debug':          '/debug.html',
+  '/funnel-preview': '/funnel-preview.html',
+}
+
 app.use('/*', async (c) => {
+  const url = new URL(c.req.url)
+  const path = url.pathname.replace(/\/$/, '') // strip trailing slash
+
+  // /r/:slug  →  funnel.html?biz=slug  (QR short links)
+  const rMatch = path.match(/^\/r\/(.+)$/)
+  if (rMatch) {
+    const rewriteUrl = new URL(c.req.url)
+    rewriteUrl.pathname = '/funnel.html'
+    rewriteUrl.searchParams.set('biz', rMatch[1])
+    return c.env.ASSETS.fetch(new Request(rewriteUrl.toString(), c.req.raw))
+  }
+
+  // Clean URL rewrite (200, not redirect)
+  if (cleanUrls[path]) {
+    const rewriteUrl = new URL(c.req.url)
+    rewriteUrl.pathname = cleanUrls[path]
+    return c.env.ASSETS.fetch(new Request(rewriteUrl.toString(), c.req.raw))
+  }
+
+  // Everything else — serve as-is from ASSETS
   return c.env.ASSETS.fetch(c.req.raw)
 })
 

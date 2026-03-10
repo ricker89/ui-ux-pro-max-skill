@@ -6,40 +6,6 @@
   <title>HappyClientele – Turn Every Customer Into a 5-Star Review</title>
   <meta name="description" content="HappyClientele installs a smart review funnel into your business in minutes. Watch your Google reviews multiply, your rankings soar, and new customers pour in." />
 
-  <!-- ════════════════════════════════════════════════════
-       PATH ROUTER — runs before anything else.
-       Genspark (and many static hosts) serve index.html
-       for any unknown path.  This script intercepts clean
-       URL paths and hard-redirects to the correct .html file
-       so /login  → login.html, /dashboard → welcome.html etc.
-  ════════════════════════════════════════════════════ -->
-  <script>
-  (function(){
-    var p = window.location.pathname.replace(/\/+$/, ''); // strip trailing slash
-    var routes = {
-      '/login':     'login.html',
-      '/signup':    'signup.html',
-      '/welcome':   'welcome.html',
-      '/dashboard': 'welcome.html',
-      '/account':   'account.html',
-      '/funnel':    'funnel.html',
-      '/feedback':  'feedback.html',
-      '/thankyou':  'thankyou.html',
-      '/debug':     'debug.html'
-    };
-    // /r/:slug  →  funnel.html?biz=slug
-    var rMatch = p.match(/^\/r\/(.+)$/);
-    if (rMatch) {
-      window.location.replace('funnel.html?biz=' + encodeURIComponent(rMatch[1]) + window.location.search.replace('?','&'));
-      return;
-    }
-    if (routes[p]) {
-      // Preserve any query string (e.g. ?next=welcome.html)
-      window.location.replace(routes[p] + window.location.search);
-    }
-    // Otherwise fall through and render index.html normally
-  })();
-  </script>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="images/favicon.png" />
