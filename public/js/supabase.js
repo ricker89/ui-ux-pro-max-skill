@@ -27,6 +27,13 @@ const sb = (() => {
     return `sb-${SUPABASE_URL.split('//')[1].split('.')[0]}-auth-token`;
   }
 
+  // Decode user ID from JWT sub claim — reliable fallback when session.user is missing
+  function _jwtDecode(token) {
+    try {
+      return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    } catch { return {}; }
+  }
+
   function _getToken() {
     try {
       // Try exact key first (matches _saveSession)
@@ -126,7 +133,12 @@ const sb = (() => {
     /* Get current user object */
     getUser() {
       const s = this.getSession();
-      return s?.user || null;
+      if (s?.user) return s.user;
+      // Fall back: decode user ID from JWT sub claim and return minimal user object
+      const token = _getToken();
+      if (!token) return null;
+      const payload = _jwtDecode(token);
+      return payload.sub ? { id: payload.sub, email: payload.email || '' } : null;
     },
 
     /* Sign out — clear local session */

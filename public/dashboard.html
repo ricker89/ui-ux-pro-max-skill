@@ -1325,20 +1325,32 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── Auth & boot ────────────────────────────────────────── */
+
+// Decode user ID from JWT payload (the 'sub' claim) — works even if
+// the session object doesn't have a user.id field attached.
+function _jwtUserId(token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return payload.sub || null;
+  } catch { return null; }
+}
+
 async function bootDashboard() {
   dbg('boot start');
 
-  // Find session token
+  // Find session token in localStorage
   for (const key of Object.keys(localStorage)) {
     if (!key.includes('auth')) continue;
     try {
       const val = JSON.parse(localStorage.getItem(key));
       if (val?.access_token) {
-        _token   = val.access_token;
-        _userId  = val.user?.id || null;
+        _token  = val.access_token;
+        // Prefer stored user.id; fall back to JWT sub claim
+        _userId = val.user?.id || _jwtUserId(val.access_token);
+        dbg('session key: ' + key + ' | userId: ' + _userId);
         break;
       }
-    } catch(e) {}
+    } catch(e) { dbg('parse err: ' + e); }
   }
 
   if (!_token) {
@@ -1347,11 +1359,18 @@ async function bootDashboard() {
     return;
   }
 
+  if (!_userId) {
+    dbg('token found but no userId — bad session, redirecting');
+    showBootError('Session is corrupted. Please <a href="login.html" style="color:#991b1b;text-decoration:underline;">sign in again</a>.');
+    return;
+  }
+
   // Always make page visible — never leave a blank screen
   document.body.classList.add('auth-ready');
 
   // Fetch business row
   try {
+    dbg('fetching biz for userId: ' + _userId);
     const res = await fetch(`${SUPA_URL}/rest/v1/businesses?select=*&user_id=eq.${_userId}&limit=1`, {
       headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_token}`, Accept: 'application/json' }
     });
