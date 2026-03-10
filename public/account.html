@@ -811,8 +811,9 @@ async function confirmDeleteLocation() {
       .eq('id', _deleteLocId);
     if (error) throw new Error(error.message);
 
+    const deletedId = _deleteLocId;  // capture before closeDeleteLocModal nulls it
     closeDeleteLocModal();
-    _locations = _locations.filter(l => l.id !== _deleteLocId);
+    _locations = _locations.filter(l => l.id !== deletedId);
     renderLocations(_locations);
     showGlobalAlert('success', 'Location deleted. Remember to cancel the Stripe subscription to stop billing.');
   } catch(e) {
