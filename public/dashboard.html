@@ -656,19 +656,7 @@
     }
     .print-pdf-btn:hover { opacity: .85; }
 
-    /* ─── Location selector dropdown ────────────────── */
-    #locDropdownItems .loc-drop-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 14px; cursor: pointer; transition: background .12s;
-      gap: 8px; border-bottom: 1px solid #f3f4f6;
-    }
-    #locDropdownItems .loc-drop-item:hover { background: #f8f8f8; }
-    #locDropdownItems .loc-drop-item.selected { background: #f0fdf4; }
-    #locDropdownItems .loc-drop-name { font-size: .85rem; font-weight: 600; color: #1a1a1a; }
-    #locDropdownItems .loc-drop-addr { font-size: .75rem; color: #6b7280; }
-    #locDropdownItems .loc-drop-badge {
-      font-size: .7rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0;
-    }
+    /* badge colours (used by loc items inside topbar dropdown) */
     .badge-active   { background: #d1fae5; color: #065f46; }
     .badge-pending  { background: #fef3c7; color: #92400e; }
     .badge-inactive { background: #f3f4f6; color: #6b7280; }
@@ -792,31 +780,6 @@
 <nav class="topbar">
   <a class="topbar-logo" href="dashboard.html">Happy<span>Clientele.</span></a>
   <div style="display:flex;align-items:center;gap:12px;">
-    <!-- Location Selector -->
-    <div id="locSelectorWrap" style="display:none;position:relative;">
-      <button id="locSelectorBtn" onclick="toggleLocDropdown()"
-        style="display:flex;align-items:center;gap:8px;background:#f3f4f6;border:1.5px solid #e8e8e8;
-               border-radius:9px;padding:6px 14px;font-family:inherit;font-size:.83rem;font-weight:600;
-               color:#1a1a1a;cursor:pointer;transition:all .15s;max-width:220px;">
-        <span>📍</span>
-        <span id="locSelectorLabel" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">Loading…</span>
-        <span style="margin-left:2px;color:#6b7280;">▾</span>
-      </button>
-      <div id="locDropdown"
-        style="display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:240px;
-               background:#fff;border:1.5px solid #e8e8e8;border-radius:12px;
-               box-shadow:0 8px 24px rgba(0,0,0,.1);z-index:300;overflow:hidden;">
-        <div id="locDropdownItems"></div>
-        <div style="border-top:1px solid #e8e8e8;">
-          <a href="account.html#add"
-            style="display:flex;align-items:center;gap:8px;padding:10px 14px;
-                   font-size:.82rem;font-weight:600;color:#1a1a1a;text-decoration:none;
-                   background:transparent;transition:background .12s;">
-            <span style="color:#34A853;">＋</span> Add Location
-          </a>
-        </div>
-      </div>
-    </div>
     <div id="topbarUserArea"></div>
   </div>
 </nav>
@@ -1491,44 +1454,53 @@ function activateLocation(loc) {
   renderDashboard();
 }
 
-/* ── Location Selector (top-right dropdown) ─────────────── */
+/* ── Location Selector — injected into topbar dropdown ──── */
 function renderLocSelector() {
-  const wrap  = document.getElementById('locSelectorWrap');
-  const lbl   = document.getElementById('locSelectorLabel');
-  const items = document.getElementById('locDropdownItems');
-
-  if (_allLocations.length <= 1) {
-    // Hide selector if only one location — keep topbar clean
-    if (wrap) wrap.style.display = 'none';
+  // Wait for topbar to have rendered the slot
+  const slot = document.getElementById('tbLocationsSlot');
+  if (!slot) {
+    // Topbar not ready yet — retry once
+    setTimeout(renderLocSelector, 100);
     return;
   }
-  if (wrap) wrap.style.display = 'block';
 
-  lbl.textContent = _biz?.biz_name || 'Select Location';
-  items.innerHTML = '';
+  slot.innerHTML = '';
+
+  if (!_allLocations.length) return;
+
+  // Section divider + label
+  const divider = document.createElement('div');
+  divider.className = 'tb-menu-divider';
+  slot.appendChild(divider);
+
+  const label = document.createElement('div');
+  label.className = 'tb-loc-section-label';
+  label.textContent = 'Locations';
+  slot.appendChild(label);
 
   _allLocations.forEach(loc => {
     const status = loc.subscription_status || 'pending';
     const bCls = status === 'active' || status === 'trialing' ? 'badge-active'
                : status.startsWith('pending') ? 'badge-pending' : 'badge-inactive';
     const bLbl = { active:'Active', trialing:'Trial', canceled:'Cancelled',
-                   pending_payment:'Pay Now', pending:'Pending' }[status] || status;
+                   pending_payment:'Activate', pending:'Pending' }[status] || status;
     const isSel = loc.id === _activeLocId;
 
     const div = document.createElement('div');
-    div.className = 'loc-drop-item' + (isSel ? ' selected' : '');
+    div.className = 'tb-loc-item' + (isSel ? ' tb-loc-active' : '');
     div.innerHTML = `
-      <div style="flex:1;min-width:0;">
-        <div class="loc-drop-name">${escH(loc.biz_name || 'Unnamed')}</div>
-        ${loc.address ? `<div class="loc-drop-addr">${escH(loc.address)}</div>` : ''}
+      <div class="tb-loc-item-info">
+        <div class="tb-loc-item-name">${escH(loc.biz_name || 'Unnamed')}</div>
+        ${loc.address ? `<div class="tb-loc-item-addr">${escH(loc.address)}</div>` : ''}
       </div>
-      <span class="loc-drop-badge ${bCls}">${escH(bLbl)}</span>
+      <span class="tb-loc-badge ${bCls}">${escH(bLbl)}</span>
     `;
     if (!isSel) {
       div.addEventListener('click', () => {
         _activeLocId = loc.id;
         activateLocation(loc);
-        closeLocDropdown();
+        // close topbar dropdown
+        document.getElementById('tbDropdown')?.classList.remove('open');
         renderLocSelector();
         const url = new URL(location.href);
         url.searchParams.set('loc', loc.id);
@@ -1537,19 +1509,28 @@ function renderLocSelector() {
     } else {
       div.style.cursor = 'default';
     }
-    items.appendChild(div);
+    slot.appendChild(div);
   });
+
+  // Add Location link
+  const addLink = document.createElement('a');
+  addLink.href = 'account.html';
+  addLink.className = 'tb-loc-add';
+  addLink.innerHTML = '<span style="color:#16a34a;font-size:1rem;">＋</span> Add Location';
+  slot.appendChild(addLink);
+
+  const divider2 = document.createElement('div');
+  divider2.className = 'tb-menu-divider';
+  slot.appendChild(divider2);
+
+  // Also update the topbar button label to show active location
+  const lbl = document.getElementById('tbUsername');
+  if (lbl && _biz?.biz_name) lbl.textContent = _biz.biz_name;
 }
 
-function toggleLocDropdown() {
-  const dd = document.getElementById('locDropdown');
-  if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
-}
-
-function closeLocDropdown() {
-  const dd = document.getElementById('locDropdown');
-  if (dd) dd.style.display = 'none';
-}
+// No-ops kept for safety in case any inline handlers still reference them
+function toggleLocDropdown() {}
+function closeLocDropdown() { document.getElementById('tbDropdown')?.classList.remove('open'); }
 
 function escH(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -2403,11 +2384,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Close webhook modal on backdrop click
   document.getElementById('webhookModal')?.addEventListener('click', e => {
     if (e.target === document.getElementById('webhookModal')) closeWebhookModal();
-  });
-  // Close location dropdown on outside click
-  document.addEventListener('click', e => {
-    const wrap = document.getElementById('locSelectorWrap');
-    if (wrap && !wrap.contains(e.target)) closeLocDropdown();
   });
   bootDashboard();
 });

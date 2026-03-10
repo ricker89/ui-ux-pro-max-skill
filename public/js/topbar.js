@@ -112,6 +112,46 @@
 
     .tb-menu-divider { height: 1px; background: #e8e8e8; margin: 5px 0; }
 
+    /* Location items inside the dropdown (injected by dashboard) */
+    .tb-loc-section-label {
+      padding: 6px 12px 2px;
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #9ca3af;
+    }
+    .tb-loc-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .1s;
+    }
+    .tb-loc-item:hover { background: #f5f5f7; }
+    .tb-loc-item.tb-loc-active { background: #f0fdf4; }
+    .tb-loc-item-info { flex: 1; min-width: 0; }
+    .tb-loc-item-name { font-size: .84rem; font-weight: 600; color: #1a1a1a;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tb-loc-item-addr { font-size: .73rem; color: #6b7280;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tb-loc-badge {
+      font-size: .68rem; font-weight: 700; padding: 2px 7px;
+      border-radius: 20px; flex-shrink: 0;
+    }
+    .tb-loc-badge.badge-active   { background:#d1fae5; color:#065f46; }
+    .tb-loc-badge.badge-pending  { background:#fef3c7; color:#92400e; }
+    .tb-loc-badge.badge-inactive { background:#f3f4f6; color:#6b7280; }
+    .tb-loc-add {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 8px;
+      font-size: .84rem; font-weight: 600; color: #1a1a1a;
+      text-decoration: none; cursor: pointer; transition: background .1s;
+    }
+    .tb-loc-add:hover { background: #f5f5f7; }
+
     .tb-signin-link {
       font-size: .82rem;
       font-weight: 600;
@@ -173,6 +213,8 @@
         </button>
         <div class="tb-dropdown" id="tbDropdown" role="menu">
           <div class="tb-menu-email" id="tbMenuEmail">${escTb(email)}</div>
+          <!-- Location slots injected here by dashboard.js via window.tbInjectLocations() -->
+          <div id="tbLocationsSlot"></div>
           <a href="dashboard.html" class="tb-menu-item ${page === 'dashboard.html' ? 'tb-active' : ''}" role="menuitem">
             🏠 Dashboard
           </a>
