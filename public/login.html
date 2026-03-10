@@ -855,8 +855,15 @@ function togglePw() {
 function redirectAfterLogin() {
   // Honour ?next= param (e.g. redirected from a protected page)
   const params = new URLSearchParams(window.location.search);
-  const next   = params.get('next');
-  window.location.href = next || 'dashboard.html';
+  let next = params.get('next') || 'dashboard.html';
+  // Safety: strip leading slash and ensure .html extension
+  // Prevents bare-path redirect loops (e.g. ?next=/dashboard → /dashboard → loop)
+  next = next.replace(/^\/+/, '');                          // strip leading slashes
+  if (next && !next.includes('.html') && !next.startsWith('http')) {
+    next = next + '.html';                                  // ensure .html
+  }
+  if (!next || next === '.html') next = 'dashboard.html';  // fallback
+  window.location.href = next;
 }
 
 /* ════════════════════════════════════════════════════════

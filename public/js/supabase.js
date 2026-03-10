@@ -287,7 +287,11 @@ async function requireAuth(redirectTo = 'login.html') {
   }
   const user = sb.auth.getUser();
   if (!user) {
-    window.location.href = redirectTo + '?next=' + encodeURIComponent(location.pathname);
+    // Use the filename only (e.g. 'dashboard.html') not the full pathname
+    // to avoid bare-path redirect loops on hosts like Genspark
+    const currentPage = location.pathname.split('/').pop() || 'dashboard.html';
+    const safePage = currentPage.endsWith('.html') ? currentPage : currentPage + '.html';
+    window.location.href = redirectTo + '?next=' + encodeURIComponent(safePage);
     return null;
   }
   return user;
