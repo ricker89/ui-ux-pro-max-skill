@@ -1,11 +1,13 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
+// $97/mo Stripe Price ID (safe to hardcode — not a secret)
+const STRIPE_PRICE_ID = 'price_1T8ZWZBf4cpCOXU3NlmAq5am'
+
 type Bindings = {
   ASSETS: Fetcher
   STRIPE_SECRET_KEY: string
   STRIPE_WEBHOOK_SECRET: string
-  STRIPE_PRICE_ID: string          // $97/mo price ID, set via wrangler secret
   STRIPE_PORTAL_FALLBACK: string
   SUPABASE_URL: string
   SUPABASE_SERVICE_KEY: string
@@ -98,7 +100,7 @@ app.post('/api/create-checkout', async (c) => {
     },
     body: new URLSearchParams({
       customer:               customerId,
-      'line_items[0][price]': c.env.STRIPE_PRICE_ID || 'price_PLACEHOLDER',
+      'line_items[0][price]': STRIPE_PRICE_ID,
       'line_items[0][quantity]': '1',
       mode:                   'subscription',
       success_url:            success_url || `https://happyclientele.com/dashboard?loc=${location_id}&paid=1`,
