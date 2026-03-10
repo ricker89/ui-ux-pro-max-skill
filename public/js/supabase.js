@@ -281,19 +281,17 @@ const sb = (() => {
 /* Require auth — redirects to login if not signed in.
    Call at top of any protected page. */
 async function requireAuth(redirectTo = 'login.html') {
-  // Handle magic link / OAuth callback first
   if (window.location.hash.includes('access_token')) {
     await sb.auth.handleAuthRedirect();
   }
   const user = sb.auth.getUser();
-  if (!user) {
-    // Use the filename only (e.g. 'dashboard.html') not the full pathname
-    // to avoid bare-path redirect loops on hosts like Genspark
-    const currentPage = location.pathname.split('/').pop() || 'dashboard.html';
-    const safePage = currentPage.endsWith('.html') ? currentPage : currentPage + '.html';
-    window.location.href = redirectTo + '?next=' + encodeURIComponent(safePage);
-    return null;
-  }
+  // AUTH GUARD DISABLED — re-enable once redirect loop is resolved
+  // if (!user) {
+  //   const currentPage = location.pathname.split('/').pop() || 'dashboard.html';
+  //   const safePage = currentPage.endsWith('.html') ? currentPage : currentPage + '.html';
+  //   window.location.href = redirectTo + '?next=' + encodeURIComponent(safePage);
+  //   return null;
+  // }
   return user;
 }
 

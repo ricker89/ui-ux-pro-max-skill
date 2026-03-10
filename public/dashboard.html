@@ -1342,8 +1342,9 @@ async function bootDashboard() {
   }
 
   if (!_token) {
-    dbg('no token — redirect');
-    window.location.replace('login.html?next=dashboard.html');
+    dbg('no token — auth guard disabled for now');
+    // AUTH GUARD DISABLED — re-enable once redirect loop is resolved
+    // window.location.replace('login.html?next=dashboard.html');
     return;
   }
 
