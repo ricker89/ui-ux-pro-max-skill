@@ -1125,8 +1125,22 @@ let _user = null;
 let _biz  = null;
 let _account = null;
 
+// Decode user ID + email from JWT sub/email claims
+// Works even when the session object has no .user property attached
+function _jwtUser(token) {
+  try {
+    const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return p.sub ? { id: p.sub, email: p.email || '' } : null;
+  } catch { return null; }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+  // Try getUser() first (has user object in session), fall back to JWT decode
   _user = sb.auth.getUser();
+  if (!_user) {
+    const session = sb.auth.getSession();
+    if (session?.access_token) _user = _jwtUser(session.access_token);
+  }
   if (!_user) {
     window.location.replace('login.html');
     return;
@@ -1145,6 +1159,8 @@ async function loadPageData() {
     window._biz = _biz; // expose for topbar.js
     _account = account;
 
+    console.log('[account] loadPageData — biz:', biz?.biz_name || '(none)', '| userId:', _user.id);
+
     populateBusinessForm(biz);
     populateContactForm(_user, account);
     populateBillingInfo(account);
@@ -1153,11 +1169,8 @@ async function loadPageData() {
     initUserMenu(_user);
 
   } catch(e) {
-    console.warn('[account] loadPageData error:', e);
-    // Only show banner for genuine unexpected errors, not missing rows
-    if (e && e.message && !e.message.includes('null')) {
-      showGlobalAlert('error', 'Failed to load account data. Please refresh the page.');
-    }
+    console.error('[account] loadPageData error:', e);
+    showGlobalAlert('error', 'Failed to load account data: ' + (e.message || e) + '. Please refresh.');
   }
 }
 
