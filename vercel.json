@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/account",   "destination": "/account.html"   },
+    { "source": "/login",     "destination": "/login.html"     },
+    { "source": "/signup",    "destination": "/signup.html"    },
+    { "source": "/funnel",    "destination": "/funnel.html"    },
+    { "source": "/menu",      "destination": "/menu.html"      },
+    { "source": "/wifi",      "destination": "/wifi.html"      },
+    { "source": "/welcome",   "destination": "/welcome.html"   }
+  ]
+}

@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<!-- signup.html v4 — direct fetch upsert -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get Started — HappyClientele.</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="apple-touch-icon" href="images/favicon.png" />
+  <!-- Open Graph (signup page shared in iMessage by sales etc) -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://happyclientele.com/signup" />
+  <meta property="og:title"       content="Get Started — HappyClientele." />
+  <meta property="og:description" content="Set up your review funnel in under 3 minutes. No integrations, no tech skills — just print and place." />
+  <meta property="og:image"       content="https://happyclientele.com/images/og-preview.png" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <meta name="twitter:image"      content="https://happyclientele.com/images/og-preview.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #1a1a1a;
+      --white:   #ffffff;
+      --off:     #f8f8f8;
+      --border:  #e8e8e8;
+      --sub:     #6b7280;
+      --yellow:  #FDB813;
+      --green:   #34A853;
+      --red:     #EA4335;
+      --blue:    #4285F4;
+      --radius:  14px;
+      --shadow:  0 4px 40px rgba(0,0,0,.09);
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--off);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── Left panel ── */
+    .left-panel {
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(253,184,19,.12) 0%, transparent 70%);
+      top: -100px; right: -150px;
+      pointer-events: none;
+    }
+
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(253,184,19,.08) 0%, transparent 70%);
+      bottom: -80px; left: -60px;
+      pointer-events: none;
+    }
+
+    .lp-logo {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--white);
+      text-decoration: none;
+      margin-bottom: 56px;
+      display: inline-block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .lp-logo span { color: var(--yellow); }
+
+    .lp-headline {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .lp-headline em {
+      font-style: normal;
+      color: var(--yellow);
+    }
+
+    .lp-sub {
+      font-size: 1rem;
+      color: rgba(255,255,255,.6);
+      line-height: 1.7;
+      margin-bottom: 48px;
+      position: relative;
+      z-index: 1;
+      max-width: 380px;
+    }
+
+    .lp-perks {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .perk {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: .9rem;
+      color: rgba(255,255,255,.8);
+    }
+
+    .perk-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(253,184,19,.15);
+      border: 1px solid rgba(253,184,19,.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .85rem;
+      flex-shrink: 0;
+    }
+
+    .lp-price {
+      margin-top: 48px;
+      padding: 20px 24px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius);
+      position: relative;
+      z-index: 1;
+    }
+
+    .price-amount {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .price-amount span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.5);
+    }
+
+    .price-sub {
+      font-size: .8rem;
+      color: rgba(255,255,255,.45);
+      margin-top: 6px;
+    }
+
+    /* ── Right panel ── */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 48px;
+      overflow-y: auto;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .form-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+
+    .form-sub {
+      font-size: .88rem;
+      color: var(--sub);
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    /* ── Steps indicator ── */
+    .steps-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 36px;
+    }
+
+    .step-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--sub);
+    }
+
+    .step-pill.active { color: var(--black); }
+    .step-pill.done   { color: var(--green); }
+
+    .step-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--sub);
+      font-size: .72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-pill.active .step-num {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .step-pill.done .step-num {
+      background: var(--green);
+      color: var(--white);
+    }
+
+    .step-connector {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin: 0 10px;
+    }
+
+    /* ── Form fields ── */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 20px;
+    }
+
+    .field label {
+      font-size: .83rem;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .field .label-hint {
+      font-weight: 400;
+      color: var(--sub);
+      font-size: .78rem;
+      margin-left: 4px;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: .93rem;
+      color: var(--black);
+      background: var(--white);
+      transition: border-color .2s;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--black);
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder { color: #c4c4c4; }
+
+    .field input.error,
+    .field textarea.error { border-color: var(--red); }
+
+    .field .err-msg {
+      font-size: .75rem;
+      color: var(--red);
+      display: none;
+    }
+
+    .field.has-error .err-msg { display: block; }
+    .field.has-error input,
+    .field.has-error textarea { border-color: var(--red); }
+
+    .field textarea { resize: none; min-height: 72px; }
+
+    /* ── URL preview ── */
+    .url-preview {
+      background: var(--off);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 11px 14px;
+      font-size: .8rem;
+      color: var(--sub);
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
+      min-height: 38px;
+      transition: all .2s;
+    }
+
+    .url-preview .url-base { color: #bbb; }
+    .url-preview .url-slug { color: var(--black); font-weight: 600; }
+
+    /* ── Google Business Search widget ── */
+    .gbp-search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      background: var(--white);
+      transition: border-color .2s;
+      overflow: hidden;
+    }
+    .gbp-search-wrap:focus-within {
+      border-color: var(--black);
+    }
+    .gbp-icon {
+      padding: 0 10px 0 14px;
+      font-size: 1rem;
+      flex-shrink: 0;
+      color: var(--sub);
+    }
+    .gbp-search-wrap input {
+      flex: 1;
+      border: none !important;
+      outline: none !important;
+      padding: 12px 8px 12px 0;
+      font-size: .9rem;
+      font-family: 'Inter', sans-serif;
+      background: transparent;
+      min-width: 0;
+    }
+    .gbp-clear {
+      background: none;
+      border: none;
+      padding: 0 12px;
+      font-size: .85rem;
+      color: #bbb;
+      cursor: pointer;
+      display: none;
+      flex-shrink: 0;
+    }
+    .gbp-clear.visible { display: flex; }
+    .gbp-clear:hover { color: var(--black); }
+
+    /* Dropdown */
+    .gbp-dropdown {
+      position: absolute;
+      left: 0; right: 0;
+      top: calc(100% + 4px);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.10);
+      z-index: 999;
+      overflow: hidden;
+      display: none;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .gbp-dropdown.open { display: block; }
+
+    .gbp-result {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background .15s;
+      border-bottom: 1px solid var(--border);
+    }
+    .gbp-result:last-child { border-bottom: none; }
+    .gbp-result:hover { background: var(--off); }
+    .gbp-result-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .gbp-result-main { flex: 1; min-width: 0; }
+    .gbp-result-name {
+      font-weight: 600;
+      font-size: .88rem;
+      color: var(--black);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gbp-result-addr {
+      font-size: .75rem;
+      color: var(--sub);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gbp-result-type {
+      font-size: .68rem;
+      color: #aaa;
+      background: var(--off);
+      border-radius: 999px;
+      padding: 2px 8px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    /* Loading / no results states */
+    .gbp-state-row {
+      padding: 16px;
+      text-align: center;
+      font-size: .82rem;
+      color: var(--sub);
+    }
+    .gbp-spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    /* Selected state */
+    .gbp-selected {
+      background: #f0faf4;
+      border: 1.5px solid #34A853;
+      border-radius: 9px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .gbp-sel-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .gbp-sel-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .gbp-sel-name {
+      font-weight: 700;
+      font-size: .88rem;
+      color: var(--black);
+    }
+    .gbp-sel-addr {
+      font-size: .75rem;
+      color: var(--sub);
+      margin-top: 2px;
+    }
+    .gbp-sel-change {
+      background: none;
+      border: 1.5px solid #34A853;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: .75rem;
+      font-weight: 600;
+      color: #34A853;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-family: inherit;
+      transition: all .15s;
+    }
+    .gbp-sel-change:hover { background: #34A853; color: #fff; }
+
+    .gbp-hint {
+      font-size: .74rem;
+      color: var(--sub);
+      margin-top: 6px;
+    }
+
+    /* Make field-google position:relative for dropdown */
+    #field-google { position: relative; }
+
+    /* ── AI chip loading skeleton ── */
+    .chips-loading {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 8px;
+    }
+    .chip-skeleton {
+      height: 30px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .chips-ai-label {
+      font-size: .7rem;
+      color: #aaa;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .chips-ai-label svg { flex-shrink: 0; }
+    .ex-chip.ai-chip {
+      background: #fffbea;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+    .ex-chip.ai-chip:hover {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #78350f;
+    }
+
+    /* ── Review Stats Widget ── */
+    #review-stats-widget {
+      margin-bottom: 4px;
+    }
+    .rsw-card {
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+    .rsw-loading {
+      padding: 16px;
+      font-size: .82rem;
+      color: var(--sub);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rsw-content { display: block; }
+    .rsw-now {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--white);
+      padding: 18px 20px;
+    }
+    .rsw-col {
+      flex: 1;
+      text-align: center;
+    }
+    .rsw-val {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--black);
+      font-family: 'Poppins', sans-serif;
+      line-height: 1;
+    }
+    .rsw-label {
+      font-size: .7rem;
+      color: var(--sub);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-top: 4px;
+    }
+    .rsw-stars {
+      font-size: .85rem;
+      color: #FBBF24;
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+    .rsw-divider {
+      width: 1px;
+      height: 52px;
+      background: var(--border);
+      flex-shrink: 0;
+      margin: 0 8px;
+    }
+    .rsw-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 0;
+      background: #f9fafb;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .rsw-projected {
+      background: #f0faf4;
+      padding: 16px 20px;
+    }
+    .rsw-proj-label {
+      font-size: .75rem;
+      font-weight: 700;
+      color: #166534;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 12px;
+    }
+    .rsw-proj-row {
+      display: flex;
+      gap: 0;
+    }
+    .rsw-proj-col {
+      flex: 1;
+      text-align: center;
+    }
+    .rsw-proj-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #15803d;
+      font-family: 'Poppins', sans-serif;
+      line-height: 1;
+    }
+    .rsw-proj-sub {
+      font-size: .68rem;
+      color: #4ade80;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-top: 4px;
+    }
+    .rsw-proj-note {
+      font-size: .72rem;
+      color: #16a34a;
+      margin-top: 12px;
+      text-align: center;
+      border-top: 1px solid #bbf7d0;
+      padding-top: 10px;
+    }
+
+    /* ── Incentive examples ── */
+    .incentive-examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 8px;
+    }
+
+    .ex-chip {
+      background: var(--off);
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 13px;
+      font-size: .75rem;
+      color: var(--sub);
+      cursor: pointer;
+      transition: all .18s;
+      font-family: inherit;
+    }
+
+    .ex-chip:hover {
+      border-color: var(--black);
+      color: var(--black);
+      background: var(--white);
+    }
+
+    /* ── CTA button ── */
+    .cta-btn {
+      width: 100%;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 11px;
+      padding: 17px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all .2s;
+      margin-top: 8px;
+    }
+
+    .cta-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .cta-btn:active { transform: translateY(0); }
+    .cta-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    .cta-btn .arrow { font-size: 1.1rem; }
+
+    .cta-btn .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+
+    .cta-btn.loading .btn-label { display: none; }
+    .cta-btn.loading .spinner   { display: block; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .secure-note {
+      text-align: center;
+      font-size: .75rem;
+      color: #bbb;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    /* ── Price summary ── */
+    .price-summary {
+      background: var(--off);
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ps-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: .88rem;
+      color: var(--black);
+      font-weight: 600;
+    }
+    .ps-price {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--black);
+    }
+    .ps-price span { font-size: .75rem; font-weight: 500; color: var(--sub); font-family: 'Inter', sans-serif; }
+    .ps-sub { font-size: .75rem; font-weight: 400; color: var(--sub); }
+    .ps-badge {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: .7rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── T&C checkbox ── */
+    .tc-field { margin-top: 4px; }
+    .tc-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+      font-size: .82rem;
+      color: var(--sub);
+      line-height: 1.5;
+    }
+    .tc-label input[type="checkbox"] {
+      flex-shrink: 0;
+      width: 17px;
+      height: 17px;
+      margin-top: 2px;
+      accent-color: var(--black);
+      cursor: pointer;
+    }
+    .field.has-error .tc-label { color: var(--red); }
+
+    /* ── Divider ── */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 0 20px;
+      color: var(--border);
+      font-size: .75rem;
+      color: #ccc;
+    }
+
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 860px) {
+      .page { grid-template-columns: 1fr; }
+      .left-panel { padding: 40px 32px 48px; }
+      .lp-perks, .lp-price { display: none; }
+      .lp-headline { font-size: 1.6rem; margin-bottom: 12px; }
+      .lp-sub { font-size: .88rem; margin-bottom: 0; }
+      .right-panel { padding: 40px 24px 60px; }
+    }
+
+    @media (max-width: 480px) {
+      .left-panel { padding: 32px 24px 36px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── LEFT PANEL ── -->
+  <div class="left-panel">
+    <a href="index.html" class="lp-logo">HappyClientele<span>.</span></a>
+
+    <h1 class="lp-headline">
+      More Google reviews.<br/>
+      <em>Starting today.</em>
+    </h1>
+
+    <p class="lp-sub">
+      Set up your review funnel in two minutes. Customers scan a QR code, you get 5-star reviews. No tech skills needed.
+    </p>
+
+    <div class="lp-perks">
+      <div class="perk">
+        <div class="perk-dot">⚡</div>
+        <span>Live in under 5 minutes — we generate everything</span>
+      </div>
+      <div class="perk">
+        <div class="perk-dot">🛡️</div>
+        <span>Negative feedback goes private, 5-star reviews go to Google</span>
+      </div>
+      <div class="perk">
+        <div class="perk-dot">📱</div>
+        <span>QR code + custom link — just print and place it</span>
+      </div>
+      <div class="perk">
+        <div class="perk-dot">🔄</div>
+        <span>Cancel anytime. No contracts. No setup fees.</span>
+      </div>
+    </div>
+
+    <div class="lp-price">
+      <div class="price-amount">$97 <span>/ month</span></div>
+      <div class="price-sub">7-day money-back guarantee · Cancel anytime</div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="right-panel">
+    <div class="form-card">
+
+      <h2 class="form-title">Create your account</h2>
+      <p class="form-sub">Step 1 of 2 — Tell us about your business, then complete checkout.</p>
+
+      <!-- Step indicator -->
+      <div class="steps-row">
+        <div class="step-pill active">
+          <div class="step-num">1</div>
+          <span>Your Info</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-pill">
+          <div class="step-num">2</div>
+          <span>Checkout</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-pill">
+          <div class="step-num">3</div>
+          <span>Your Assets</span>
+        </div>
+      </div>
+
+      <form id="signupForm" novalidate>
+
+        <!-- Google Business Search -->
+        <div class="field" id="field-google">
+          <label for="google-search">Find Your Google Business</label>
+
+          <div class="gbp-search-wrap" id="gbpSearchWrap">
+            <span class="gbp-icon">🔍</span>
+            <input
+              type="text"
+              id="google-search"
+              name="google_search"
+              placeholder="Search your business name..."
+              autocomplete="off"
+            />
+            <button type="button" class="gbp-clear" id="gbpClear" title="Clear">✕</button>
+          </div>
+
+          <!-- Dropdown results -->
+          <div class="gbp-dropdown" id="gbpDropdown"></div>
+
+          <!-- Selected state -->
+          <div class="gbp-selected" id="gbpSelected" style="display:none">
+            <div class="gbp-sel-info">
+              <div class="gbp-sel-icon">📍</div>
+              <div>
+                <div class="gbp-sel-name" id="gbpSelName"></div>
+                <div class="gbp-sel-addr" id="gbpSelAddr"></div>
+              </div>
+            </div>
+            <button type="button" class="gbp-sel-change" id="gbpSelChange">Change</button>
+          </div>
+
+          <!-- Hidden field stores the resolved Google Review URL -->
+          <input type="hidden" id="google-url" name="google_url" />
+
+          <div class="gbp-hint" id="gbpHint">
+            🔍 Search your business name — we'll find your Google listing automatically
+          </div>
+          <span class="err-msg">Please select your business from the list</span>
+        </div>
+
+        <!-- Business Name (hidden – auto-filled from Google search) -->
+        <input type="hidden" id="biz-name" name="business_name" />
+        <input type="hidden" id="urlSlug" />
+
+        <!-- URL preview shown after business is selected -->
+        <div id="urlPreviewRow" style="display:none;margin-bottom:4px;">
+          <div style="font-size:.75rem;color:var(--sub);margin-bottom:5px;">Your review link will be:</div>
+          <div class="url-preview" id="urlPreview">
+            <span class="url-base">happyclientele.com/r/</span><span class="url-slug-display" id="urlSlugDisplay">your-business</span>
+          </div>
+        </div>
+
+        <!-- Review Stats Widget -->
+        <div id="review-stats-widget" style="display:none;">
+          <div class="rsw-card" id="rswCard">
+            <div class="rsw-loading" id="rswLoading">
+              <span class="gbp-spinner"></span> Fetching your current Google rating…
+            </div>
+            <div class="rsw-content" id="rswContent" style="display:none;">
+              <div class="rsw-now">
+                <div class="rsw-col">
+                  <div class="rsw-val" id="rswRating">—</div>
+                  <div class="rsw-label">Current Rating</div>
+                  <div class="rsw-stars" id="rswStars"></div>
+                </div>
+                <div class="rsw-divider"></div>
+                <div class="rsw-col">
+                  <div class="rsw-val" id="rswCount">—</div>
+                  <div class="rsw-label">Google Reviews</div>
+                </div>
+              </div>
+              <div class="rsw-arrow">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+              </div>
+              <div class="rsw-projected">
+                <div class="rsw-proj-label">📈 Estimated in 3–6 months with HappyClientele</div>
+                <div class="rsw-proj-row">
+                  <div class="rsw-proj-col">
+                    <div class="rsw-proj-val" id="rswProjRating">—</div>
+                    <div class="rsw-proj-sub">Projected Rating</div>
+                  </div>
+                  <div class="rsw-proj-col">
+                    <div class="rsw-proj-val" id="rswProjCount">—</div>
+                    <div class="rsw-proj-sub">Projected Reviews</div>
+                  </div>
+                </div>
+                <div class="rsw-proj-note" id="rswProjNote"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Email + Phone -->
+        <div class="field" id="field-email">
+          <label for="owner-email">Contact Email</label>
+          <input
+            type="email"
+            id="owner-email"
+            name="owner_email"
+            placeholder="you@yourbusiness.com"
+            autocomplete="email"
+          />
+          <span class="err-msg">Please enter a valid email address</span>
+        </div>
+
+        <div class="field" id="field-phone">
+          <label for="owner-phone">Contact Phone <span style="font-weight:400;color:var(--sub);">(optional)</span></label>
+          <input
+            type="tel"
+            id="owner-phone"
+            name="owner_phone"
+            placeholder="(555) 000-0000"
+            autocomplete="tel"
+          />
+        </div>
+
+        <div class="field" id="field-password">
+          <label for="owner-password">Create a Password <span style="font-weight:400;color:var(--sub);">(for your dashboard login)</span></label>
+          <input
+            type="password"
+            id="owner-password"
+            name="owner_password"
+            placeholder="At least 8 characters"
+            autocomplete="new-password"
+            minlength="8"
+          />
+          <span class="err-msg">Password must be at least 8 characters</span>
+        </div>
+
+        <!-- Price summary -->
+        <div class="price-summary">
+          <div class="ps-row">
+            <span>HappyClientele Monthly</span>
+            <span class="ps-price">$97<span>/mo</span></span>
+          </div>
+          <div class="ps-row ps-sub">
+            <span>Cancel anytime &nbsp;·&nbsp; 7-day money-back guarantee</span>
+            <span class="ps-badge">🛡️ 7-Day Guarantee</span>
+          </div>
+        </div>
+
+        <!-- Terms checkbox -->
+        <div class="field tc-field" id="field-tc">
+          <label class="tc-label">
+            <input type="checkbox" id="tc-checkbox" />
+            <span>I agree to the <a href="#" target="_blank" style="color:var(--black);font-weight:600;">Terms &amp; Conditions</a> and understand this is a recurring monthly subscription.</span>
+          </label>
+          <span class="err-msg">Please accept the terms to continue</span>
+        </div>
+
+        <button type="submit" class="cta-btn" id="submitBtn">
+          <span class="btn-label">Continue to Checkout — $97/mo <span class="arrow">→</span></span>
+          <span class="spinner"></span>
+        </button>
+
+        <div class="secure-note">
+          🔒 &nbsp;Secure checkout powered by Stripe &nbsp;·&nbsp; 🛡️ 7-day money-back guarantee
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/supabase.js?v=4"></script>
+<script>
+/* v4 — direct fetch with explicit token */
+/* ── Persistent debug logger (survives page redirect) ── */
+const dbgLog = (...args) => {  const msg = args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+  const ts   = new Date().toLocaleTimeString();
+  const line = `[${ts}] ${msg}`;
+  console.log(...args);
+  try {
+    const prev = JSON.parse(localStorage.getItem('hc_debug_log') || '[]');
+    prev.push(line);
+    if (prev.length > 60) prev.splice(0, prev.length - 60);
+    localStorage.setItem('hc_debug_log', JSON.stringify(prev));
+  } catch {}
+};
+// Override console.error too
+const dbgErr = (...args) => { dbgLog('❌ ERROR:', ...args); };
+
+/* ════════════════════════════════════════════════════════
+   CONFIG
+   Replace STRIPE_PAYMENT_LINK with your actual Stripe
+   Payment Link URL. e.g.:
+   https://buy.stripe.com/XXXXXXXXXXXXXXXX
+
+   Stripe will redirect back to welcome.html after payment.
+   Set your success URL in Stripe Dashboard to:
+   https://yourdomain.com/welcome.html?signup=1
+════════════════════════════════════════════════════════ */
+const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/bJedR81KC9wMeDs2aN3840s';
+const WEBHOOK_URL         = 'https://hook.us2.make.com/71c6bp3dkpejjip6aklpnwrtijst1iee';
+const PROD_DOMAIN_SIGNUP  = 'https://happyclientele.com/';
+dbgLog('🚀 signup.html v4 loaded — direct fetch upsert build');
+
+/* ════════════════════════════════════════════════════════
+   SLUG GENERATOR
+   Converts "Brew Haven Coffee" → "brew-haven-coffee"
+════════════════════════════════════════════════════════ */
+function toSlug(str) {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .substring(0, 40);
+}
+
+/* ════════════════════════════════════════════════════════
+   GOOGLE PLACES AUTOCOMPLETE
+   Uses the Places Autocomplete (New) API — no SDK needed.
+   Set GOOGLE_MAPS_API_KEY to your key.
+   Get a key: console.cloud.google.com → Enable Places API
+════════════════════════════════════════════════════════ */
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBIUNvxwoItiLeJo-BScNk8-W-yLMY4H5k';
+
+let searchDebounce = null;
+let selectedPlaceId = null;
+
+function initGBPSearch() {
+  const searchInput = document.getElementById('google-search');
+  const dropdown    = document.getElementById('gbpDropdown');
+  const clearBtn    = document.getElementById('gbpClear');
+  const selected    = document.getElementById('gbpSelected');
+  const selChange   = document.getElementById('gbpSelChange');
+  const hint        = document.getElementById('gbpHint');
+  const hiddenUrl   = document.getElementById('google-url');
+  const wrap        = document.getElementById('gbpSearchWrap');
+
+  // Show/hide clear button
+  searchInput.addEventListener('input', () => {
+    clearBtn.classList.toggle('visible', searchInput.value.length > 0);
+    if (searchInput.value.length < 2) {
+      closeDropdown();
+      return;
+    }
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => searchPlaces(searchInput.value), 380);
+  });
+
+  // Clear
+  clearBtn.addEventListener('click', () => {
+    resetSearch();
+    searchInput.focus();
+  });
+
+  // Change selection
+  selChange.addEventListener('click', () => {
+    resetSearch();
+    searchInput.focus();
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    if (!document.getElementById('field-google').contains(e.target)) {
+      closeDropdown();
+    }
+  });
+
+  async function searchPlaces(query) {
+    showLoading();
+
+    // If API key isn't set yet, show fallback manual entry
+    if (!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY') {
+      showFallbackUI();
+      return;
+    }
+
+    try {
+      // Use Google Places Autocomplete (New) REST endpoint — CORS-enabled
+      const resp = await fetch(
+        `https://places.googleapis.com/v1/places:autocomplete`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY
+          },
+          body: JSON.stringify({
+            input: query,
+            includedPrimaryTypes: ['establishment'],
+            languageCode: 'en'
+          })
+        }
+      );
+
+      if (!resp.ok) throw new Error('API error');
+      const data = await resp.json();
+      renderResults(data.suggestions || []);
+    } catch(err) {
+      showFallbackUI();
+    }
+  }
+
+  function renderResults(suggestions) {
+    dropdown.innerHTML = '';
+    if (!suggestions.length) {
+      dropdown.innerHTML = '<div class="gbp-state-row">No businesses found. Try a more specific search.</div>';
+      dropdown.classList.add('open');
+      return;
+    }
+    suggestions.slice(0, 6).forEach(s => {
+      const p = s.placePrediction;
+      if (!p) return;
+
+      const name    = p.structuredFormat?.mainText?.text  || p.text?.text || '';
+      const addr    = p.structuredFormat?.secondaryText?.text || '';
+      const placeId = p.placeId || '';
+      const types   = (p.types || []).filter(t => t !== 'establishment' && t !== 'point_of_interest');
+      const typeLabel = types[0] ? types[0].replace(/_/g,' ') : '';
+
+      const el = document.createElement('div');
+      el.className = 'gbp-result';
+      el.innerHTML = `
+        <div class="gbp-result-icon">📍</div>
+        <div class="gbp-result-main">
+          <div class="gbp-result-name">${escHtml(name)}</div>
+          ${addr ? `<div class="gbp-result-addr">${escHtml(addr)}</div>` : ''}
+        </div>
+        ${typeLabel ? `<div class="gbp-result-type">${escHtml(typeLabel)}</div>` : ''}
+      `;
+      el.addEventListener('click', () => selectBusiness(placeId, name, addr, types));
+      dropdown.appendChild(el);
+    });
+    dropdown.classList.add('open');
+  }
+
+  function selectBusiness(placeId, name, addr, types) {
+    selectedPlaceId = placeId;
+    const reviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
+    document.getElementById('google-url').value = reviewUrl;
+    document.getElementById('gbpSelName').textContent = name;
+    document.getElementById('gbpSelAddr').textContent = addr;
+
+    // Auto-populate hidden Business Name + slug
+    const bizNameInput   = document.getElementById('biz-name');
+    const urlSlugEl      = document.getElementById('urlSlug');
+    const urlSlugDisplay = document.getElementById('urlSlugDisplay');
+    const urlPreviewRow  = document.getElementById('urlPreviewRow');
+    const slug = toSlug(name) || 'unknown';
+    bizNameInput.value = name;
+    if (urlSlugEl)      urlSlugEl.value          = slug;
+    if (urlSlugDisplay) urlSlugDisplay.textContent = slug;
+    if (urlPreviewRow)  urlPreviewRow.style.display = 'block';
+
+    // Show selected, hide search
+    wrap.style.display = 'none';
+    clearBtn.classList.remove('visible');
+    selected.style.display = 'flex';
+    hint.style.display = 'none';
+    dropdown.classList.remove('open');
+    dropdown.innerHTML = '';
+
+    // Clear error state
+    document.getElementById('field-google').classList.remove('has-error');
+
+    // Generate AI incentive chips for this business
+    generateIncentiveChips(name, types || []);
+
+    // Fetch live rating + review count from Places Details
+    fetchPlaceDetails(placeId);
+  }
+
+  function resetSearch() {
+    selectedPlaceId = null;
+    document.getElementById('google-url').value = '';
+    document.getElementById('biz-name').value   = '';
+    document.getElementById('gbpSelName').textContent = '';
+    document.getElementById('gbpSelAddr').textContent = '';
+    document.getElementById('google-search').value = '';
+    clearBtn.classList.remove('visible');
+    selected.style.display = 'none';
+    wrap.style.display = 'flex';
+    hint.style.display = 'block';
+    const urlPreviewRow = document.getElementById('urlPreviewRow');
+    if (urlPreviewRow) urlPreviewRow.style.display = 'none';
+    closeDropdown();
+    // Hide stats widget
+    const w = document.getElementById('review-stats-widget');
+    if (w) w.style.display = 'none';
+  }
+
+  function showLoading() {
+    dropdown.innerHTML = '<div class="gbp-state-row"><span class="gbp-spinner"></span>Searching...</div>';
+    dropdown.classList.add('open');
+  }
+
+  function closeDropdown() {
+    dropdown.classList.remove('open');
+    dropdown.innerHTML = '';
+  }
+
+  function showFallbackUI() {
+    // API key not configured — show manual URL entry instead
+    dropdown.innerHTML = `
+      <div class="gbp-state-row" style="padding:16px;text-align:left;">
+        <div style="font-weight:600;color:var(--black);margin-bottom:8px;">Can't search right now</div>
+        <div style="font-size:.78rem;color:var(--sub);">Paste your Google Business or review link below (optional):</div>
+        <input type="url" id="gbpManualInput" placeholder="https://g.page/r/..." 
+          style="width:100%;margin-top:8px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;">
+        <button type="button" onclick="useManualUrl()" 
+          style="margin-top:8px;width:100%;padding:9px;background:var(--black);color:white;border:none;border-radius:8px;font-size:.83rem;font-weight:600;cursor:pointer;font-family:inherit;">Use this link</button>
+      </div>
+    `;
+    dropdown.classList.add('open');
+  }
+}
+
+// Used by fallback manual entry
+window.useManualUrl = function() {
+  const val = (document.getElementById('gbpManualInput')?.value || '').trim();
+  if (!val) return;
+  document.getElementById('google-url').value = val;
+  document.getElementById('gbpSelName').textContent = document.getElementById('biz-name').value.trim() || 'Your Business';
+  document.getElementById('gbpSelAddr').textContent = val;
+  document.getElementById('gbpSearchWrap').style.display = 'none';
+  document.getElementById('gbpSelected').style.display = 'flex';
+  document.getElementById('gbpHint').style.display = 'none';
+  document.getElementById('gbpDropdown').classList.remove('open');
+  document.getElementById('field-google').classList.remove('has-error');
+};
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ════════════════════════════════════════════════════════
+   AI INCENTIVE CHIP GENERATOR
+   Uses Gemini 2.0 Flash (free, CORS-enabled) to generate
+   8 custom incentive ideas tailored to the selected business.
+════════════════════════════════════════════════════════ */
+const GEMINI_KEY = 'AIzaSyBIUNvxwoItiLeJo-BScNk8-W-yLMY4H5k';
+
+/* ════════════════════════════════════════════════════════
+   PLACES DETAILS — fetch rating + review count
+════════════════════════════════════════════════════════ */
+async function fetchPlaceDetails(placeId) {
+  const widget  = document.getElementById('review-stats-widget');
+  const loading = document.getElementById('rswLoading');
+  const content = document.getElementById('rswContent');
+
+  widget.style.display  = 'block';
+  loading.style.display = 'flex';
+  content.style.display = 'none';
+
+  try {
+    const resp = await fetch(
+      `https://places.googleapis.com/v1/places/${placeId}?fields=rating,userRatingCount,displayName`,
+      {
+        headers: {
+          'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY,
+          'X-Goog-FieldMask': 'rating,userRatingCount,displayName'
+        }
+      }
+    );
+    if (!resp.ok) throw new Error('Places Details failed');
+    const data = await resp.json();
+
+    const rating = data.rating        ? parseFloat(data.rating.toFixed(1))  : null;
+    const count  = data.userRatingCount ? parseInt(data.userRatingCount)     : null;
+
+    if (rating === null && count === null) throw new Error('No data');
+
+    renderStats(rating, count);
+  } catch(e) {
+    // Hide widget silently if data unavailable
+    widget.style.display = 'none';
+  }
+}
+
+function renderStats(rating, count) {
+  const loading = document.getElementById('rswLoading');
+  const content = document.getElementById('rswContent');
+
+  // Current
+  document.getElementById('rswRating').textContent = rating !== null ? rating.toFixed(1) : 'N/A';
+  document.getElementById('rswCount').textContent  = count  !== null ? count.toLocaleString() : 'N/A';
+  document.getElementById('rswStars').innerHTML    = rating !== null ? starsHtml(rating) : '';
+
+  // Projected — based on HappyClientele avg outcomes:
+  //   • 300% review increase (3x count) within 90 days
+  //   • Rating trend: filtered reviews push score toward 4.6–4.9
+  const projCount  = count  !== null ? Math.round(count  * 3.2) : null;
+  const projRating = rating !== null ? Math.min(4.9, parseFloat((rating + (5 - rating) * 0.55).toFixed(1))) : null;
+
+  document.getElementById('rswProjRating').textContent = projRating !== null ? '⭐ ' + projRating.toFixed(1) : '—';
+  document.getElementById('rswProjCount').textContent  = projCount  !== null ? '📝 ' + projCount.toLocaleString() : '—';
+
+  // Dynamic note
+  const reviewGain = projCount  !== null && count  !== null ? projCount - count : null;
+  const ratingGain = projRating !== null && rating !== null ? (projRating - rating).toFixed(1) : null;
+  let note = '';
+  if (reviewGain && ratingGain) {
+    note = `+${reviewGain.toLocaleString()} new reviews · +${ratingGain} stars · based on avg client outcomes`;
+  } else if (reviewGain) {
+    note = `+${reviewGain.toLocaleString()} new reviews · based on avg client outcomes`;
+  }
+  document.getElementById('rswProjNote').textContent = note;
+
+  loading.style.display = 'none';
+  content.style.display = 'block';
+}
+
+function starsHtml(rating) {
+  const full  = Math.floor(rating);
+  const half  = rating - full >= 0.3 ? 1 : 0;
+  const empty = 5 - full - half;
+  return '★'.repeat(full) + (half ? '⯨' : '') + '☆'.repeat(empty);
+}
+
+async function generateIncentiveChips(bizName, types) {
+  const container = document.querySelector('.incentive-examples');
+  const label     = document.querySelector('.chips-ai-label');
+  if (!container) return;
+
+  // Show shimmer skeleton while loading
+  container.innerHTML = '';
+  const widths = [90, 110, 80, 130, 95, 105, 85, 120];
+  widths.forEach(w => {
+    const sk = document.createElement('div');
+    sk.className = 'chip-skeleton';
+    sk.style.width = w + 'px';
+    container.appendChild(sk);
+  });
+
+  // Build a readable type hint (e.g. "pizza restaurant")
+  const typeHint = types
+    .filter(t => !['establishment','point_of_interest','food','store'].includes(t))
+    .slice(0, 2)
+    .map(t => t.replace(/_/g, ' '))
+    .join(', ');
+
+  const prompt = `You are helping a small business owner set up a review incentive for their customers.
+Business name: "${bizName}"${typeHint ? `\nBusiness type: ${typeHint}` : ''}
+
+Generate exactly 8 short, creative review incentive ideas specific to this business.
+Each idea should be a short phrase (4-7 words max) that a customer would scan a QR code to receive.
+Make them feel natural and specific to this type of business — not generic.
+Use casual language. Include relevant food/product items where appropriate.
+Start each with "Scan for" or "Scan to".
+
+Respond with ONLY a JSON array of 8 strings, no explanation. Example format:
+["Scan for a free slice", "Scan for 10% off your order", ...]`;
+
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.9, maxOutputTokens: 300 }
+        })
+      }
+    );
+
+    const data = await resp.json();
+    const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    // Extract JSON array from response (handle markdown code blocks)
+    const match = raw.match(/\[[\s\S]*?\]/);
+    if (!match) throw new Error('No array found');
+    const chips = JSON.parse(match[0]);
+    if (!Array.isArray(chips) || chips.length === 0) throw new Error('Empty');
+
+    // Render AI chips
+    container.innerHTML = '';
+    chips.slice(0, 8).forEach(text => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ex-chip ai-chip';
+      btn.textContent = text;
+      btn.dataset.val = text;
+      btn.addEventListener('click', () => {
+        document.getElementById('incentive').value = text;
+        document.getElementById('incentive').focus();
+      });
+      container.appendChild(btn);
+    });
+
+    // Show AI label
+    if (label) {
+      label.style.display = 'flex';
+      const bizSpan = document.getElementById('chipsForBiz');
+      if (bizSpan) bizSpan.textContent = bizName;
+    }
+
+  } catch (err) {
+    // Fallback to default chips silently
+    container.innerHTML = `
+      <button type="button" class="ex-chip" data-val="Scan to get a free item on your next visit 🎁">Free item 🎁</button>
+      <button type="button" class="ex-chip" data-val="Scan for a free dessert 🍮">Free dessert 🍮</button>
+      <button type="button" class="ex-chip" data-val="Scan for a free drink ☕">Free drink ☕</button>
+      <button type="button" class="ex-chip" data-val="Scan for a free appetizer 🍟">Free appetizer 🍟</button>
+      <button type="button" class="ex-chip" data-val="Scan for a free entree 🍽️">Free entree 🍽️</button>
+      <button type="button" class="ex-chip" data-val="Scan for free merch 👕">Free merch 👕</button>
+      <button type="button" class="ex-chip" data-val="Scan for 10% off your next visit">10% off next visit</button>
+      <button type="button" class="ex-chip" data-val="Scan to enter our monthly giveaway 🎉">Monthly giveaway 🎉</button>
+    `;
+    // Re-bind fallback chips
+    container.querySelectorAll('.ex-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.getElementById('incentive').value = chip.dataset.val;
+        document.getElementById('incentive').focus();
+      });
+    });
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const incentiveInput = document.getElementById('incentive');
+
+  // Incentive example chips
+  document.querySelectorAll('.ex-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      incentiveInput.value = chip.dataset.val;
+      incentiveInput.focus();
+    });
+  });
+
+  // Init Google Business search
+  initGBPSearch();
+
+  // Form submit
+  document.getElementById('signupForm').addEventListener('submit', handleSubmit);
+});
+
+/* ════════════════════════════════════════════════════════
+   VALIDATION
+════════════════════════════════════════════════════════ */
+function validate() {
+  let valid = true;
+
+  const rules = [
+    {
+      fieldId: 'field-email',
+      inputId: 'owner-email',
+      test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
+    },
+    {
+      fieldId: 'field-password',
+      inputId: 'owner-password',
+      test: v => !v || v.length === 0 || v.length >= 8  // optional but if filled must be ≥8
+    },
+    {
+      fieldId: 'field-tc',
+      inputId: 'tc-checkbox',
+      test: () => document.getElementById('tc-checkbox').checked
+    }
+  ];
+
+  rules.forEach(rule => {
+    const fieldEl = document.getElementById(rule.fieldId);
+    const inputEl = document.getElementById(rule.inputId);
+    const passes  = rule.test(inputEl.value);
+    fieldEl.classList.toggle('has-error', !passes);
+    if (!passes) valid = false;
+  });
+
+  return valid;
+}
+
+/* ════════════════════════════════════════════════════════
+   SUBMIT → SUPABASE SIGNUP + STRIPE
+   
+   HOW IT WORKS:
+   1. Create Supabase auth account (email + password)
+   2. Save business data to localStorage + Supabase
+   3. Redirect to Stripe with prefilled_email param
+   4. Stripe redirects to welcome.html on success
+   5. welcome.html reads from Supabase (auth'd) or localStorage (fallback)
+════════════════════════════════════════════════════════ */
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  if (!validate()) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  const bizName   = document.getElementById('biz-name').value.trim();
+  const googleUrl = document.getElementById('google-url').value.trim();
+  const incentive = '';
+  const email     = document.getElementById('owner-email').value.trim();
+  const phone     = document.getElementById('owner-phone').value.trim();
+  const slug      = document.getElementById('urlSlug').value || toSlug(bizName) || 'my-business';
+  const password  = document.getElementById('owner-password')?.value || '';
+
+  // Capture live rating data
+  const ratingEl    = document.getElementById('rswRating');
+  const countEl     = document.getElementById('rswCount');
+  const rating      = ratingEl ? ratingEl.textContent.replace(/[^\d.]/g,'') : '';
+  const ratingCount = countEl  ? countEl.textContent.replace(/[^\d,]/g,'').replace(/,/g,'') : '';
+
+  const bizData = {
+    bizName,
+    googleUrl,
+    incentive,
+    email,
+    phone,
+    slug,
+    placeId:     selectedPlaceId || '',
+    rating:      rating      || '',
+    ratingCount: ratingCount || '',
+    createdAt:   new Date().toISOString()
+  };
+
+  // ── Step 1: Save to localStorage (always — Stripe redirect fallback) ──
+  localStorage.setItem('hc_pending_biz', JSON.stringify(bizData));
+
+  // ── Step 2: Create Supabase account + save business data ──
+  if (password) {
+    try {
+      // Sign up the user
+      const signUpResult = await sb.auth.signUp(email, password);
+      dbgLog('[signup] signUp result:', JSON.stringify(signUpResult).slice(0, 300));
+
+      // Extract user id from signup response (raw REST returns id at top level)
+      const signUpUser = signUpResult?.user || signUpResult?.data?.user || signUpResult;
+      const userId = signUpUser?.id || null;
+      dbgLog('[signup] userId from signUp:', userId);
+
+      if (userId) {
+        localStorage.setItem('hc_pending_user_id', userId);
+
+        // Sign in immediately to get a live session (required for RLS)
+        const signInResult = await sb.auth.signIn(email, password);
+        dbgLog('[signup] signIn result:', JSON.stringify(signInResult).slice(0, 200));
+
+        const hasSession = !!signInResult?.access_token;
+        const liveToken  = signInResult?.access_token || null;
+        dbgLog('[signup] hasSession after signIn:', hasSession, '| token prefix:', liveToken?.slice(0,20) || 'NONE');
+
+        if (hasSession && liveToken) {
+          // Direct fetch with token injected explicitly — bypasses any localStorage lookup
+          const authHeaders = {
+            'apikey':        SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${liveToken}`,
+            'Content-Type':  'application/json',
+            'Prefer':        'resolution=merge-duplicates,return=representation'
+          };
+          dbgLog('[signup] authHeaders Authorization prefix:', `Bearer ${liveToken.slice(0,20)}...`);
+
+          try {
+            const now = new Date().toISOString();
+
+            // ── Upsert businesses ──
+            const bizBody = JSON.stringify({
+              user_id:         userId,
+              biz_name:        bizName,
+              slug,
+              google_url:      googleUrl,
+              google_place_id: selectedPlaceId || '',
+              incentive:       incentive,
+              phone:           phone,
+              rating:          rating || null,
+              rating_count:    ratingCount ? parseInt(ratingCount) : null,
+              created_at:      now,
+              updated_at:      now
+            });
+            dbgLog('[signup] POSTing to businesses, body:', bizBody.slice(0, 150));
+            const bizRes = await fetch(
+              `${SUPABASE_URL}/rest/v1/businesses?on_conflict=user_id`,
+              { method: 'POST', headers: authHeaders, body: bizBody }
+            );
+            const bizJson = await bizRes.json();
+            dbgLog('[signup] businesses response status:', bizRes.status, '| body:', JSON.stringify(bizJson).slice(0,200));
+            if (!bizRes.ok) throw new Error(`businesses ${bizRes.status}: ${JSON.stringify(bizJson)}`);
+            dbgLog('[signup] ✅ businesses upsert OK');
+
+            // ── Upsert accounts ──
+            const accBody = JSON.stringify({
+              user_id:             userId,
+              email,
+              phone,
+              subscription_status: 'pending',
+              stripe_customer_id:  '',
+              created_at:          now,
+              updated_at:          now
+            });
+            const accRes = await fetch(
+              `${SUPABASE_URL}/rest/v1/accounts?on_conflict=user_id`,
+              { method: 'POST', headers: authHeaders, body: accBody }
+            );
+            const accJson = await accRes.json();
+            dbgLog('[signup] accounts response status:', accRes.status, '| body:', JSON.stringify(accJson).slice(0,200));
+            if (!accRes.ok) throw new Error(`accounts ${accRes.status}: ${JSON.stringify(accJson)}`);
+            dbgLog('[signup] ✅ accounts upsert OK');
+
+            // ── Send welcome email via Make.com ──
+            try {
+              const funnelUrl = `${PROD_DOMAIN_SIGNUP}funnel.html?biz=${slug}`;
+              await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  type:      'welcome',
+                  email:     email,
+                  bizName:   bizName,
+                  bizSlug:   slug,
+                  funnelUrl: funnelUrl
+                })
+              });
+              dbgLog('[signup] ✅ welcome webhook fired');
+            } catch(whErr) {
+              dbgLog('[signup] ⚠️ welcome webhook failed (non-blocking):', whErr.message);
+            }
+
+          } catch(dbErr) {
+            dbgErr('[signup] DB upsert failed:', dbErr.message);
+          }
+        } else {
+          dbgLog('[signup] ⚠️ No session after signIn — DB save deferred to welcome.html');
+        }
+      } else {
+        dbgErr('[signup] No userId returned from signUp:', JSON.stringify(signUpResult).slice(0,300));
+      }
+    } catch(authErr) {
+      dbgErr('[signup] Auth error:', String(authErr));
+    }
+  }
+
+  // ── Step 3: Redirect to Stripe ──
+  const stripeUrl = new URL(STRIPE_PAYMENT_LINK);
+  stripeUrl.searchParams.set('prefilled_email', email);
+  stripeUrl.searchParams.set('client_reference_id', slug);
+  dbgLog('[signup] ✅ Redirecting to Stripe:', stripeUrl.toString().slice(0, 80));
+
+  setTimeout(() => {
+    window.location.href = stripeUrl.toString();
+  }, 400);
+}
+</script>
+</body>
+</html>

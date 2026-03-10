@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — HappyClientele.</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="apple-touch-icon" href="images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #1a1a1a;
+      --white:   #ffffff;
+      --off:     #f8f8f8;
+      --border:  #e8e8e8;
+      --sub:     #6b7280;
+      --yellow:  #FDB813;
+      --green:   #34A853;
+      --red:     #EA4335;
+      --blue:    #4285F4;
+      --radius:  14px;
+    }
+
+    html, body {
+      min-height: 100svh;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--off);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .page {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── Left panel ── */
+    .left-panel {
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(253,184,19,.12) 0%, transparent 70%);
+      top: -100px; right: -150px;
+      pointer-events: none;
+    }
+
+    .left-logo {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--white);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 64px;
+    }
+    .left-logo span { color: var(--yellow); }
+
+    .left-headline {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.15;
+      letter-spacing: -.03em;
+      margin-bottom: 20px;
+    }
+
+    .left-headline span { color: var(--yellow); }
+
+    .left-sub {
+      font-size: .95rem;
+      color: rgba(255,255,255,.55);
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 48px;
+    }
+
+    /* Stat pills */
+    .left-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+
+    .stat-pill-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .stat-pill-text strong {
+      display: block;
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 2px;
+    }
+
+    .stat-pill-text span {
+      font-size: .78rem;
+      color: rgba(255,255,255,.45);
+    }
+
+    /* ── Right panel ── */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px;
+      background: var(--white);
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .form-header {
+      margin-bottom: 36px;
+    }
+
+    .form-eyebrow {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--sub);
+      margin-bottom: 10px;
+    }
+
+    .form-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--black);
+      letter-spacing: -.03em;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .form-sub {
+      font-size: .88rem;
+      color: var(--sub);
+      line-height: 1.5;
+    }
+
+    /* ── Tabs: Password / Magic Link ── */
+    .auth-tabs {
+      display: flex;
+      background: var(--off);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--sub);
+      cursor: pointer;
+      transition: all .18s;
+    }
+
+    .auth-tab.active {
+      background: var(--white);
+      color: var(--black);
+      box-shadow: 0 1px 4px rgba(0,0,0,.1);
+    }
+
+    /* ── Fields ── */
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--black);
+      margin-bottom: 7px;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 13px 16px;
+      font-size: .95rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--black);
+      background: var(--white);
+      transition: border-color .18s;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--black);
+    }
+
+    .field.has-error input {
+      border-color: var(--red);
+    }
+
+    .field-error {
+      font-size: .75rem;
+      color: var(--red);
+      margin-top: 5px;
+      display: none;
+    }
+
+    .field.has-error .field-error {
+      display: block;
+    }
+
+    /* Password visibility toggle */
+    .pw-wrap {
+      position: relative;
+    }
+
+    .pw-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: .85rem;
+      color: var(--sub);
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .pw-toggle:hover { color: var(--black); }
+
+    /* Forgot password link */
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: .78rem;
+      color: var(--sub);
+      text-decoration: none;
+      margin-top: -10px;
+      margin-bottom: 18px;
+      cursor: pointer;
+    }
+
+    .forgot-link:hover { color: var(--black); text-decoration: underline; }
+
+    /* ── Submit button ── */
+    .btn-submit {
+      width: 100%;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .18s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: -.01em;
+    }
+
+    .btn-submit:hover { opacity: .87; }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+    .btn-submit .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+
+    .btn-submit.loading .btn-label { display: none; }
+    .btn-submit.loading .spinner   { display: block; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Alert banner ── */
+    .alert {
+      border-radius: 9px;
+      padding: 12px 16px;
+      font-size: .84rem;
+      line-height: 1.5;
+      margin-bottom: 18px;
+      display: none;
+    }
+
+    .alert.show { display: flex; align-items: flex-start; gap: 10px; }
+
+    .alert-error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .alert-success {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+
+    .alert-info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0;
+      font-size: .75rem;
+      color: #ccc;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Magic link form ── */
+    #magicLinkForm { display: none; }
+
+    /* ── Footer links ── */
+    .form-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: .82rem;
+      color: var(--sub);
+    }
+
+    .form-footer a {
+      color: var(--black);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .form-footer a:hover { text-decoration: underline; }
+
+    /* ── Success screen (after magic link sent) ── */
+    #successScreen {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .success-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .success-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .success-text {
+      font-size: .88rem;
+      color: var(--sub);
+      line-height: 1.6;
+      max-width: 320px;
+      margin: 0 auto 24px;
+    }
+
+    /* ── Forgot password overlay ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      animation: modal-in .2s ease both;
+    }
+
+    @keyframes modal-in {
+      from { opacity: 0; transform: scale(.97) translateY(6px); }
+      to   { opacity: 1; transform: scale(1)  translateY(0); }
+    }
+
+    .modal-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .modal-sub {
+      font-size: .84rem;
+      color: var(--sub);
+      line-height: 1.5;
+      margin-top: -8px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-outline {
+      flex: 0;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 8px;
+      padding: 11px 20px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--black);
+      transition: all .15s;
+    }
+
+    .btn-outline:hover { border-color: var(--black); }
+
+    .btn-primary {
+      flex: 1;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 11px 20px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s;
+    }
+
+    .btn-primary:hover { opacity: .85; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .page { grid-template-columns: 1fr; }
+      .left-panel { display: none; }
+      .right-panel { padding: 40px 24px; background: var(--off); }
+      .form-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 32px 24px;
+        box-shadow: 0 4px 24px rgba(0,0,0,.06);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── Left panel ── -->
+  <div class="left-panel">
+    <a href="index.html" class="left-logo">HappyClientele<span>.</span></a>
+
+    <h1 class="left-headline">Welcome<br>back<span>.</span></h1>
+    <p class="left-sub">Sign in to access your review funnel, QR code, and business dashboard.</p>
+
+    <div class="left-stats">
+      <div class="stat-pill">
+        <div class="stat-pill-icon">⭐</div>
+        <div class="stat-pill-text">
+          <strong>Your QR code is live</strong>
+          <span>Customers are scanning it right now</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon">📈</div>
+        <div class="stat-pill-text">
+          <strong>Track your reviews</strong>
+          <span>See real-time Google rating &amp; review count</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-pill-icon">🔒</div>
+        <div class="stat-pill-text">
+          <strong>Secure &amp; private</strong>
+          <span>Your business data is always yours</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right panel ── -->
+  <div class="right-panel">
+    <div class="form-card">
+
+      <!-- Header -->
+      <div class="form-header">
+        <div class="form-eyebrow">HappyClientele Dashboard</div>
+        <h2 class="form-title">Sign in to your account</h2>
+        <p class="form-sub">Don't have an account? <a href="signup.html">Start your free trial →</a></p>
+      </div>
+
+      <!-- Alert area -->
+      <div class="alert alert-error" id="alertError">
+        <span>⚠️</span>
+        <span id="alertErrorMsg">Something went wrong. Please try again.</span>
+      </div>
+      <div class="alert alert-success" id="alertSuccess">
+        <span>✅</span>
+        <span id="alertSuccessMsg"></span>
+      </div>
+      <div class="alert alert-info" id="alertInfo">
+        <span>ℹ️</span>
+        <span id="alertInfoMsg"></span>
+      </div>
+
+      <!-- Auth tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabPassword" onclick="switchTab('password')">
+          🔑 Password
+        </button>
+        <button class="auth-tab" id="tabMagic" onclick="switchTab('magic')">
+          ✉️ Magic Link
+        </button>
+      </div>
+
+      <!-- ── Password form ── -->
+      <form id="passwordForm" onsubmit="handlePasswordSignIn(event)" novalidate>
+
+        <div class="field" id="field-email">
+          <label for="email">Email address</label>
+          <input type="email" id="email" placeholder="you@yourbusiness.com" autocomplete="email" />
+          <div class="field-error">Please enter a valid email address.</div>
+        </div>
+
+        <div class="field" id="field-password">
+          <label for="password">Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="password" placeholder="Your password" autocomplete="current-password" />
+            <button type="button" class="pw-toggle" id="pwToggle" onclick="togglePw()">👁️</button>
+          </div>
+          <div class="field-error">Password is required.</div>
+        </div>
+
+        <span class="forgot-link" onclick="openForgot()">Forgot password?</span>
+
+        <button type="submit" class="btn-submit" id="submitPasswordBtn">
+          <span class="btn-label">Sign In →</span>
+          <span class="spinner"></span>
+        </button>
+
+      </form>
+
+      <!-- ── Magic link form ── -->
+      <form id="magicLinkForm" onsubmit="handleMagicLink(event)" novalidate>
+
+        <div class="field" id="field-magic-email">
+          <label for="magicEmail">Email address</label>
+          <input type="email" id="magicEmail" placeholder="you@yourbusiness.com" autocomplete="email" />
+          <div class="field-error">Please enter a valid email address.</div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitMagicBtn">
+          <span class="btn-label">Send Magic Link →</span>
+          <span class="spinner"></span>
+        </button>
+
+      </form>
+
+      <!-- ── Magic link sent screen ── -->
+      <div id="successScreen">
+        <div class="success-icon">📬</div>
+        <div class="success-title">Check your inbox!</div>
+        <p class="success-text">
+          We sent a sign-in link to <strong id="sentToEmail"></strong>.<br>
+          Click the link in the email to sign in instantly — no password needed.
+        </p>
+        <button class="btn-outline" style="width:100%;justify-content:center;" onclick="resetToForm()">
+          ← Use a different email
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="form-footer" id="formFooter">
+        New here? <a href="signup.html">Create your account →</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Forgot password modal ── -->
+<div class="modal-overlay" id="forgotOverlay">
+  <div class="modal">
+    <div class="modal-title">Reset your password</div>
+    <p class="modal-sub">Enter your email and we'll send you a link to reset your password.</p>
+
+    <div class="alert alert-error" id="forgotError" style="margin:0;">
+      <span>⚠️</span><span id="forgotErrorMsg"></span>
+    </div>
+    <div class="alert alert-success" id="forgotSuccess" style="margin:0;">
+      <span>✅</span><span id="forgotSuccessMsg"></span>
+    </div>
+
+    <div class="field" id="field-forgot-email" style="margin:0;">
+      <label for="forgotEmail">Email address</label>
+      <input type="email" id="forgotEmail" placeholder="you@yourbusiness.com" />
+      <div class="field-error">Please enter a valid email address.</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeForgot()">Cancel</button>
+      <button class="btn-primary" id="forgotSubmitBtn" onclick="handleForgotPassword()">Send Reset Link</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/supabase.js"></script>
+<script>
+/* ════════════════════════════════════════════════════════
+   LOGIN PAGE — boot
+════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  // Handle magic link callback (token in URL hash)
+  if (window.location.hash.includes('access_token')) {
+    showAlert('info', 'Signing you in…');
+    try {
+      const result = await sb.auth.handleAuthRedirect();
+      if (result?.session) {
+        redirectAfterLogin();
+        return;
+      }
+    } catch(e) {
+      showAlert('error', 'Sign-in link expired or invalid. Please request a new one.');
+    }
+  }
+
+  // If already signed in, redirect straight to dashboard
+  const user = sb.auth.getUser();
+  if (user) {
+    redirectAfterLogin();
+  }
+});
+
+/* ════════════════════════════════════════════════════════
+   TAB SWITCHING
+════════════════════════════════════════════════════════ */
+function switchTab(tab) {
+  clearAlerts();
+  const isPassword = tab === 'password';
+  document.getElementById('tabPassword').classList.toggle('active', isPassword);
+  document.getElementById('tabMagic').classList.toggle('active', !isPassword);
+  document.getElementById('passwordForm').style.display   = isPassword ? '' : 'none';
+  document.getElementById('magicLinkForm').style.display  = isPassword ? 'none' : '';
+  document.getElementById('successScreen').style.display  = 'none';
+  document.getElementById('formFooter').style.display     = '';
+}
+
+/* ════════════════════════════════════════════════════════
+   PASSWORD SIGN IN
+════════════════════════════════════════════════════════ */
+async function handlePasswordSignIn(e) {
+  e.preventDefault();
+  clearAlerts();
+
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  let valid = true;
+
+  // Validate
+  setFieldError('field-email', !isValidEmail(email));
+  setFieldError('field-password', !password);
+  if (!isValidEmail(email) || !password) return;
+
+  const btn = document.getElementById('submitPasswordBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    const data = await sb.auth.signIn(email, password);
+
+    if (data.error || data.error_description || !data.access_token) {
+      const msg = data.error_description || data.message || 'Invalid email or password.';
+      showAlert('error', msg);
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      return;
+    }
+
+    redirectAfterLogin();
+
+  } catch(err) {
+    showAlert('error', 'Network error. Please check your connection and try again.');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   MAGIC LINK
+════════════════════════════════════════════════════════ */
+async function handleMagicLink(e) {
+  e.preventDefault();
+  clearAlerts();
+
+  const email = document.getElementById('magicEmail').value.trim();
+  setFieldError('field-magic-email', !isValidEmail(email));
+  if (!isValidEmail(email)) return;
+
+  const btn = document.getElementById('submitMagicBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    await sb.auth.sendMagicLink(email);
+
+    // Show success screen regardless (don't leak whether email exists)
+    document.getElementById('magicLinkForm').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'block';
+    document.getElementById('formFooter').style.display    = 'none';
+    document.getElementById('sentToEmail').textContent     = email;
+
+  } catch(err) {
+    showAlert('error', 'Could not send magic link. Please try again.');
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+function resetToForm() {
+  document.getElementById('successScreen').style.display  = 'none';
+  document.getElementById('magicLinkForm').style.display  = '';
+  document.getElementById('formFooter').style.display     = '';
+  document.getElementById('submitMagicBtn').disabled      = false;
+  document.getElementById('submitMagicBtn').classList.remove('loading');
+  document.getElementById('magicEmail').value = '';
+}
+
+/* ════════════════════════════════════════════════════════
+   FORGOT PASSWORD MODAL
+════════════════════════════════════════════════════════ */
+function openForgot() {
+  document.getElementById('forgotOverlay').classList.add('open');
+  document.getElementById('forgotEmail').focus();
+}
+
+function closeForgot() {
+  document.getElementById('forgotOverlay').classList.remove('open');
+  document.getElementById('forgotEmail').value = '';
+  document.getElementById('forgotError').classList.remove('show');
+  document.getElementById('forgotSuccess').classList.remove('show');
+  document.getElementById('field-forgot-email').classList.remove('has-error');
+}
+
+async function handleForgotPassword() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  document.getElementById('forgotError').classList.remove('show');
+  document.getElementById('forgotSuccess').classList.remove('show');
+
+  if (!isValidEmail(email)) {
+    document.getElementById('field-forgot-email').classList.add('has-error');
+    return;
+  }
+  document.getElementById('field-forgot-email').classList.remove('has-error');
+
+  const btn = document.getElementById('forgotSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  try {
+    await sb.auth.resetPassword(email);
+    document.getElementById('forgotSuccessMsg').textContent = `Reset link sent to ${email}. Check your inbox.`;
+    document.getElementById('forgotSuccess').classList.add('show');
+    btn.textContent = 'Sent ✓';
+  } catch(err) {
+    document.getElementById('forgotErrorMsg').textContent = 'Could not send reset email. Try again.';
+    document.getElementById('forgotError').classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Send Reset Link';
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   PASSWORD TOGGLE
+════════════════════════════════════════════════════════ */
+function togglePw() {
+  const input = document.getElementById('password');
+  const btn   = document.getElementById('pwToggle');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁️';
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   REDIRECT AFTER LOGIN
+════════════════════════════════════════════════════════ */
+function redirectAfterLogin() {
+  // Honour ?next= param (e.g. redirected from a protected page)
+  const params = new URLSearchParams(window.location.search);
+  const next   = params.get('next');
+  window.location.href = next || 'dashboard.html';
+}
+
+/* ════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════ */
+function isValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+function setFieldError(fieldId, hasError) {
+  document.getElementById(fieldId)?.classList.toggle('has-error', hasError);
+}
+
+function clearAlerts() {
+  ['alertError','alertSuccess','alertInfo'].forEach(id => {
+    document.getElementById(id)?.classList.remove('show');
+  });
+}
+
+function showAlert(type, msg) {
+  clearAlerts();
+  if (type === 'error') {
+    document.getElementById('alertErrorMsg').textContent = msg;
+    document.getElementById('alertError').classList.add('show');
+  } else if (type === 'success') {
+    document.getElementById('alertSuccessMsg').textContent = msg;
+    document.getElementById('alertSuccess').classList.add('show');
+  } else {
+    document.getElementById('alertInfoMsg').textContent = msg;
+    document.getElementById('alertInfo').classList.add('show');
+  }
+}
+</script>
+</body>
+</html>

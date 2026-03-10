@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Share Your Experience</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="apple-touch-icon" href="images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white:  #ffffff;
+      --off:    #f8f8f8;
+      --border: #e8e8e8;
+      --text:   #1a1a1a;
+      --sub:    #6b7280;
+      --yellow: #FDB813;
+      --green:  #34A853;
+      --red:    #EA4335;
+      --blue:   #4285F4;
+      --radius: 16px;
+      --shadow: 0 4px 32px rgba(0,0,0,.08);
+      --trans:  all .22s cubic-bezier(.4,0,.2,1);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--off);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px 40px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 480px;
+      padding: 40px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ── Header ── */
+    .card-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .biz-logo { width:64px;height:64px;border-radius:14px;object-fit:cover;display:none; }
+    .biz-logo.loaded { display:block; }
+    .biz-icon { width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:var(--off); }
+    .biz-name { font-size:1.05rem;font-weight:600;color:var(--text); }
+
+    /* ── Progress bar ── */
+    .progress-wrap { display:flex;flex-direction:column;gap:6px; }
+    .progress-top-row { display:flex;align-items:center;justify-content:space-between;min-height:22px; }
+    .progress-track { height:4px;background:var(--border);border-radius:99px;overflow:hidden; }
+    .progress-fill { height:100%;border-radius:99px;background:var(--text);transition:width .4s cubic-bezier(.4,0,.2,1); }
+    .progress-label { font-size:.75rem;color:var(--sub);text-align:right; }
+
+    /* ── Steps ── */
+    .step { display:none;flex-direction:column;gap:24px; }
+    .step.active { display:flex;animation:fade-up .28s ease both; }
+
+    .step-q { font-size:1.25rem;font-weight:600;line-height:1.4;text-align:center;color:var(--text); }
+    .step-q .biz-inline { display:inline;font-style:normal; }
+
+    /* ── Stars ── */
+    .stars-row { display:flex;justify-content:center;gap:10px; }
+    .star-btn { background:none;border:none;cursor:pointer;padding:4px;font-size:2.6rem;line-height:1;transition:transform .15s ease;filter:grayscale(1) opacity(.35);user-select:none;-webkit-tap-highlight-color:transparent; }
+    .star-btn:hover,.star-btn.lit { filter:none;transform:scale(1.12); }
+    .star-btn.lit { transform:scale(1.08); }
+
+    /* ── Yes/No ── */
+    .yn-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    .yn-btn { border:2px solid var(--border);background:var(--white);border-radius:12px;padding:18px 12px;cursor:pointer;font-family:inherit;font-size:.95rem;font-weight:500;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:8px;transition:var(--trans);-webkit-tap-highlight-color:transparent; }
+    .yn-btn .yn-icon { font-size:1.6rem; }
+    .yn-btn:hover { border-color:var(--text);color:var(--text); }
+    .yn-btn.selected { border-color:var(--text);background:var(--text);color:var(--white); }
+
+    /* ── CTA Button ── */
+    .cta-btn { width:100%;background:var(--text);color:var(--white);border:none;border-radius:12px;padding:17px 24px;font-family:inherit;font-size:1rem;font-weight:600;cursor:pointer;transition:var(--trans);display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;text-decoration:none; }
+    .cta-btn:hover { opacity:.88;transform:translateY(-1px); }
+    .cta-btn:active { transform:translateY(0); }
+    .cta-btn:disabled { opacity:.4;cursor:not-allowed;transform:none; }
+    .cta-btn.google { background:var(--blue); }
+    .cta-btn.google::before { content:'';display:inline-block;width:18px;height:18px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23FFF' d='M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z'/%3E%3C/svg%3E") center/contain no-repeat; }
+    .cta-btn.outline { background:transparent;color:var(--sub);border:1.5px solid var(--border);font-weight:500;font-size:.88rem; }
+    .cta-btn.outline:hover { border-color:var(--text);color:var(--text);opacity:1;transform:none; }
+    .cta-btn.green { background:var(--green); }
+
+    /* ── Email input step ── */
+    .email-input-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .email-field {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--text);
+      background: var(--white);
+      transition: var(--trans);
+      -webkit-appearance: none;
+    }
+
+    .email-field:focus { outline:none;border-color:var(--text); }
+    .email-field::placeholder { color:#c0c0c0; }
+    .email-field.error { border-color:var(--red); }
+
+    .email-disclaimer {
+      font-size: .72rem;
+      color: var(--sub);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .skip-link {
+      font-size: .8rem;
+      color: #c0c0c0;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: underline;
+      -webkit-tap-highlight-color: transparent;
+      background: none;
+      border: none;
+      font-family: inherit;
+      width: 100%;
+    }
+    .skip-link:hover { color: var(--sub); }
+
+    /* ── Redemption code box ── */
+    .code-box {
+      background: var(--off);
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .code-label { font-size:.78rem;font-weight:600;color:var(--sub);letter-spacing:.08em;text-transform:uppercase; }
+
+    .code-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: .12em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .code-exp { font-size:.75rem;color:var(--sub); }
+
+    /* ── Warm close ── */
+    .warm-close { display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:8px 0 4px; }
+    .warm-close-icon { font-size:2.4rem;animation:pop-in .4s cubic-bezier(.4,0,.2,1) both; }
+    .warm-close-msg { font-size:1rem;color:var(--sub);line-height:1.65;max-width:300px; }
+
+    /* ── Transition screens ── */
+    .transition-screen { display:none;flex-direction:column;align-items:center;gap:20px;text-align:center;padding:8px 0; }
+    .transition-screen.active { display:flex;animation:fade-up .28s ease both; }
+    .transition-icon { font-size:3.5rem;animation:pop-in .4s cubic-bezier(.4,0,.2,1) both; }
+    .transition-title { font-size:1.3rem;font-weight:700;color:var(--text); }
+    .transition-sub { font-size:.95rem;color:var(--sub);line-height:1.6;max-width:300px; }
+
+    /* Email confirmed display in success screen */
+    .confirmed-email { font-size:.82rem;color:var(--sub);font-style:italic; }
+
+    /* ── Footer ── */
+    .page-footer { margin-top:20px;font-size:.72rem;color:#c0c0c0;text-align:center; }
+    .page-footer a { color:#c0c0c0;text-decoration:none; }
+
+    /* ── Animations ── */
+    @keyframes pop-in { from{transform:scale(.6);opacity:0} to{transform:scale(1);opacity:1} }
+    @keyframes fade-up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── Responsive ── */
+    @media (max-width:520px) { .card{padding:32px 24px;border-radius:20px;} .step-q{font-size:1.15rem;} .star-btn{font-size:2.3rem;} }
+    @media (max-width:360px) { .card{padding:28px 18px;} .star-btn{font-size:2rem;} .code-value{font-size:1.8rem;} }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <div class="card" id="mainCard">
+
+    <!-- Header -->
+    <div class="card-header" id="cardHeader">
+      <div class="biz-icon" id="bizIcon">🏪</div>
+      <img class="biz-logo" id="bizLogo" src="" alt="" />
+      <div class="biz-name" id="bizName">Loading…</div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-top-row">
+        <button id="btnBack" onclick="goBack()"
+          style="display:none;background:none;border:none;cursor:pointer;font-size:.82rem;color:#9ca3af;padding:0;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent;font-family:inherit;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <div style="flex:1;"></div>
+        <div class="progress-label" id="progressLabel">Step 1 of 4</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:25%"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         STEP 1 — Star rating
+    ══════════════════════════════════════ -->
+    <div class="step active" id="step1">
+      <p class="step-q">
+        How was your overall experience at<br/>
+        <strong class="biz-inline" id="bizNameS1">…</strong>?
+      </p>
+      <div class="stars-row" id="starsRow" role="group" aria-label="Star rating">
+        <button class="star-btn" data-val="1" aria-label="1 star">⭐</button>
+        <button class="star-btn" data-val="2" aria-label="2 stars">⭐</button>
+        <button class="star-btn" data-val="3" aria-label="3 stars">⭐</button>
+        <button class="star-btn" data-val="4" aria-label="4 stars">⭐</button>
+        <button class="star-btn" data-val="5" aria-label="5 stars">⭐</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         STEP 2 — Recommend?
+    ══════════════════════════════════════ -->
+    <div class="step" id="step2">
+      <p class="step-q">
+        Would you recommend<br/>
+        <strong class="biz-inline" id="bizNameS2">…</strong> to a friend?
+      </p>
+      <div class="yn-row">
+        <button class="yn-btn" data-val="yes" id="ynYes">
+          <span class="yn-icon">👍</span>
+          <span>Definitely</span>
+        </button>
+        <button class="yn-btn" data-val="no" id="ynNo">
+          <span class="yn-icon">🤔</span>
+          <span>Not Sure</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         STEP 3 — Claim incentive (email capture)
+         Only shown on POSITIVE path
+    ══════════════════════════════════════ -->
+    <div class="step" id="step3">
+      <div class="warm-close">
+        <div class="warm-close-icon">🎁</div>
+        <p class="warm-close-msg" id="incentiveClaimMsg">
+          We'd love to give you a little thank-you gift!
+        </p>
+      </div>
+
+      <div class="email-input-wrap">
+        <input
+          type="email"
+          id="emailInput"
+          class="email-field"
+          placeholder="your@email.com"
+          autocomplete="email"
+          inputmode="email"
+        />
+        <button class="cta-btn" id="btnEmailContinue" onclick="handleEmailContinue()">
+          Claim My Reward →
+        </button>
+        <button class="skip-link" onclick="handleSkipEmail()">
+          No thanks, skip the reward
+        </button>
+      </div>
+
+      <p class="email-disclaimer">
+        Your email is shared with <span id="bizNameS3">this business</span> and used only to send your reward code. No spam, ever.
+      </p>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         STEP 4 — Leave the review
+         Shown after email captured (or skipped)
+    ══════════════════════════════════════ -->
+    <div class="step" id="step4">
+      <div class="warm-close">
+        <div class="warm-close-icon" id="warmIcon">🧡</div>
+        <p class="warm-close-msg" id="warmMsg">
+          It's been a pleasure serving you. Your kind words mean the world to us. ♥
+        </p>
+      </div>
+
+      <!-- Google review — direct link, opens new tab, ALSO triggers code send -->
+      <a id="btnGoogle" href="#" target="_blank" rel="noopener"
+         class="cta-btn google" style="text-decoration:none;"
+         onclick="handleReviewTap()">
+        ⭐ Leave a Review
+      </a>
+
+      <button class="cta-btn outline" id="btnFeedback">
+        Send Private Feedback Instead
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         NEGATIVE STEP — Private feedback
+    ══════════════════════════════════════ -->
+    <div class="step" id="stepNegative">
+      <div class="warm-close">
+        <div class="warm-close-icon">💛</div>
+        <p class="warm-close-msg">
+          Thank you for your honesty. Your feedback goes directly to the owner — never posted publicly. ♥
+        </p>
+      </div>
+      <button class="cta-btn" id="btnFeedbackNeg">
+        Send Private Feedback
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SCREEN — Code sent via email
+    ══════════════════════════════════════ -->
+    <div class="transition-screen" id="screenCodeSent">
+      <div class="transition-icon">📬</div>
+      <div class="transition-title">You're all set!</div>
+      <div class="transition-sub">
+        Your reward code is on its way.<br/>Check your inbox in about a minute.
+      </div>
+      <div class="confirmed-email" id="confirmedEmail"></div>
+      <div style="font-size:.8rem;color:var(--sub);margin-top:-8px;">
+        Thank you for helping <strong id="bizNameConfirm"></strong> grow! 🙏
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SCREEN — On-screen code (webhook not configured or no email)
+    ══════════════════════════════════════ -->
+    <div class="transition-screen" id="screenCodeOnScreen">
+      <div class="transition-icon">🎉</div>
+      <div class="transition-title">Thank you for the review!</div>
+      <div class="transition-sub">Show this code to redeem your reward:</div>
+      <div class="code-box">
+        <div class="code-label">Your Reward Code</div>
+        <div class="code-value" id="onScreenCode">HC-0000</div>
+        <div class="code-exp">Valid today only · One per visit</div>
+      </div>
+      <div style="font-size:.8rem;color:var(--sub);">
+        Thank you for helping <strong id="bizNameCode"></strong> grow! 🙏
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SCREEN — Negative / sending to feedback
+    ══════════════════════════════════════ -->
+    <div class="transition-screen" id="screenNeg">
+      <div class="transition-icon">💬</div>
+      <div class="transition-title">We hear you.</div>
+      <div class="transition-sub">
+        We're sorry your experience wasn't perfect.<br/>
+        One moment — taking you to our feedback form…
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SCREEN — Error
+    ══════════════════════════════════════ -->
+    <div class="transition-screen" id="screenError">
+      <div class="transition-icon">🔍</div>
+      <div class="transition-title">Page not found</div>
+      <div class="transition-sub">
+        This review link doesn't match a business in our system.<br/>
+        Please check your link or contact support.
+      </div>
+    </div>
+
+  </div><!-- /.card -->
+
+  <div class="page-footer">
+    Powered by <a href="https://happyclientele.com" target="_blank">HappyClientele.</a>
+    <span id="funnelVer" style="margin-left:8px;opacity:.4;font-size:.7rem;"></span>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   CONFIG
+   WEBHOOK_URL: drop your Make.com (or Netlify function) URL here.
+   Leave as '' to show the on-screen code fallback instead.
+══════════════════════════════════════════════════════════════ */
+/* ── Paste your Make.com webhook URL here. One URL handles all email types
+   (reward_code, menu_review_prompt, welcome) via a Router in Make.com. ── */
+const WEBHOOK_URL    = 'https://hook.us2.make.com/71c6bp3dkpejjip6aklpnwrtijst1iee';
+const FUNNEL_VERSION = '3.0';
+
+const SUPA_URL = 'https://dbbryatmoxlzifsurxrm.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk';
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════ */
+const state = {
+  biz:          null,
+  bizSlug:      '',
+  starRating:   0,
+  recommend:    '',
+  path:         '',     // 'positive' | 'negative'
+  email:        '',     // captured email (may be empty if skipped)
+  code:         '',     // generated redemption code e.g. HC-4F2A
+  leadId:       null,   // Supabase lead row id
+  reviewTapped: false
+};
+
+/* ══════════════════════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('funnelVer').textContent = `v${FUNNEL_VERSION}`;
+
+  const params      = new URLSearchParams(window.location.search);
+  const rawSlug     = (params.get('biz') || '').toLowerCase().trim();
+  const incentiveParam = params.get('incentive') || '';
+
+  if (!rawSlug) { showError('No ?biz= slug in URL'); return; }
+  state.bizSlug = rawSlug;
+
+  // Loading state
+  document.getElementById('bizName').textContent = 'Loading…';
+
+  let biz = null;
+  let fetchStatus = '', fetchBody = '';
+  try {
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/businesses?slug=eq.${encodeURIComponent(rawSlug)}&select=biz_name,slug,google_url,incentive&limit=1`,
+      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }
+    );
+    fetchStatus = String(res.status);
+    const text  = await res.text();
+    fetchBody   = text.slice(0, 200);
+    if (res.ok) {
+      const rows = JSON.parse(text);
+      if (rows && rows.length > 0) {
+        const r = rows[0];
+        biz = {
+          name:      r.biz_name    || 'Your Business',
+          emoji:     '⭐',
+          logo:      '',
+          googleUrl: r.google_url  || '',
+          incentive: incentiveParam || r.incentive || '',
+          slug:      r.slug        || rawSlug
+        };
+      } else {
+        fetchBody = 'rows=0 — slug not found or RLS blocking';
+      }
+    }
+  } catch(e) { fetchStatus = 'EXCEPTION'; fetchBody = String(e); }
+
+  if (!biz) { showError(`v${FUNNEL_VERSION} | slug="${rawSlug}" | HTTP ${fetchStatus} | ${fetchBody}`); return; }
+
+  state.biz = biz;
+  initUI(biz);
+  bindEvents();
+});
+
+/* ══════════════════════════════════════════════════════════════
+   UI INIT
+══════════════════════════════════════════════════════════════ */
+function initUI(biz) {
+  ['bizName','bizNameS1','bizNameS2','bizNameS3','bizNameConfirm','bizNameCode']
+    .forEach(id => { const el=document.getElementById(id); if(el) el.textContent = biz.name; });
+
+  document.getElementById('bizIcon').textContent = biz.emoji || '🏪';
+  if (biz.logo) {
+    const img = document.getElementById('bizLogo');
+    img.src = biz.logo; img.alt = biz.name;
+    img.onload = () => { img.classList.add('loaded'); document.getElementById('bizIcon').style.display='none'; };
+  }
+
+  // Personalise the incentive claim message
+  const msg = document.getElementById('incentiveClaimMsg');
+  if (msg && biz.incentive) {
+    msg.textContent = `Enter your email and we'll send you a code for: ${biz.incentive} 🎁`;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EVENTS
+══════════════════════════════════════════════════════════════ */
+function bindEvents() {
+  // Stars
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.starRating = parseInt(btn.dataset.val);
+      highlightStars(state.starRating);
+      setTimeout(() => advanceToStep2(), 420);
+    });
+    btn.addEventListener('mouseenter', () => highlightStars(parseInt(btn.dataset.val)));
+    btn.addEventListener('mouseleave', () => highlightStars(state.starRating));
+  });
+
+  // Yes/No
+  ['ynYes','ynNo'].forEach(id => {
+    document.getElementById(id).addEventListener('click', (e) => {
+      document.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('selected'));
+      e.currentTarget.classList.add('selected');
+      state.recommend = e.currentTarget.dataset.val;
+      setTimeout(() => routeAfterStep2(), 320);
+    });
+  });
+
+  // Positive path: feedback-instead on step4
+  document.getElementById('btnFeedback').addEventListener('click', handleFeedbackRedirect);
+
+  // Negative path: feedback button on stepNegative
+  document.getElementById('btnFeedbackNeg').addEventListener('click', handleFeedbackRedirect);
+
+  // Email input: allow Enter key to continue
+  document.getElementById('emailInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); handleEmailContinue(); }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STEP ROUTING
+══════════════════════════════════════════════════════════════ */
+function advanceToStep2() {
+  setProgress(2); showStep('step2'); showBack(true);
+}
+
+function routeAfterStep2() {
+  const isPositive = state.starRating >= 4 && state.recommend === 'yes';
+  state.path = isPositive ? 'positive' : 'negative';
+
+  if (isPositive) {
+    setProgress(3); showStep('step3'); showBack(true);
+  } else {
+    // Negative: skip straight to private feedback step
+    setProgress(3);
+    document.getElementById('progressLabel').textContent = 'Almost done';
+    showStep('stepNegative'); showBack(true);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EMAIL CAPTURE (Step 3)
+══════════════════════════════════════════════════════════════ */
+function handleEmailContinue() {
+  const input = document.getElementById('emailInput');
+  const email = input.value.trim();
+
+  // Basic validation
+  if (email && !isValidEmail(email)) {
+    input.classList.add('error');
+    input.placeholder = 'Please enter a valid email';
+    setTimeout(() => input.classList.remove('error'), 2000);
+    return;
+  }
+
+  state.email = email;
+  state.code  = generateCode();
+
+  // Save lead to Supabase (fire and forget — don't block UX)
+  saveLead();
+
+  advanceToStep4();
+}
+
+function handleSkipEmail() {
+  state.email = '';
+  state.code  = generateCode();
+  advanceToStep4();
+}
+
+function advanceToStep4() {
+  setProgress(4);
+  const gBtn = document.getElementById('btnGoogle');
+  if (gBtn && state.biz) { gBtn.href = state.biz.googleUrl || '#'; }
+  showStep('step4'); showBack(false); // no back from step 4 — review intent committed
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REVIEW TAP — triggers the delayed code send
+══════════════════════════════════════════════════════════════ */
+function handleReviewTap() {
+  if (state.reviewTapped) return; // prevent double-fire
+  state.reviewTapped = true;
+
+  // Update lead record in Supabase
+  updateLeadReviewTapped();
+
+  // Hide progress + steps, show appropriate screen
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('cardHeader').style.display   = 'none';
+  hideAllSteps();
+
+  if (state.email && WEBHOOK_URL) {
+    // Email path: show "check your inbox" screen, send after 60s delay
+    document.getElementById('confirmedEmail').textContent = state.email;
+    showTransition('screenCodeSent');
+    setTimeout(() => sendCodeViaWebhook(), 60000); // 60 second delay
+  } else {
+    // Fallback: show code on screen
+    document.getElementById('onScreenCode').textContent = state.code;
+    showTransition('screenCodeOnScreen');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WEBHOOK — send code email via Make.com
+   Payload spec for Make.com scenario:
+   {
+     email:     "customer@gmail.com",
+     code:      "HC-4F2A",
+     bizName:   "Bocashi CoffeeHouse",
+     incentive: "Free beer 🍺",
+     bizSlug:   "bocashi-coffeehouse",
+     stars:     5
+   }
+══════════════════════════════════════════════════════════════ */
+async function sendCodeViaWebhook() {
+  if (!WEBHOOK_URL || !state.email) return;
+  try {
+    await fetch(WEBHOOK_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        type:      'reward_code',
+        email:     state.email,
+        code:      state.code,
+        bizName:   state.biz?.name     || '',
+        bizEmail:  state.biz?.email    || '',
+        incentive: state.biz?.incentive || '',
+        bizSlug:   state.bizSlug,
+        reviewUrl: state.biz?.googleUrl || '',
+        stars:     state.starRating,
+        delaySeconds: 0
+      })
+    });
+    // Mark code as sent in Supabase
+    updateLeadCodeSent();
+  } catch(e) {
+    console.warn('[funnel] webhook error:', e);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SUPABASE LEAD OPERATIONS
+   Requires this SQL in Supabase:
+   CREATE POLICY "leads_insert_anon" ON leads FOR INSERT WITH CHECK (true);
+   CREATE POLICY "leads_owner_read"  ON leads FOR SELECT USING (
+     business_slug IN (SELECT slug FROM businesses WHERE user_id = auth.uid())
+   );
+══════════════════════════════════════════════════════════════ */
+async function saveLead() {
+  if (!state.email && !state.code) return;
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/leads`, {
+      method:  'POST',
+      headers: {
+        apikey:          SUPA_KEY,
+        Authorization:  `Bearer ${SUPA_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer:         'return=representation'
+      },
+      body: JSON.stringify({
+        business_slug: state.bizSlug,
+        email:         state.email || null,
+        incentive:     state.biz?.incentive || '',
+        code:          state.code,
+        stars:         state.starRating,
+        review_tapped: false,
+        code_sent:     false,
+        source:        'funnel'
+      })
+    });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows && rows[0]) state.leadId = rows[0].id;
+    }
+  } catch(e) { console.warn('[funnel] saveLead error:', e); }
+}
+
+async function updateLeadReviewTapped() {
+  if (!state.leadId) return;
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/leads?id=eq.${state.leadId}`, {
+      method:  'PATCH',
+      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ review_tapped: true })
+    });
+  } catch(e) {}
+}
+
+async function updateLeadCodeSent() {
+  if (!state.leadId) return;
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/leads?id=eq.${state.leadId}`, {
+      method:  'PATCH',
+      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code_sent: true })
+    });
+  } catch(e) {}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEEDBACK REDIRECT
+══════════════════════════════════════════════════════════════ */
+function handleFeedbackRedirect() {
+  document.getElementById('progressWrap').style.display = 'none';
+  hideAllSteps();
+  showTransition('screenNeg');
+  const qp = new URLSearchParams({ biz: state.bizSlug, stars: state.starRating });
+  setTimeout(() => { window.location.href = `feedback.html?${qp}`; }, 1800);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PROGRESS / STEP HELPERS
+══════════════════════════════════════════════════════════════ */
+function setProgress(step) {
+  const totalSteps = 4;
+  const pct = Math.round((step / totalSteps) * 100);
+  document.getElementById('progressFill').style.width  = pct + '%';
+  document.getElementById('progressLabel').textContent = `Step ${step} of ${totalSteps}`;
+}
+
+function showStep(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+function showBack(visible) {
+  const btn = document.getElementById('btnBack');
+  if (btn) btn.style.display = visible ? 'flex' : 'none';
+}
+
+function goBack() {
+  const active = document.querySelector('.step.active');
+  if (!active) return;
+  if (active.id === 'step2')       { setProgress(1); showStep('step1'); showBack(false); }
+  else if (active.id === 'step3')  { setProgress(2); showStep('step2'); showBack(true); }
+  else if (active.id === 'stepNegative') { setProgress(2); showStep('step2'); showBack(true); }
+}
+
+function highlightStars(val) {
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.classList.toggle('lit', parseInt(btn.dataset.val) <= val);
+  });
+}
+
+function hideAllSteps() {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+}
+
+function showTransition(id) {
+  document.querySelectorAll('.transition-screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════════════════════ */
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I confusion
+  let code = 'HC-';
+  for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function showError(debugMsg) {
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('cardHeader').style.display   = 'none';
+  hideAllSteps();
+  showTransition('screenError');
+  if (debugMsg) {
+    const errScreen = document.getElementById('screenError');
+    const dbg = document.createElement('div');
+    dbg.style.cssText = 'margin-top:16px;padding:10px 14px;background:#f3f4f6;border-radius:10px;font-size:11px;color:#6b7280;word-break:break-all;text-align:left;';
+    dbg.innerHTML = `<strong>Debug:</strong><br>${debugMsg.replace(/</g,'&lt;')}`;
+    errScreen.appendChild(dbg);
+  }
+}
+</script>
+</body>
+</html>

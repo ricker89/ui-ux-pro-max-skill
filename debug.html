@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup Debug Log — HappyClientele</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0d0d;
+      color: #e0e0e0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #fff;
+      font-size: 18px;
+      margin-bottom: 6px;
+      font-family: sans-serif;
+    }
+    .subtitle {
+      color: #666;
+      font-size: 12px;
+      margin-bottom: 24px;
+      font-family: sans-serif;
+    }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: sans-serif;
+      font-weight: 600;
+    }
+    .btn-clear { background: #ff4444; color: #fff; }
+    .btn-refresh { background: #2a7fff; color: #fff; }
+    .btn-copy { background: #333; color: #ccc; }
+    .log-wrap {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 16px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    .log-line {
+      padding: 3px 0;
+      border-bottom: 1px solid #1a1a1a;
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+    .log-line.error   { color: #ff6b6b; }
+    .log-line.warn    { color: #ffd93d; }
+    .log-line.success { color: #6bcb77; }
+    .log-line.info    { color: #4fc3f7; }
+    .empty { color: #444; text-align: center; padding: 40px; font-family: sans-serif; }
+    .count { color: #555; font-size: 11px; margin-bottom: 12px; font-family: sans-serif; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Signup Debug Log</h1>
+  <p class="subtitle">Logs written by signup.html and saved to localStorage — persist across page redirects</p>
+
+  <div class="toolbar">
+    <button class="btn-refresh" onclick="renderLogs()">↺ Refresh</button>
+    <button class="btn-copy"    onclick="copyLogs()">📋 Copy All</button>
+    <button class="btn-clear"   onclick="clearLogs()">🗑 Clear Logs</button>
+  </div>
+
+  <div id="logWrap" class="log-wrap">
+    <div class="empty">No logs yet. Submit the signup form first, then come back here.</div>
+  </div>
+
+  <script>
+    function getLogs() {
+      try { return JSON.parse(localStorage.getItem('hc_debug_log') || '[]'); }
+      catch { return []; }
+    }
+
+    function renderLogs() {
+      const logs = getLogs();
+      const wrap = document.getElementById('logWrap');
+      if (!logs.length) {
+        wrap.innerHTML = '<div class="empty">No logs yet. Submit the signup form first, then come back here.</div>';
+        return;
+      }
+      let html = `<div class="count">${logs.length} log entries — most recent at bottom</div>`;
+      logs.forEach(line => {
+        let cls = 'info';
+        if (line.includes('❌') || line.includes('ERROR') || line.includes('failed')) cls = 'error';
+        else if (line.includes('⚠️') || line.includes('warn') || line.includes('deferred')) cls = 'warn';
+        else if (line.includes('✅') || line.includes('OK') || line.includes('upsert')) cls = 'success';
+        html += `<div class="log-line ${cls}">${escHtml(line)}</div>`;
+      });
+      wrap.innerHTML = html;
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    function clearLogs() {
+      localStorage.removeItem('hc_debug_log');
+      renderLogs();
+    }
+
+    function copyLogs() {
+      const logs = getLogs();
+      navigator.clipboard.writeText(logs.join('\n')).then(() => {
+        const btn = document.querySelector('.btn-copy');
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => btn.textContent = '📋 Copy All', 2000);
+      });
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    renderLogs();
+    // Auto-refresh every 3 seconds
+    setInterval(renderLogs, 3000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Menu</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="apple-touch-icon" href="images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white:   #ffffff;
+      --off:     #f8f8f8;
+      --border:  #e8e8e8;
+      --text:    #1a1a1a;
+      --sub:     #6b7280;
+      --yellow:  #FDB813;
+      --green:   #34A853;
+      --red:     #EA4335;
+      --blue:    #4285F4;
+      --radius:  16px;
+      --shadow:  0 4px 32px rgba(0,0,0,.08);
+      --trans:   all .22s cubic-bezier(.4,0,.2,1);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--off);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page wrapper ── */
+    .page {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px 48px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 440px;
+      padding: 40px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      position: relative;
+    }
+
+    /* ── Header ── */
+    .card-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .biz-icon {
+      width: 64px; height: 64px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      background: var(--off);
+    }
+    .biz-name   { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .biz-tagline { font-size: .82rem; color: var(--sub); }
+
+    /* ── CTA Button ── */
+    .cta-btn {
+      width: 100%;
+      background: var(--text); color: var(--white);
+      border: none; border-radius: 12px;
+      padding: 17px 24px;
+      font-family: inherit; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: var(--trans);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cta-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .cta-btn:active { transform: translateY(0); }
+    .cta-btn.outline {
+      background: transparent; color: var(--sub);
+      border: 1.5px solid var(--border);
+      font-weight: 500; font-size: .88rem;
+    }
+    .cta-btn.outline:hover { border-color: var(--text); color: var(--text); opacity: 1; transform: none; }
+    .cta-btn.green { background: var(--green); }
+    .cta-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    /* ── Email input ── */
+    .email-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .email-field {
+      width: 100%;
+      border: 2px solid var(--border); border-radius: 12px;
+      padding: 16px 18px;
+      font-family: inherit; font-size: 1rem; color: var(--text);
+      background: var(--white); transition: var(--trans);
+      -webkit-appearance: none;
+    }
+    .email-field:focus { outline: none; border-color: var(--text); }
+    .email-field::placeholder { color: #c0c0c0; }
+    .email-field.error { border-color: var(--red); animation: shake .3s ease both; }
+
+    .skip-link {
+      font-size: .8rem; color: #c0c0c0; text-align: center;
+      cursor: pointer; text-decoration: underline;
+      background: none; border: none; font-family: inherit; width: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .skip-link:hover { color: var(--sub); }
+
+    .email-disclaimer {
+      font-size: .72rem; color: var(--sub); text-align: center; line-height: 1.5;
+    }
+
+    /* ── Incentive banner ── */
+    .incentive-banner {
+      display: flex; align-items: center; gap: 12px;
+      background: #fffbeb; border: 1.5px solid #fde68a;
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .incentive-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .incentive-text { font-size: .9rem; font-weight: 600; color: #92400e; line-height: 1.4; }
+
+    /* ── Menu view button ── */
+    .menu-view-wrap { display: flex; flex-direction: column; gap: 12px; text-align: center; }
+    .menu-view-title { font-size: 1.15rem; font-weight: 700; }
+    .menu-view-sub   { font-size: .85rem; color: var(--sub); line-height: 1.55; }
+    .menu-btn-icon   { font-size: 1.3rem; }
+
+    /* ── Review prompt overlay ── */
+    #reviewOverlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(3px);
+      z-index: 999;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0 16px 32px;
+    }
+    #reviewOverlay.active { display: flex; animation: slide-up .32s cubic-bezier(.4,0,.2,1) both; }
+
+    .review-sheet {
+      background: var(--white);
+      border-radius: 20px 20px 16px 16px;
+      padding: 32px 28px 28px;
+      width: 100%; max-width: 440px;
+      display: flex; flex-direction: column; gap: 18px;
+      text-align: center;
+    }
+    .review-sheet-icon  { font-size: 2.8rem; }
+    .review-sheet-title { font-size: 1.2rem; font-weight: 700; }
+    .review-sheet-sub   { font-size: .88rem; color: var(--sub); line-height: 1.55; }
+
+    .review-stars-row {
+      display: flex; justify-content: center; gap: 8px;
+    }
+    .r-star {
+      font-size: 2.2rem; cursor: pointer; filter: grayscale(1) opacity(.3);
+      transition: transform .12s, filter .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .r-star.lit { filter: none; transform: scale(1.15); }
+
+    /* ── Error / Loading screen ── */
+    .screen {
+      display: none; flex-direction: column;
+      align-items: center; gap: 18px; text-align: center; padding: 8px 0;
+    }
+    .screen.active { display: flex; animation: fade-up .28s ease both; }
+    .screen-icon  { font-size: 3rem; }
+    .screen-title { font-size: 1.2rem; font-weight: 700; }
+    .screen-sub   { font-size: .9rem; color: var(--sub); line-height: 1.6; max-width: 280px; }
+
+    /* ── Footer ── */
+    .page-footer { margin-top: 20px; font-size: .72rem; color: #c0c0c0; text-align: center; }
+    .page-footer a { color: #c0c0c0; text-decoration: none; }
+
+    /* ── Animations ── */
+    @keyframes fade-up    { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes slide-up   { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes pop-in     { from{transform:scale(.6);opacity:0} to{transform:scale(1);opacity:1} }
+    @keyframes shake      { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+
+    /* ── Main content views ── */
+    #viewCapture { display: none; flex-direction: column; gap: 24px; }
+    #viewCapture.active { display: flex; animation: fade-up .28s ease both; }
+    #viewMenu { display: none; flex-direction: column; gap: 24px; }
+    #viewMenu.active { display: flex; animation: fade-up .28s ease both; }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .card { padding: 32px 22px; }
+      .review-sheet { padding: 28px 20px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <div class="card" id="mainCard">
+
+    <!-- ══════════ HEADER ══════════ -->
+    <div class="card-header" id="cardHeader">
+      <div class="biz-icon" id="bizIcon">🍽️</div>
+      <div class="biz-name" id="bizName">Loading…</div>
+      <div class="biz-tagline" id="bizTagline"></div>
+    </div>
+
+    <!-- ══════════ LOADING ══════════ -->
+    <div class="screen active" id="screenLoading">
+      <div class="screen-icon" style="animation:pop-in .4s ease both;">⏳</div>
+      <div class="screen-title">Loading menu…</div>
+    </div>
+
+    <!-- ══════════ ERROR ══════════ -->
+    <div class="screen" id="screenError">
+      <div class="screen-icon">🔍</div>
+      <div class="screen-title">Menu not found</div>
+      <div class="screen-sub">This link doesn't match an active menu. Please ask your server for assistance.</div>
+    </div>
+
+    <!-- ══════════ VIEW A — Email capture ══════════ -->
+    <div id="viewCapture">
+
+      <!-- Incentive banner (shown when incentive is set) -->
+      <div class="incentive-banner" id="incentiveBanner" style="display:none;">
+        <div class="incentive-icon">🎁</div>
+        <div class="incentive-text" id="incentiveText">Enter your email for a special offer!</div>
+      </div>
+
+      <div class="email-wrap">
+        <input
+          type="email"
+          id="emailInput"
+          class="email-field"
+          placeholder="your@email.com"
+          autocomplete="email"
+          inputmode="email"
+        />
+        <button class="cta-btn" id="btnGetMenu" onclick="handleEmailSubmit()">
+          Get the Menu →
+        </button>
+        <button class="skip-link" onclick="handleSkip()">
+          Skip — just show me the menu
+        </button>
+      </div>
+
+      <p class="email-disclaimer" id="captureDisclaimer">
+        Your email is shared with <span id="bizNameDisclaimer">this business</span> and used only to send your reward. No spam, ever.
+      </p>
+
+    </div><!-- /#viewCapture -->
+
+    <!-- ══════════ VIEW B — Menu ══════════ -->
+    <div id="viewMenu">
+
+      <div class="menu-view-wrap">
+        <div class="menu-view-title" id="menuViewTitle">Tap to view the menu</div>
+        <div class="menu-view-sub" id="menuViewSub">Opens in your browser — works on all devices</div>
+        <a class="cta-btn" id="btnViewMenu" href="#" target="_blank" rel="noopener" style="text-decoration:none;">
+          <span class="menu-btn-icon">📄</span>
+          <span id="btnViewMenuLabel">View Menu</span>
+        </a>
+      </div>
+
+      <!-- Shown after email captured: confirm code coming -->
+      <div id="emailConfirmNote" style="display:none;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:14px 16px;font-size:.84rem;color:#166534;text-align:center;line-height:1.5;">
+        ✅ Got it! Your offer will arrive in your inbox during your visit.
+      </div>
+
+    </div><!-- /#viewMenu -->
+
+  </div><!-- /.card -->
+
+  <div class="page-footer">
+    Powered by <a href="https://happyclientele.com" target="_blank">HappyClientele.</a>
+  </div>
+</div><!-- /.page -->
+
+<!-- ══════════ REVIEW PROMPT OVERLAY ══════════ -->
+<!-- Slides up from bottom after timer fires -->
+<div id="reviewOverlay">
+  <div class="review-sheet">
+    <div class="review-sheet-icon">⭐</div>
+    <div class="review-sheet-title" id="reviewSheetTitle">How was everything?</div>
+    <div class="review-sheet-sub">
+      Quick tap — it means a lot to <strong id="reviewSheetBiz">us</strong>.
+    </div>
+
+    <div class="review-stars-row" id="reviewStarsRow">
+      <span class="r-star" data-val="1">⭐</span>
+      <span class="r-star" data-val="2">⭐</span>
+      <span class="r-star" data-val="3">⭐</span>
+      <span class="r-star" data-val="4">⭐</span>
+      <span class="r-star" data-val="5">⭐</span>
+    </div>
+
+    <a class="cta-btn google" id="btnLeaveReview" href="#" target="_blank" rel="noopener"
+       style="text-decoration:none;display:none;background:#4285F4;">
+      ⭐ Leave a Quick Review
+    </a>
+
+    <button class="cta-btn outline" onclick="dismissReviewOverlay()">
+      Maybe next time
+    </button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   CONFIG
+   WEBHOOK_URL: paste your Make.com webhook URL here when ready.
+   Leave as '' and the email-capture step still saves to Supabase,
+   but no email will be sent until the webhook is configured.
+══════════════════════════════════════════════════════════════ */
+const WEBHOOK_URL   = 'https://hook.us2.make.com/71c6bp3dkpejjip6aklpnwrtijst1iee';
+const MENU_VERSION  = '1.0';
+
+const SUPA_URL = 'https://dbbryatmoxlzifsurxrm.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk';
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════ */
+const state = {
+  biz:          null,   // fetched business row
+  menu:         null,   // fetched menu row
+  bizSlug:      '',
+  email:        '',
+  leadId:       null,
+  timerHandle:  null,
+  starRating:   0
+};
+
+/* ══════════════════════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  const params  = new URLSearchParams(window.location.search);
+  const rawSlug = (params.get('biz') || '').toLowerCase().trim();
+
+  if (!rawSlug) { showError('No ?biz= in URL.'); return; }
+  state.bizSlug = rawSlug;
+
+  // Fetch biz + menu in parallel
+  try {
+    const [bizRes, menuRes] = await Promise.all([
+      fetch(`${SUPA_URL}/rest/v1/businesses?slug=eq.${encodeURIComponent(rawSlug)}&select=biz_name,slug,google_url,incentive&limit=1`,
+        { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }),
+      fetch(`${SUPA_URL}/rest/v1/menus?biz_slug=eq.${encodeURIComponent(rawSlug)}&limit=1`,
+        { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } })
+    ]);
+
+    if (!bizRes.ok) { showError(`Business fetch ${bizRes.status}`); return; }
+
+    const bizRows  = await bizRes.json();
+    const menuRows = menuRes.ok ? await menuRes.json() : [];
+
+    if (!bizRows || !bizRows.length) { showError('Business not found.'); return; }
+
+    const r = bizRows[0];
+    state.biz = {
+      name:      r.biz_name   || 'Your Business',
+      googleUrl: r.google_url || '',
+      incentive: r.incentive  || '',
+      slug:      r.slug       || rawSlug
+    };
+
+    state.menu = (menuRows && menuRows.length) ? menuRows[0] : null;
+
+    // Validate menu has a PDF URL
+    if (!state.menu || !state.menu.pdf_url) {
+      // Business exists but no menu uploaded yet
+      showNoMenu();
+      return;
+    }
+
+    // Check active flag
+    if (state.menu.active === false) {
+      showNoMenu();
+      return;
+    }
+
+    initUI();
+
+  } catch(e) {
+    showError(String(e));
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   UI INIT
+══════════════════════════════════════════════════════════════ */
+function initUI() {
+  const biz  = state.biz;
+  const menu = state.menu;
+
+  // Header
+  document.getElementById('bizName').textContent = biz.name;
+  document.getElementById('bizIcon').textContent = '🍽️';
+
+  // Review sheet
+  document.getElementById('reviewSheetBiz').textContent = biz.name;
+  document.getElementById('reviewSheetTitle').textContent = `How was everything at ${biz.name}?`;
+
+  // Set Google review link on the leave-review button
+  if (biz.googleUrl) {
+    document.getElementById('btnLeaveReview').href = biz.googleUrl;
+  }
+
+  // Menu button
+  document.getElementById('btnViewMenu').href = menu.pdf_url;
+
+  // Determine incentive — menu-level overrides biz-level
+  const incentive = (menu.incentive || biz.incentive || '').trim();
+
+  // Hide loading screen
+  hideScreen('screenLoading');
+
+  if (incentive) {
+    // Show email capture first
+    document.getElementById('incentiveBanner').style.display = 'flex';
+    document.getElementById('incentiveText').textContent      = incentive;
+    document.getElementById('bizNameDisclaimer').textContent  = biz.name;
+    showView('viewCapture');
+    // Email input enter key
+    document.getElementById('emailInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); handleEmailSubmit(); }
+    });
+  } else {
+    // No incentive — go straight to menu
+    proceedToMenu(false);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EMAIL CAPTURE HANDLERS
+══════════════════════════════════════════════════════════════ */
+function handleEmailSubmit() {
+  const input = document.getElementById('emailInput');
+  const email = (input?.value || '').trim();
+
+  if (email && !isValidEmail(email)) {
+    input.classList.add('error');
+    setTimeout(() => input?.classList.remove('error'), 2000);
+    return;
+  }
+
+  state.email = email;
+
+  if (email) {
+    // Save lead then proceed
+    saveLead().then(() => {
+      proceedToMenu(true);
+    });
+  } else {
+    proceedToMenu(false);
+  }
+}
+
+function handleSkip() {
+  state.email = '';
+  proceedToMenu(false);
+}
+
+function proceedToMenu(capturedEmail) {
+  hideView('viewCapture');
+  hideScreen('screenLoading');
+
+  // Show email confirmation if email was captured
+  if (capturedEmail) {
+    document.getElementById('emailConfirmNote').style.display = 'block';
+  }
+
+  // Set menu button label
+  const menu = state.menu;
+  const isPdf = menu?.pdf_url?.toLowerCase().includes('.pdf') ||
+                menu?.pdf_url?.includes('drive.google') ||
+                menu?.pdf_url?.includes('dropbox');
+  document.getElementById('btnViewMenuLabel').textContent = isPdf ? 'Open Menu PDF' : 'View Menu';
+
+  showView('viewMenu');
+
+  // Start review prompt timer
+  const delayMin = (menu?.timer_minutes > 0) ? menu.timer_minutes : 60;
+  startReviewTimer(delayMin);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REVIEW PROMPT TIMER
+══════════════════════════════════════════════════════════════ */
+function startReviewTimer(minutes) {
+  if (state.timerHandle) clearTimeout(state.timerHandle);
+  const ms = minutes * 60 * 1000;
+  state.timerHandle = setTimeout(() => showReviewOverlay(), ms);
+}
+
+function showReviewOverlay() {
+  // Only show if Google URL is available
+  if (!state.biz?.googleUrl) return;
+  const overlay = document.getElementById('reviewOverlay');
+  if (overlay) overlay.classList.add('active');
+
+  // Bind star taps
+  document.querySelectorAll('.r-star').forEach(star => {
+    star.addEventListener('click', () => {
+      const val = parseInt(star.dataset.val);
+      state.starRating = val;
+      highlightReviewStars(val);
+      // Show review button after star selected
+      const btn = document.getElementById('btnLeaveReview');
+      if (btn) {
+        btn.style.display = 'flex';
+        btn.addEventListener('click', () => {
+          updateLeadReviewTapped();
+        }, { once: true });
+      }
+    });
+    star.addEventListener('mouseenter', () => highlightReviewStars(parseInt(star.dataset.val)));
+    star.addEventListener('mouseleave', () => highlightReviewStars(state.starRating));
+  });
+}
+
+function dismissReviewOverlay() {
+  const overlay = document.getElementById('reviewOverlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+    overlay.style.display = 'none';
+  }
+}
+
+function highlightReviewStars(val) {
+  document.querySelectorAll('.r-star').forEach(s => {
+    s.classList.toggle('lit', parseInt(s.dataset.val) <= val);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SUPABASE — save lead
+══════════════════════════════════════════════════════════════ */
+async function saveLead() {
+  if (!state.email) return;
+
+  const menu      = state.menu;
+  const biz       = state.biz;
+  const incentive = (menu?.incentive || biz?.incentive || '').trim();
+
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/leads`, {
+      method:  'POST',
+      headers: {
+        apikey:          SUPA_KEY,
+        Authorization:  `Bearer ${SUPA_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer:         'return=representation'
+      },
+      body: JSON.stringify({
+        business_slug: state.bizSlug,
+        email:         state.email,
+        incentive,
+        source:        'menu',
+        stars:         0,
+        review_tapped: false,
+        code_sent:     false
+      })
+    });
+
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows && rows[0]) state.leadId = rows[0].id;
+    }
+  } catch(e) { console.warn('[menu] saveLead error:', e); }
+
+  // Fire webhook if configured (immediate — delay handled by Make.com)
+  if (WEBHOOK_URL && state.email) {
+    sendMenuWebhook();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WEBHOOK — notify Make.com to send timed email
+   Make.com scenario: receive → Sleep(delayMinutes) → Send email
+══════════════════════════════════════════════════════════════ */
+async function sendMenuWebhook() {
+  if (!WEBHOOK_URL || !state.email) return;
+
+  const menu      = state.menu;
+  const biz       = state.biz;
+  const incentive = (menu?.incentive || biz?.incentive || '').trim();
+  const delay     = menu?.timer_minutes > 0 ? menu.timer_minutes : 60;
+
+  try {
+    await fetch(WEBHOOK_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type:          'menu_review_prompt',
+        email:         state.email,
+        bizName:       biz?.name      || '',
+        bizEmail:      biz?.email     || '',
+        reviewUrl:     biz?.googleUrl || '',
+        incentive,
+        delaySeconds:  delay * 60,
+        bizSlug:       state.bizSlug
+      })
+    });
+  } catch(e) { console.warn('[menu] webhook error:', e); }
+}
+
+async function updateLeadReviewTapped() {
+  if (!state.leadId) return;
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/leads?id=eq.${state.leadId}`, {
+      method:  'PATCH',
+      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ review_tapped: true, stars: state.starRating })
+    });
+  } catch(e) {}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════════════════ */
+function showView(id) {
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); }
+}
+
+function hideView(id) {
+  const el = document.getElementById(id);
+  if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+}
+
+function hideScreen(id) {
+  const el = document.getElementById(id);
+  if (el) { el.classList.remove('active'); }
+}
+
+function showError(msg) {
+  hideScreen('screenLoading');
+  const err = document.getElementById('screenError');
+  if (err) {
+    err.classList.add('active');
+    if (msg) {
+      const dbg = document.createElement('div');
+      dbg.style.cssText = 'margin-top:12px;padding:8px 12px;background:#f3f4f6;border-radius:8px;font-size:10px;color:#6b7280;word-break:break-all;text-align:left;';
+      dbg.innerHTML = `<strong>Debug:</strong> ${msg.replace(/</g,'&lt;')}`;
+      err.appendChild(dbg);
+    }
+  }
+}
+
+function showNoMenu() {
+  hideScreen('screenLoading');
+  // Show a friendly "menu coming soon" state in the header
+  const bizName = state.biz?.name || 'This business';
+  document.getElementById('bizName').textContent    = bizName;
+  document.getElementById('bizTagline').textContent = '';
+
+  const err = document.getElementById('screenError');
+  if (err) {
+    err.querySelector('.screen-icon').textContent  = '📋';
+    err.querySelector('.screen-title').textContent = 'Menu coming soon';
+    err.querySelector('.screen-sub').textContent   = `${bizName} is still setting up their digital menu. Check back soon!`;
+    err.classList.add('active');
+  }
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+</script>
+</body>
+</html>

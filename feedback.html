@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Share Your Feedback</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="apple-touch-icon" href="images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white:   #ffffff;
+      --off:     #f8f8f8;
+      --border:  #e8e8e8;
+      --text:    #1a1a1a;
+      --sub:     #6b7280;
+      --yellow:  #FDB813;
+      --green:   #34A853;
+      --red:     #EA4335;
+      --blue:    #4285F4;
+      --radius:  16px;
+      --shadow:  0 4px 32px rgba(0,0,0,.08);
+      --trans:   all .22s cubic-bezier(.4,0,.2,1);
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--off);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 32px 20px 48px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 520px;
+      padding: 40px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ── Header ── */
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+    }
+
+    .biz-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: var(--off);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+
+    .biz-name {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ── Empathy banner ── */
+    .empathy-banner {
+      background: #fff8f7;
+      border: 1.5px solid #fde8e6;
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .empathy-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+
+    .empathy-text h4 {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .empathy-text p {
+      font-size: .85rem;
+      color: var(--sub);
+      line-height: 1.55;
+    }
+
+    /* ── Context pills (pre-filled from funnel) ── */
+    .context-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .context-pill {
+      background: var(--off);
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--sub);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ── Form ── */
+    .form-section-label {
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #bbb;
+      margin-bottom: -12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .field label .req { color: var(--red); }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 15px;
+      font-family: inherit;
+      font-size: .9rem;
+      color: var(--text);
+      background: var(--white);
+      transition: var(--trans);
+      appearance: none;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--text);
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder { color: #c4c4c4; }
+
+    .field textarea { resize: vertical; min-height: 110px; }
+
+    .field.error input,
+    .field.error textarea { border-color: var(--red); }
+
+    .field-hint {
+      font-size: .76rem;
+      color: var(--sub);
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    /* ── Rating recap stars ── */
+    .rating-recap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .88rem;
+      color: var(--sub);
+    }
+
+    .rating-recap .stars { font-size: 1rem; letter-spacing: 1px; }
+
+    /* ── Submit ── */
+    .submit-btn {
+      width: 100%;
+      background: var(--text);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      padding: 17px 24px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--trans);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .submit-btn:hover { opacity: .88; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .submit-btn .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      display: none;
+    }
+
+    .submit-btn.loading .btn-text { display: none; }
+    .submit-btn.loading .spinner { display: block; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .privacy-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .78rem;
+      color: #bbb;
+      text-align: center;
+      justify-content: center;
+    }
+
+    /* ── Success screen ── */
+    .success-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+      padding: 16px 0 8px;
+    }
+
+    .success-screen.active { display: flex; }
+
+    .success-icon {
+      font-size: 3.5rem;
+      animation: pop-in .4s cubic-bezier(.4,0,.2,1) both;
+    }
+
+    @keyframes pop-in {
+      from { transform: scale(.6); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+
+    .success-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .success-sub {
+      font-size: .93rem;
+      color: var(--sub);
+      line-height: 1.65;
+      max-width: 320px;
+    }
+
+    .back-link {
+      margin-top: 8px;
+      font-size: .82rem;
+      color: #bbb;
+      text-decoration: none;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 1px;
+    }
+
+    /* ── Footer ── */
+    .page-footer {
+      margin-top: 20px;
+      font-size: .72rem;
+      color: #c0c0c0;
+      text-align: center;
+    }
+
+    .page-footer a { color: #c0c0c0; text-decoration: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      .card { padding: 30px 22px; }
+      .row-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <div class="card" id="mainCard">
+
+    <!-- Header -->
+    <div class="card-header">
+      <div class="biz-icon" id="bizIcon">🏪</div>
+      <div class="biz-name" id="bizName">Loading…</div>
+    </div>
+
+    <!-- Form section (hidden when success) -->
+    <div id="formSection">
+
+      <!-- Empathy banner -->
+      <div class="empathy-banner" style="margin-bottom:20px;">
+        <span class="empathy-icon">💛</span>
+        <div class="empathy-text">
+          <h4>We're sorry your experience wasn't perfect.</h4>
+        </div>
+      </div>
+
+      <!-- Context pre-filled from funnel -->
+      <div class="context-row" id="contextRow" style="display:none"></div>
+
+      <!-- Form -->
+      <form id="feedbackForm" novalidate>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+
+          <p class="form-section-label">Your Contact Info <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#ccc;">(optional)</span></p>
+
+          <div class="row-2">
+            <div class="field">
+              <label for="fb-name">Your Name</label>
+              <input type="text" id="fb-name" name="customer_name" placeholder="First name" autocomplete="given-name" />
+            </div>
+            <div class="field">
+              <label for="fb-phone">Phone / Email</label>
+              <input type="text" id="fb-phone" name="contact_info" placeholder="Optional" />
+            </div>
+          </div>
+
+          <p class="form-section-label" style="margin-top:4px;">What Happened?</p>
+
+          <div class="field">
+            <label for="fb-message">Tell us more <span class="req">*</span></label>
+            <textarea
+              id="fb-message"
+              name="message"
+              placeholder="We want to understand exactly what went wrong so we can fix it and make things right for you…"
+              required
+            ></textarea>
+          </div>
+
+          <!-- Hidden fields -->
+          <input type="hidden" name="access_key" id="web3key" value="" />
+          <input type="hidden" name="subject"    id="emailSubject" value="" />
+          <input type="hidden" name="from_name"  value="HappyClientele Feedback System" />
+          <input type="hidden" name="star_rating" id="hidStars" value="" />
+          <input type="hidden" name="issues_selected" id="hidChips" value="" />
+          <input type="hidden" name="funnel_note" id="hidNote" value="" />
+          <input type="hidden" name="business_slug" id="hidSlug" value="" />
+          <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span class="btn-text">Send Feedback to Owner →</span>
+            <span class="spinner"></span>
+          </button>
+
+          <div class="privacy-note">
+            🔒 &nbsp;This feedback is 100% private and goes directly to the owner.
+          </div>
+
+        </div>
+      </form>
+
+    </div><!-- /#formSection -->
+
+    <!-- Success screen -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Thank you for letting us know.</div>
+      <div class="success-sub">
+        Your feedback has been sent directly to the owner.<br/>
+        We take this seriously and will be in touch soon.
+      </div>
+      <a class="back-link" href="javascript:window.close()">Close this window</a>
+    </div>
+
+  </div><!-- /.card -->
+
+  <div class="page-footer">
+    Powered by <a href="https://happyclientele.com" target="_blank">HappyClientele.</a>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   BUSINESS CONFIG — must match funnel.html exactly
+═══════════════════════════════════════════════════════════ */
+const MASTER_KEY = '1c2925a9-6881-47d9-bb50-496f6bc39c2c';
+
+/* ── Supabase config ── */
+const SUPA_URL  = 'https://dbbryatmoxlzifsurxrm.supabase.co';
+const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk';
+
+async function fetchBizBySlug(slug) {
+  if (!slug) return null;
+  const url = `${SUPA_URL}/rest/v1/businesses?slug=eq.${encodeURIComponent(slug)}&select=biz_name,slug,google_url,incentive&limit=1`;
+  try {
+    const res = await fetch(url, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Accept': 'application/json' }
+    });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    if (!rows || rows.length === 0) return null;
+    const r = rows[0];
+    return { name: r.biz_name || 'Your Business', emoji: '⭐', web3key: '' };
+  } catch(e) { return null; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  const params  = new URLSearchParams(window.location.search);
+  const slug    = (params.get('biz')   || '').toLowerCase().trim();
+  const stars   = params.get('stars')  || '';
+  const chips   = params.get('chips')  || '';
+  const note    = params.get('note')   || '';
+
+  const biz = await fetchBizBySlug(slug);
+
+  // Set business UI
+  if (biz) {
+    document.getElementById('bizName').textContent = biz.name;
+    document.getElementById('bizIcon').textContent = biz.emoji;
+
+    // Hidden form fields
+    document.getElementById('web3key').value      = biz.web3key || MASTER_KEY;
+    document.getElementById('emailSubject').value = `⚠️ Private Feedback — ${biz.name}`;
+    document.getElementById('hidSlug').value      = slug;
+  } else {
+    document.getElementById('bizName').textContent = 'Your Recent Visit';
+    document.getElementById('bizIcon').textContent = '🏪';
+    document.getElementById('web3key').value       = MASTER_KEY;
+    document.getElementById('emailSubject').value  = '⚠️ Private Feedback — Unknown Business';
+    document.getElementById('hidSlug').value       = slug;
+  }
+
+  // Pre-fill hidden context from funnel
+  document.getElementById('hidStars').value = stars;
+  document.getElementById('hidChips').value = chips;
+  document.getElementById('hidNote').value  = note;
+
+  // Show context pills if we have data
+  const contextRow = document.getElementById('contextRow');
+  const pillData   = [];
+
+  if (stars) {
+    const starEmoji = '⭐'.repeat(parseInt(stars) || 0);
+    pillData.push(`${starEmoji} ${stars} star${stars !== '1' ? 's' : ''}`);
+  }
+
+  if (chips) {
+    chips.split(',').filter(Boolean).forEach(c => pillData.push(c));
+  }
+
+  if (note) {
+    pillData.push(`"${note.substring(0, 40)}${note.length > 40 ? '…' : ''}"`);
+  }
+
+  if (pillData.length > 0) {
+    contextRow.style.display = 'flex';
+    pillData.forEach(text => {
+      const pill = document.createElement('span');
+      pill.className = 'context-pill';
+      pill.textContent = text;
+      contextRow.appendChild(pill);
+    });
+  }
+
+  // Bind form
+  document.getElementById('feedbackForm').addEventListener('submit', handleSubmit);
+});
+
+/* ═══════════════════════════════════════════════════════════
+   SUBMIT
+═══════════════════════════════════════════════════════════ */
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  const msgField = document.getElementById('fb-message');
+  const fieldEl  = msgField.closest('.field');
+
+  // Validate
+  if (!msgField.value.trim()) {
+    fieldEl.classList.add('error');
+    msgField.focus();
+    return;
+  }
+  fieldEl.classList.remove('error');
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    const formData = new FormData(document.getElementById('feedbackForm'));
+    const payload  = Object.fromEntries(formData.entries());
+
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      showSuccess();
+    } else {
+      throw new Error(json.message || 'Submission failed');
+    }
+  } catch (err) {
+    console.error('Feedback error:', err);
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    alert('Something went wrong. Please try again or contact us directly.');
+  }
+}
+
+function showSuccess() {
+  document.getElementById('formSection').style.display  = 'none';
+  document.getElementById('successScreen').classList.add('active');
+  // Scroll to top of card
+  document.getElementById('mainCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>

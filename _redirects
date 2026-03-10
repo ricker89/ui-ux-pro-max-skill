@@ -1,0 +1,11 @@
+# Cloudflare Pages / Netlify clean URL rewrites
+# Maps /path -> /path.html (200 = rewrite, not redirect — URL stays clean)
+
+/dashboard      /dashboard.html     200
+/account        /account.html       200
+/login          /login.html         200
+/signup         /signup.html        200
+/funnel         /funnel.html        200
+/menu           /menu.html          200
+/wifi           /wifi.html          200
+/welcome        /welcome.html       200

@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Settings — HappyClientele.</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="apple-touch-icon" href="images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet" />
+  <script src="js/supabase.js"></script>
+  <script src="js/topbar.js?v=2.0"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #1a1a1a;
+      --white:   #ffffff;
+      --off:     #f8f8f8;
+      --border:  #e8e8e8;
+      --sub:     #6b7280;
+      --yellow:  #FDB813;
+      --green:   #34A853;
+      --red:     #EA4335;
+      --blue:    #4285F4;
+      --radius:  14px;
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--off);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .topbar-logo {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--black);
+      text-decoration: none;
+    }
+    .topbar-logo span { color: var(--yellow); }
+
+    .topbar-back {
+      font-size: .82rem;
+      color: var(--sub);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color .15s;
+    }
+    .topbar-back:hover { color: var(--black); }
+
+    /* ── User menu (reused from topbar.js) ── */
+    .user-menu-wrap {
+      position: relative;
+    }
+
+    .user-menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--off);
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 14px 6px 8px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--black);
+      transition: all .15s;
+    }
+    .user-menu-btn:hover { border-color: #ccc; background: #f0f0f0; }
+
+    .user-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--black);
+      color: var(--white);
+      font-size: .72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .user-menu-dropdown {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.1);
+      min-width: 200px;
+      padding: 6px;
+      z-index: 200;
+      display: none;
+    }
+    .user-menu-dropdown.open { display: block; }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: .84rem;
+      font-weight: 500;
+      color: var(--black);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .12s;
+      border: none;
+      background: none;
+      width: 100%;
+      font-family: inherit;
+      text-align: left;
+    }
+    .menu-item:hover { background: var(--off); }
+    .menu-item.active { background: var(--off); font-weight: 700; }
+    .menu-item.danger { color: var(--red); }
+    .menu-item.danger:hover { background: #fef2f2; }
+    .menu-divider { height: 1px; background: var(--border); margin: 5px 0; }
+    .menu-email {
+      padding: 8px 12px 10px;
+      font-size: .75rem;
+      color: var(--sub);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+
+    /* ── Page layout ── */
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .page-header {
+      margin-bottom: 36px;
+    }
+
+    .page-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      margin-bottom: 6px;
+    }
+
+    .page-sub {
+      font-size: .9rem;
+      color: var(--sub);
+    }
+
+    /* ── Section cards ── */
+    .section {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 20px 24px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #bbb;
+    }
+
+    .section-body {
+      padding: 24px;
+    }
+
+    /* ── Subscription status badge ── */
+    .sub-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    .sub-status.active   { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    .sub-status.inactive { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .sub-status.trial    { background: #fffbea; color: #b45309; border: 1px solid #fde68a; }
+
+    /* ── Billing hero ── */
+    .billing-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .billing-plan {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .billing-plan-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: var(--black);
+      color: var(--white);
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .billing-plan-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--black);
+      margin-bottom: 3px;
+    }
+
+    .billing-plan-price {
+      font-size: .88rem;
+      color: var(--sub);
+    }
+
+    .billing-plan-price strong {
+      color: var(--black);
+      font-weight: 700;
+    }
+
+    .btn-manage-billing {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 9px;
+      padding: 12px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: .88rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity .15s;
+      white-space: nowrap;
+    }
+    .btn-manage-billing:hover { opacity: .83; }
+    .btn-manage-billing.loading { opacity: .6; pointer-events: none; }
+
+    /* Billing note */
+    .billing-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 18px;
+      padding: 12px 14px;
+      background: var(--off);
+      border-radius: 9px;
+      font-size: .8rem;
+      color: var(--sub);
+    }
+
+    /* ── Row-style form fields ── */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--black);
+    }
+
+    .field input, .field textarea {
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 12px 14px;
+      font-size: .92rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--black);
+      background: var(--white);
+      outline: none;
+      transition: border-color .18s;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus { border-color: var(--black); }
+
+    .field input:disabled {
+      background: var(--off);
+      color: var(--sub);
+      cursor: not-allowed;
+    }
+
+    .field-hint {
+      font-size: .74rem;
+      color: var(--sub);
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .field.has-error input,
+    .field.has-error textarea { border-color: var(--red); }
+
+    .field-error-msg {
+      font-size: .74rem;
+      color: var(--red);
+      display: none;
+    }
+    .field.has-error .field-error-msg { display: block; }
+
+    /* Slug preview */
+    .slug-preview {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      overflow: hidden;
+      background: var(--white);
+      transition: border-color .18s;
+    }
+    .slug-preview:focus-within { border-color: var(--black); }
+    .slug-prefix {
+      background: var(--off);
+      border-right: 1.5px solid var(--border);
+      padding: 12px 10px;
+      font-size: .78rem;
+      color: var(--sub);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .slug-preview input {
+      border: none !important;
+      border-radius: 0 !important;
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+    }
+    .slug-preview input:focus { outline: none; border-color: transparent !important; }
+
+    /* ── Section actions ── */
+    .section-actions {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--off);
+    }
+
+    .save-status {
+      font-size: .8rem;
+      color: var(--sub);
+    }
+
+    .save-status.saved { color: var(--green); font-weight: 600; }
+    .save-status.error { color: var(--red); font-weight: 600; }
+
+    .btn-save {
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-size: .88rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-save:hover { opacity: .85; }
+    .btn-save:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Password change section ── */
+    .pw-strength {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .pw-strength-bar {
+      height: 100%;
+      border-radius: 2px;
+      transition: width .3s, background .3s;
+      width: 0;
+    }
+    /* ── Password eye toggle ── */
+    .pw-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .pw-wrap input {
+      flex: 1;
+      padding-right: 42px; /* room for the eye button */
+    }
+    .pw-eye {
+      position: absolute;
+      right: 11px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--sub);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: color .15s;
+      line-height: 1;
+    }
+    .pw-eye:hover { color: var(--black); }
+
+
+    .danger-zone {
+      border-color: #fecaca;
+    }
+
+    .danger-zone .section-header {
+      border-bottom-color: #fecaca;
+    }
+
+    .danger-zone .section-title {
+      color: var(--red);
+    }
+
+    .danger-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .danger-item-text strong {
+      display: block;
+      font-size: .9rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .danger-item-text p {
+      font-size: .8rem;
+      color: var(--sub);
+      line-height: 1.5;
+    }
+
+    .btn-danger {
+      background: none;
+      border: 1.5px solid var(--red);
+      color: var(--red);
+      border-radius: 8px;
+      padding: 9px 18px;
+      font-size: .85rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: all .15s;
+      flex-shrink: 0;
+    }
+    .btn-danger:hover { background: var(--red); color: #fff; }
+
+    /* ── Alert ── */
+    .alert {
+      border-radius: 9px;
+      padding: 12px 16px;
+      font-size: .84rem;
+      line-height: 1.5;
+      display: none;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .alert.show { display: flex; }
+    .alert-error   { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; }
+    .alert-success { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; }
+
+    /* ── Skeleton loader ── */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ── Confirm modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: modal-in .2s ease both;
+    }
+    @keyframes modal-in {
+      from { opacity: 0; transform: scale(.97) translateY(6px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-icon { font-size: 2.2rem; text-align: center; }
+    .modal-title { font-family:'Poppins',sans-serif; font-size:1.15rem; font-weight:800; text-align:center; }
+    .modal-body { font-size:.85rem; color:var(--sub); text-align:center; line-height:1.6; }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 4px; }
+    .btn-outline {
+      flex: 1;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 9px;
+      padding: 12px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .15s;
+    }
+    .btn-outline:hover { border-color: var(--black); }
+
+    .btn-danger-confirm {
+      flex: 1;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 12px;
+      font-size: .9rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s;
+    }
+    .btn-danger-confirm:hover { opacity: .85; }
+
+    .confirm-input-wrap { display: flex; flex-direction: column; gap: 7px; }
+    .confirm-input-wrap label { font-size: .8rem; font-weight: 600; }
+    .confirm-input-wrap input {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: .9rem;
+      font-family: inherit;
+      outline: none;
+    }
+    .confirm-input-wrap input:focus { border-color: var(--red); }
+
+    /* ── Inline GBP Picker ── */
+    .gbp-picker-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    /* Selected / confirmed card */
+    .gbp-confirmed {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 10px;
+      background: #f0fdf4;
+      font-size: .9rem;
+    }
+    .gbp-confirmed-info { display: flex; align-items: center; gap: 10px; }
+    .gbp-confirmed-name { font-weight: 700; color: var(--black); }
+    .gbp-confirmed-addr { font-size: .78rem; color: var(--sub); margin-top: 2px; }
+    .gbp-change-btn {
+      flex-shrink: 0;
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--sub);
+      transition: all .15s;
+    }
+    .gbp-change-btn:hover { border-color: var(--black); color: var(--black); }
+    /* Inline search */
+    .gbp-search-block { display: none; flex-direction: column; gap: 6px; }
+    .gbp-search-block.active { display: flex; }
+    .gbp-search-row {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0 12px;
+      background: var(--white);
+      gap: 8px;
+      transition: border-color .15s;
+    }
+    .gbp-search-row:focus-within { border-color: var(--black); }
+    .gbp-search-row input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: .88rem;
+      padding: 12px 0;
+      background: transparent;
+      color: var(--black);
+    }
+    .gbp-search-row input::placeholder { color: #b0b0b0; }
+    .gbp-inp-clear {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--border);
+      border: none;
+      cursor: pointer;
+      font-size: .7rem;
+      color: var(--sub);
+      flex-shrink: 0;
+    }
+    .gbp-inp-clear.visible { display: flex; }
+    .gbp-inp-clear:hover { color: var(--black); }
+    .gbp-results-list {
+      display: none;
+      flex-direction: column;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      overflow: hidden;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .gbp-results-list.open { display: flex; }
+    .gbp-res-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      cursor: pointer;
+      transition: background .12s;
+      border-bottom: 1px solid var(--border);
+    }
+    .gbp-res-row:last-child { border-bottom: none; }
+    .gbp-res-row:hover { background: var(--off); }
+    .gbp-res-name { font-size: .88rem; font-weight: 600; }
+    .gbp-res-addr { font-size: .77rem; color: var(--sub); }
+    .gbp-res-type { font-size: .7rem; color: var(--sub); margin-left: auto; white-space: nowrap; text-transform: capitalize; }
+    .gbp-state-msg {
+      padding: 13px 14px;
+      font-size: .83rem;
+      color: var(--sub);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .gbp-spinner {
+      width: 15px; height: 15px;
+      border: 2px solid var(--border);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: gbpSpin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes gbpSpin { to { transform: rotate(360deg); } }
+    .gbp-cancel-link {
+      font-size: .78rem;
+      color: var(--sub);
+      cursor: pointer;
+      text-align: right;
+      padding: 2px 0;
+      text-decoration: underline;
+      align-self: flex-end;
+    }
+    .gbp-cancel-link:hover { color: var(--black); }
+    .gbp-save-note {
+      font-size: .77rem;
+      color: var(--sub);
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 9px 12px;
+      line-height: 1.55;
+    }
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+      .billing-hero { flex-direction: column; align-items: flex-start; }
+      .danger-item { flex-direction: column; align-items: flex-start; }
+      .topbar { padding: 0 16px; }
+      .page { padding: 24px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Top bar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="topbar-logo">HappyClientele<span>.</span></a>
+    <a href="dashboard.html" class="topbar-back">← Dashboard</a>
+  </div>
+  <div id="topbarUserArea"></div>
+</div>
+</div>
+
+<!-- ── Page ── -->
+<div class="page">
+
+  <div class="page-header">
+    <h1 class="page-title">Account Settings</h1>
+    <p class="page-sub">Manage your business profile, billing, and security settings.</p>
+  </div>
+
+  <!-- Global alert -->
+  <div class="alert alert-error" id="globalError">
+    <span>⚠️</span><span id="globalErrorMsg"></span>
+  </div>
+  <div class="alert alert-success" id="globalSuccess">
+    <span>✅</span><span id="globalSuccessMsg"></span>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       1. BILLING & SUBSCRIPTION
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Billing &amp; Subscription</div>
+      <div class="sub-status active" id="subStatusBadge">
+        <span>●</span> <span id="subStatusText">Active</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="billing-hero">
+        <div class="billing-plan">
+          <div class="billing-plan-icon">⭐</div>
+          <div>
+            <div class="billing-plan-name">HappyClientele Monthly</div>
+            <div class="billing-plan-price">
+              <strong>$97</strong> / month &nbsp;·&nbsp;
+              <span id="billingNext">Renews —</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-manage-billing" id="manageBtn" onclick="openBillingPortal()">
+          💳 Manage Billing →
+        </button>
+      </div>
+
+
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       2. BUSINESS PROFILE
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Business Profile</div>
+    </div>
+    <div class="section-body">
+
+      <!-- Google Business Profile — inline picker -->
+      <div class="field full" style="margin-bottom:20px;">
+        <label>Your Google Business</label>
+
+        <div class="gbp-picker-wrap" id="gbpPickerWrap">
+
+          <!-- Confirmed card (shown when a business is linked) -->
+          <div class="gbp-confirmed" id="gbpConfirmed" style="display:none;">
+            <div class="gbp-confirmed-info">
+              <span style="font-size:1.1rem;">📍</span>
+              <div>
+                <div class="gbp-confirmed-name" id="gbpConfirmedName"></div>
+                <div class="gbp-confirmed-addr" id="gbpConfirmedAddr"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state (no business linked) -->
+          <div id="gbpEmpty" style="padding:12px 14px;border:1.5px dashed var(--border);border-radius:10px;
+            background:var(--off);font-size:.85rem;color:var(--sub);display:none;">
+            No Google Business linked — use the search below to add one.
+          </div>
+
+          <!-- Inline search (hidden until no biz, or shown if empty) -->
+          <div class="gbp-search-block" id="gbpSearchBlock">
+            <div class="gbp-search-row">
+              <span style="font-size:1rem;color:var(--sub);flex-shrink:0;">🔍</span>
+              <input type="text" id="gbpSearchInput"
+                placeholder="Search your business name or address…"
+                autocomplete="off" />
+              <button class="gbp-inp-clear" id="gbpInpClear">✕</button>
+            </div>
+            <div class="gbp-results-list" id="gbpResultsList"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              <button type="button" id="gbpSavePickBtn" onclick="acctGbpSave()"
+                style="background:var(--black);color:#fff;border:none;border-radius:9px;
+                       padding:10px 22px;font-family:inherit;font-size:.85rem;font-weight:700;
+                       cursor:pointer;opacity:.4;pointer-events:none;transition:opacity .15s;"
+                disabled>Save Business</button>
+              <span class="gbp-cancel-link" id="gbpCancelLink" onclick="acctGbpCancelChange()" style="display:none;">Cancel</span>
+            </div>
+            <div id="gbpPickSaveStatus" style="font-size:.8rem;min-height:18px;"></div>
+          </div>
+
+        </div><!-- /.gbp-picker-wrap -->
+
+        <input type="hidden" id="bizName" />
+        <input type="hidden" id="bizSlug" />
+        <input type="hidden" id="bizGoogleUrl" />
+        <input type="hidden" id="bizPlaceId" />
+      </div>
+
+      <!-- Funnel URL below GBP -->
+      <div class="field full" style="margin-bottom:20px;">
+        <label>Funnel URL</label>
+        <div class="slug-preview" style="background:var(--off);cursor:default;">
+          <span class="slug-prefix">happyclientele.com/r/</span>
+          <span id="bizSlugDisplay" style="font-size:.9rem;color:var(--black);padding:0 4px;"></span>
+        </div>
+      </div>
+
+      <!-- Google-pulled business details (read-only, shown after GBP linked) -->
+      <div id="gbpDetailPanel" style="display:none;margin-bottom:20px;">
+        <div style="font-size:.75rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">📊 Pulled from Google Business Profile</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="field" style="margin:0;">
+            <label style="font-size:.75rem;">Google Rating</label>
+            <div class="gbp-detail-val" id="gbpDetailRating" style="padding:9px 12px;background:var(--off);border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;color:var(--black);">—</div>
+          </div>
+          <div class="field" style="margin:0;">
+            <label style="font-size:.75rem;">Total Reviews</label>
+            <div class="gbp-detail-val" id="gbpDetailReviews" style="padding:9px 12px;background:var(--off);border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;color:var(--black);">—</div>
+          </div>
+          <div class="field" style="margin:0;">
+            <label style="font-size:.75rem;">Business Phone (Google)</label>
+            <div class="gbp-detail-val" id="gbpDetailPhone" style="padding:9px 12px;background:var(--off);border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;color:var(--black);">—</div>
+          </div>
+          <div class="field" style="margin:0;">
+            <label style="font-size:.75rem;">Website (Google)</label>
+            <div class="gbp-detail-val" id="gbpDetailWebsite" style="padding:9px 12px;background:var(--off);border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;color:var(--black);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping / Mailing Address -->
+      <div class="field full" style="margin-bottom:20px;">
+        <label for="bizAddress">Business Address <span style="font-size:.75rem;font-weight:400;color:var(--sub);">(for print shipments)</span></label>
+        <input type="text" id="bizAddress" placeholder="123 Main St, City, State, ZIP" />
+        <div class="field-hint">Used to ship physical QR code print products to your location.</div>
+      </div>
+
+      <!-- Website (overrideable) -->
+      <div class="field full" style="margin-bottom:20px;">
+        <label for="bizWebsite">Website URL</label>
+        <input type="url" id="bizWebsite" placeholder="https://yourwebsite.com" />
+        <div class="field-hint">Pre-filled from Google — edit if different.</div>
+      </div>
+
+      <!-- Social Media Links -->
+      <div class="field full" style="margin-bottom:20px;">
+        <label>Social Media Links <span style="font-size:.75rem;font-weight:400;color:var(--sub);">(added to email footers)</span></label>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1rem;width:22px;text-align:center;flex-shrink:0;">📘</span>
+            <input type="url" id="bizFacebook" placeholder="https://facebook.com/yourbusiness" style="flex:1;" />
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1rem;width:22px;text-align:center;flex-shrink:0;">📷</span>
+            <input type="url" id="bizInstagram" placeholder="https://instagram.com/yourbusiness" style="flex:1;" />
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1rem;width:22px;text-align:center;flex-shrink:0;">🐦</span>
+            <input type="url" id="bizTwitter" placeholder="https://x.com/yourbusiness" style="flex:1;" />
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1rem;width:22px;text-align:center;flex-shrink:0;">▶️</span>
+            <input type="url" id="bizYoutube" placeholder="https://youtube.com/@yourbusiness" style="flex:1;" />
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1rem;width:22px;text-align:center;flex-shrink:0;">🎵</span>
+            <input type="url" id="bizTiktok" placeholder="https://tiktok.com/@yourbusiness" style="flex:1;" />
+          </div>
+        </div>
+        <div class="field-hint" style="margin-top:6px;">These links appear in the footer of automated review emails.</div>
+      </div>
+
+      <!-- Email + Phone side by side -->
+      <div class="form-row" style="margin-bottom:0;">
+
+        <div class="field">
+          <label for="contactEmail">Contact Email</label>
+          <input type="email" id="contactEmail" placeholder="you@example.com" />
+          <div class="field-hint">A confirmation link will be sent to your new email.</div>
+          <div class="save-status" id="emailSaveStatus" style="margin-top:4px;"></div>
+        </div>
+
+        <div class="field">
+          <label for="bizPhone">Contact Phone</label>
+          <input type="tel" id="bizPhone" placeholder="(555) 000-0000"
+            oninput="formatPhone(this)" maxlength="14" />
+          <div class="field-hint">We recommend a personal number for support purposes.</div>
+        </div>
+
+      </div>
+    </div>
+    <div class="section-actions">
+      <span class="save-status" id="bizSaveStatus"></span>
+      <button class="btn-save" id="bizSaveBtn" onclick="saveBusinessProfile()">
+        Save Changes
+      </button>
+    </div>
+  </div>
+
+  <!-- Contact Information section removed — email + phone now live in Business Profile -->
+
+  <!-- ══════════════════════════════════════════
+       4. CHANGE PASSWORD
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Change Password</div>
+    </div>
+    <div class="section-body">
+      <form id="pwForm" onsubmit="savePassword(event)" autocomplete="on">
+      <input type="text" name="username" id="pwFormUsername" autocomplete="username"
+             style="display:none;" aria-hidden="true" tabindex="-1" />
+      <div class="form-row">
+
+        <div class="field full">
+          <label for="currentPassword">Current Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="currentPassword" name="current_password"
+                   placeholder="Enter your current password" autocomplete="current-password" />
+            <button type="button" class="pw-eye" onclick="togglePw('currentPassword', this)" tabindex="-1" aria-label="Show password">
+              <svg id="eyeIcon-currentPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="newPassword">New Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="newPassword" name="new_password" placeholder="At least 8 characters"
+                   oninput="checkPwStrength(this.value)" autocomplete="new-password" />
+            <button type="button" class="pw-eye" onclick="togglePw('newPassword', this)" tabindex="-1" aria-label="Show password">
+              <svg id="eyeIcon-newPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="pw-strength"><div class="pw-strength-bar" id="pwStrengthBar"></div></div>
+          <div class="field-hint" id="pwStrengthLabel"></div>
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm New Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="confirmPassword" name="confirm_password"
+                   placeholder="Repeat new password" autocomplete="new-password" />
+            <button type="button" class="pw-eye" onclick="togglePw('confirmPassword', this)" tabindex="-1" aria-label="Show password">
+              <svg id="eyeIcon-confirmPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      </form>
+    </div>
+    <div class="section-actions">
+      <span class="save-status" id="pwSaveStatus"></span>
+      <button class="btn-save" id="pwSaveBtn" onclick="savePassword(event)">
+        Update Password
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       5. DANGER ZONE
+  ══════════════════════════════════════════ -->
+  <div class="section danger-zone">
+    <div class="section-header">
+      <div class="section-title">Danger Zone</div>
+    </div>
+    <div class="section-body" style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Cancel sub -->
+      <div class="danger-item">
+        <div class="danger-item-text">
+          <strong>Cancel Subscription</strong>
+          <p>Your funnel and QR code will remain active until the end of your current billing period.</p>
+        </div>
+        <button class="btn-danger" onclick="openBillingPortal()">Cancel Plan</button>
+      </div>
+
+      <div style="height:1px;background:var(--border);"></div>
+
+      <!-- Delete account -->
+      <div class="danger-item">
+        <div class="danger-item-text">
+          <strong>Delete Account</strong>
+          <p>Permanently delete your account and all associated data. This cannot be undone.</p>
+        </div>
+        <button class="btn-danger" onclick="openDeleteModal()">Delete Account</button>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /.page -->
+
+<!-- ── Delete account confirm modal ── -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Delete your account?</div>
+    <p class="modal-body">
+      This will permanently delete your account, business profile, QR code, and all review data.
+      <strong>This cannot be undone.</strong>
+    </p>
+    <div class="confirm-input-wrap">
+      <label for="deleteConfirmInput">Type <strong>DELETE</strong> to confirm</label>
+      <input type="text" id="deleteConfirmInput" placeholder="DELETE" oninput="checkDeleteConfirm()" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-danger-confirm" id="deleteConfirmBtn" onclick="handleDeleteAccount()" disabled>
+        Delete Forever
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   STRIPE BILLING PORTAL
+   Replace with your own server endpoint or Stripe portal link.
+   In production: POST to your serverless function which calls
+   stripe.billingPortal.sessions.create({ customer: id })
+   and returns a { url } you redirect to.
+════════════════════════════════════════════════════════ */
+const STRIPE_PORTAL_ENDPOINT = '/api/create-portal-session'; // your serverless fn
+// For demo/static mode — replace with your Stripe Customer Portal direct link:
+// Settings → Billing → Customer portal → Copy link
+const STRIPE_PORTAL_FALLBACK = 'https://billing.stripe.com/p/login/28EeVc1KCaAQbrg3eR38400';
+
+/* ════════════════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════════════════ */
+let _user = null;
+let _biz  = null;
+let _account = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  _user = await requireAuth('login.html');
+  if (!_user) return;
+
+  await loadPageData();
+});
+
+async function loadPageData() {
+  try {
+    const [biz, account] = await Promise.all([
+      loadBusiness(_user.id),
+      loadAccount(_user.id)
+    ]);
+
+    _biz     = biz;
+    window._biz = _biz; // expose for topbar.js
+    _account = account;
+
+    populateBusinessForm(biz);
+    populateContactForm(_user, account);
+    populateBillingInfo(account);
+
+    // Init user menu AFTER biz loads so business name is available
+    initUserMenu(_user);
+
+  } catch(e) {
+    console.warn('[account] loadPageData error:', e);
+    // Only show banner for genuine unexpected errors, not missing rows
+    if (e && e.message && !e.message.includes('null')) {
+      showGlobalAlert('error', 'Failed to load account data. Please refresh the page.');
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   POPULATE FORMS
+════════════════════════════════════════════════════════ */
+function populateBusinessForm(biz) {
+  // No biz row yet — still show the search so the user can add one
+  if (!biz) {
+    document.getElementById('gbpConfirmed').style.display = 'none';
+    document.getElementById('gbpEmpty').style.display     = 'none';
+    document.getElementById('gbpSearchBlock').classList.add('active');
+    acctGbpInit();
+    return;
+  }
+
+  // Format phone on load
+  const rawPhone = biz.phone || '';
+  const digits   = rawPhone.replace(/\D/g, '').slice(0, 10);
+  let formatted  = '';
+  if (digits.length > 6)      formatted = '(' + digits.slice(0,3) + ') ' + digits.slice(3,6) + '-' + digits.slice(6);
+  else if (digits.length > 3) formatted = '(' + digits.slice(0,3) + ') ' + digits.slice(3);
+  else if (digits.length > 0) formatted = '(' + digits;
+  setVal('bizPhone', formatted);
+
+  // Store hidden fields
+  setVal('bizName',      biz.biz_name   || '');
+  setVal('bizSlug',      biz.slug       || '');
+  setVal('bizGoogleUrl', biz.google_url || '');
+  setVal('bizPlaceId',   biz.google_place_id || '');
+
+  // Slug display
+  const slugDisplay = document.getElementById('bizSlugDisplay');
+  if (slugDisplay) slugDisplay.textContent = biz.slug || '—';
+
+  // Populate editable fields
+  setVal('bizAddress',  biz.address  || '');
+  setVal('bizWebsite',  biz.website  || '');
+  setVal('bizFacebook', biz.social_facebook  || '');
+  setVal('bizInstagram',biz.social_instagram || '');
+  setVal('bizTwitter',  biz.social_twitter   || '');
+  setVal('bizYoutube',  biz.social_youtube   || '');
+  setVal('bizTiktok',   biz.social_tiktok    || '');
+
+  // Google-pulled detail panel
+  const detailPanel = document.getElementById('gbpDetailPanel');
+  if (biz.biz_name && (biz.google_rating || biz.google_review_count || biz.google_phone || biz.google_website)) {
+    detailPanel.style.display = 'block';
+    document.getElementById('gbpDetailRating').textContent  = biz.google_rating ? `⭐ ${biz.google_rating}` : '—';
+    document.getElementById('gbpDetailReviews').textContent = biz.google_review_count ? biz.google_review_count.toLocaleString() : '—';
+    document.getElementById('gbpDetailPhone').textContent   = biz.google_phone   || '—';
+    const webEl = document.getElementById('gbpDetailWebsite');
+    if (biz.google_website) {
+      webEl.innerHTML = `<a href="${escAcct(biz.google_website)}" target="_blank" style="color:var(--blue);text-decoration:none;">${escAcct(biz.google_website.replace(/^https?:\/\//,''))}</a>`;
+    } else { webEl.textContent = '—'; }
+  } else {
+    detailPanel.style.display = 'none';
+  }
+
+  // GBP card — show confirmed card or empty + search
+  if (biz.biz_name) {
+    document.getElementById('gbpConfirmed').style.display  = 'flex';
+    document.getElementById('gbpEmpty').style.display      = 'none';
+    document.getElementById('gbpConfirmedName').textContent = biz.biz_name;
+    document.getElementById('gbpConfirmedAddr').textContent = biz.address || 'Loading address…';
+
+    // Fetch live address from Google Places API (always refresh)
+    if (biz.google_place_id) {
+      fetchAccountGBPAddress(biz.google_place_id);
+    } else {
+      document.getElementById('gbpConfirmedAddr').textContent = '';
+    }
+  } else {
+    // No business yet — show empty state and open search immediately
+    document.getElementById('gbpConfirmed').style.display = 'none';
+    document.getElementById('gbpEmpty').style.display     = 'block';
+    document.getElementById('gbpSearchBlock').classList.add('active');
+    acctGbpInit();
+  }
+}
+
+async function fetchAccountGBPAddress(placeId) {
+  const GBIZ_API_KEY = 'AIzaSyBIUNvxwoItiLeJo-BScNk8-W-yLMY4H5k';
+  const addrEl = document.getElementById('gbpConfirmedAddr');
+  try {
+    const resp = await fetch(
+      `https://places.googleapis.com/v1/places/${placeId}?fields=formattedAddress`,
+      { headers: { 'X-Goog-Api-Key': GBIZ_API_KEY, 'X-Goog-FieldMask': 'formattedAddress' } }
+    );
+    if (!resp.ok) throw new Error('fetch failed');
+    const data = await resp.json();
+    if (addrEl) addrEl.textContent = data.formattedAddress || '';
+  } catch(e) {
+    if (addrEl) addrEl.textContent = '';
+  }
+}
+
+function populateContactForm(user, account) {
+  setVal('contactEmail', user.email || '');
+}
+
+function populateBillingInfo(account) {
+  if (!account) return;
+
+  const status = account.subscription_status || 'unknown';
+  const badge  = document.getElementById('subStatusBadge');
+  const text   = document.getElementById('subStatusText');
+
+  badge.className = 'sub-status';
+  if (status === 'active' || status === 'trialing') {
+    badge.classList.add(status === 'trialing' ? 'trial' : 'active');
+    text.textContent = status === 'trialing' ? 'Trial' : 'Active';
+  } else {
+    badge.classList.add('inactive');
+    text.textContent = status === 'canceled' ? 'Cancelled' : 'Inactive';
+  }
+
+  if (account.current_period_end) {
+    const d = new Date(account.current_period_end * 1000);
+    const label = status === 'canceled' ? 'Access until' : 'Renews';
+    document.getElementById('billingNext').textContent =
+      `${label} ${d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   SAVE: BUSINESS PROFILE
+════════════════════════════════════════════════════════ */
+async function saveBusinessProfile() {
+  const btn    = document.getElementById('bizSaveBtn');
+  const status = document.getElementById('bizSaveStatus');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  status.textContent = '';
+  status.className   = 'save-status';
+
+  try {
+    const token = sb.auth.getSession()?.access_token;
+    const payload = {
+      phone:            getVal('bizPhone').replace(/\D/g,''),
+      address:          getVal('bizAddress'),
+      website:          getVal('bizWebsite'),
+      social_facebook:  getVal('bizFacebook'),
+      social_instagram: getVal('bizInstagram'),
+      social_twitter:   getVal('bizTwitter'),
+      social_youtube:   getVal('bizYoutube'),
+      social_tiktok:    getVal('bizTiktok'),
+      updated_at:       new Date().toISOString()
+    };
+
+    const patchResp = await fetch(
+      `${SUPABASE_URL}/rest/v1/businesses?user_id=eq.${_user.id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey':        SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type':  'application/json',
+          'Prefer':        'return=representation'
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+    if (!patchResp.ok) {
+      const err = await patchResp.json().catch(() => ({}));
+      throw new Error(err.message || 'Save failed');
+    }
+
+    // Update in-memory biz
+    if (_biz) Object.assign(_biz, payload);
+
+    // Email change — only if different
+    const newEmail = (getVal('contactEmail') || '').trim();
+    if (newEmail && newEmail !== _user.email) {
+      const result = await sb.auth.updateUser({ email: newEmail });
+      if (result.error || result.error_description) throw new Error(result.error_description || result.error || 'Email update failed');
+      status.textContent = '✓ Saved — check your new email for a confirmation link';
+      status.className   = 'save-status saved';
+    } else {
+      status.textContent = '✓ Saved';
+      status.className   = 'save-status saved';
+    }
+  } catch(e) {
+    status.textContent = '✗ ' + (e.message || 'Error saving');
+    status.className   = 'save-status error';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Save Changes';
+  setTimeout(() => { status.textContent = ''; status.className = 'save-status'; }, 6000);
+}
+
+/* ════════════════════════════════════════════════════════
+   SAVE: EMAIL CHANGE (separate button)
+════════════════════════════════════════════════════════ */
+async function saveEmailChange() {
+  const btn      = document.getElementById('emailChangeBtn');
+  const statusEl = document.getElementById('emailSaveStatus');
+  const newEmail = (getVal('contactEmail') || '').trim();
+
+  if (!newEmail || !newEmail.includes('@')) {
+    statusEl.textContent = '✗ Please enter a valid email';
+    statusEl.className   = 'save-status error';
+    setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'save-status'; }, 3000);
+    return;
+  }
+
+  if (newEmail === _user.email) {
+    statusEl.textContent = 'That’s already your current email.';
+    statusEl.className   = 'save-status';
+    setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'save-status'; }, 3000);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '…';
+
+  try {
+    const result = await sb.auth.updateUser({ email: newEmail });
+    if (result.error || result.error_description) throw new Error(result.error_description || result.error || 'Update failed');
+    statusEl.textContent = '✓ Confirmation link sent to ' + newEmail;
+    statusEl.className   = 'save-status saved';
+  } catch(e) {
+    statusEl.textContent = '✗ ' + (e.message || 'Failed to update email');
+    statusEl.className   = 'save-status error';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Change';
+  setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'save-status'; }, 6000);
+}
+
+/* ════════════════════════════════════════════════════════
+   PHONE FORMATTING
+════════════════════════════════════════════════════════ */
+function formatPhone(input) {
+  let digits = input.value.replace(/\D/g, '').slice(0, 10);
+  let formatted = '';
+  if (digits.length > 6)       formatted = '(' + digits.slice(0,3) + ') ' + digits.slice(3,6) + '-' + digits.slice(6);
+  else if (digits.length > 3)  formatted = '(' + digits.slice(0,3) + ') ' + digits.slice(3);
+  else if (digits.length > 0)  formatted = '(' + digits;
+  input.value = formatted;
+}
+
+/* ════════════════════════════════════════════════════════
+   CHANGE BUSINESS MODAL
+════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   INLINE GBP PICKER (Account Settings)
+════════════════════════════════════════════════════════ */
+const ACCT_GBIZ_KEY = 'AIzaSyBIUNvxwoItiLeJo-BScNk8-W-yLMY4H5k';
+let _acctGbpSelected = null; // { placeId, name, addr }
+let _acctGbpDebounce = null;
+let _acctGbpBound    = false;
+
+function acctGbpInit() {
+  if (_acctGbpBound) return;
+  _acctGbpBound = true;
+
+  const inp  = document.getElementById('gbpSearchInput');
+  const clr  = document.getElementById('gbpInpClear');
+  const list = document.getElementById('gbpResultsList');
+
+  inp.addEventListener('input', () => {
+    clr.classList.toggle('visible', inp.value.length > 0);
+    acctGbpResetSelection();
+    if (inp.value.length < 2) { acctGbpCloseDrop(); return; }
+    clearTimeout(_acctGbpDebounce);
+    _acctGbpDebounce = setTimeout(() => acctGbpSearch(inp.value), 380);
+  });
+
+  clr.addEventListener('click', () => {
+    inp.value = '';
+    clr.classList.remove('visible');
+    acctGbpResetSelection();
+    acctGbpCloseDrop();
+    inp.focus();
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', e => {
+    if (!document.getElementById('gbpPickerWrap').contains(e.target)) acctGbpCloseDrop();
+  });
+}
+
+function acctGbpStartChange() {
+  // Hide confirmed card, show search
+  document.getElementById('gbpConfirmed').style.display  = 'none';
+  document.getElementById('gbpEmpty').style.display      = 'none';
+  document.getElementById('gbpSearchBlock').classList.add('active');
+  document.getElementById('gbpCancelLink').style.display = 'inline';
+  document.getElementById('gbpSaveNote').style.display   = 'block';
+  acctGbpInit();
+  setTimeout(() => document.getElementById('gbpSearchInput').focus(), 50);
+}
+
+function acctGbpCancelChange() {
+  // Restore confirmed card
+  document.getElementById('gbpSearchBlock').classList.remove('active');
+  document.getElementById('gbpCancelLink').style.display = 'none';
+  document.getElementById('gbpSaveNote').style.display   = 'none';
+  // Re-show whichever state was before
+  if (_biz && _biz.biz_name) {
+    document.getElementById('gbpConfirmed').style.display = 'flex';
+  } else {
+    document.getElementById('gbpEmpty').style.display = 'block';
+  }
+  document.getElementById('gbpSearchInput').value = '';
+  document.getElementById('gbpInpClear').classList.remove('visible');
+  acctGbpResetSelection();
+  acctGbpCloseDrop();
+  document.getElementById('gbpPickSaveStatus').textContent = '';
+}
+
+function acctGbpResetSelection() {
+  _acctGbpSelected = null;
+  const btn = document.getElementById('gbpSavePickBtn');
+  btn.disabled = true;
+  btn.style.opacity = '.4';
+  btn.style.pointerEvents = 'none';
+}
+
+async function acctGbpSearch(query) {
+  const list = document.getElementById('gbpResultsList');
+  list.innerHTML = '<div class="gbp-state-msg"><span class="gbp-spinner"></span>Searching…</div>';
+  list.classList.add('open');
+  try {
+    const resp = await fetch('https://places.googleapis.com/v1/places:autocomplete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': ACCT_GBIZ_KEY },
+      body: JSON.stringify({ input: query, includedPrimaryTypes: ['establishment'], languageCode: 'en' })
+    });
+    if (!resp.ok) throw new Error('API ' + resp.status);
+    const data = await resp.json();
+    acctGbpRenderResults(data.suggestions || []);
+  } catch(e) {
+    list.innerHTML = '<div class="gbp-state-msg">Search unavailable. Please try again.</div>';
+  }
+}
+
+function acctGbpRenderResults(suggestions) {
+  const list = document.getElementById('gbpResultsList');
+  list.innerHTML = '';
+  if (!suggestions.length) {
+    list.innerHTML = '<div class="gbp-state-msg">No results found. Try a different search.</div>';
+    list.classList.add('open');
+    return;
+  }
+  suggestions.slice(0, 6).forEach(s => {
+    const p = s.placePrediction; if (!p) return;
+    const name    = p.structuredFormat?.mainText?.text || p.text?.text || '';
+    const addr    = p.structuredFormat?.secondaryText?.text || '';
+    const placeId = p.placeId || '';
+    const types   = (p.types || []).filter(t => t !== 'establishment' && t !== 'point_of_interest');
+    const typeLabel = types[0] ? types[0].replace(/_/g,' ') : '';
+    const row = document.createElement('div');
+    row.className = 'gbp-res-row';
+    row.innerHTML = `
+      <span style="font-size:1rem;">📍</span>
+      <div style="flex:1;min-width:0;">
+        <div class="gbp-res-name">${escAcct(name)}</div>
+        ${addr ? `<div class="gbp-res-addr">${escAcct(addr)}</div>` : ''}
+      </div>
+      ${typeLabel ? `<div class="gbp-res-type">${escAcct(typeLabel)}</div>` : ''}
+    `;
+    row.addEventListener('click', () => acctGbpSelect(placeId, name, addr));
+    list.appendChild(row);
+  });
+  list.classList.add('open');
+}
+
+function acctGbpSelect(placeId, name, addr) {
+  _acctGbpSelected = { placeId, name, addr };
+  // Fill search input with chosen name
+  const inp = document.getElementById('gbpSearchInput');
+  inp.value = name;
+  document.getElementById('gbpInpClear').classList.add('visible');
+  acctGbpCloseDrop();
+  // Enable save button
+  const btn = document.getElementById('gbpSavePickBtn');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+  document.getElementById('gbpPickSaveStatus').textContent = '';
+}
+
+function acctGbpCloseDrop() {
+  const list = document.getElementById('gbpResultsList');
+  list.classList.remove('open');
+  list.innerHTML = '';
+}
+
+function escAcct(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function acctGbpSave() {
+  if (!_acctGbpSelected) return;
+  const btn    = document.getElementById('gbpSavePickBtn');
+  const status = document.getElementById('gbpPickSaveStatus');
+  btn.disabled = true;
+  btn.textContent = 'Fetching details…';
+  status.textContent = '';
+
+  try {
+    const { placeId, name, addr } = _acctGbpSelected;
+    // Build a clean slug
+    const newSlug   = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const googleUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
+
+    // ── Fetch rich data from Google Places API v1 ──
+    let googlePhone = '', googleWebsite = '', googleRating = null, googleReviewCount = null;
+    let googleAddress = addr;
+    try {
+      btn.textContent = 'Fetching from Google…';
+      const placeResp = await fetch(
+        `https://places.googleapis.com/v1/places/${placeId}` +
+        `?fields=formattedAddress,nationalPhoneNumber,websiteUri,rating,userRatingCount`,
+        { headers: { 'X-Goog-Api-Key': ACCT_GBIZ_KEY, 'X-Goog-FieldMask': 'formattedAddress,nationalPhoneNumber,websiteUri,rating,userRatingCount' } }
+      );
+      if (placeResp.ok) {
+        const pd = await placeResp.json();
+        googleAddress    = pd.formattedAddress    || addr;
+        googlePhone      = pd.nationalPhoneNumber || '';
+        googleWebsite    = pd.websiteUri          || '';
+        googleRating     = pd.rating              || null;
+        googleReviewCount = pd.userRatingCount    || null;
+      }
+    } catch(ge) {
+      console.warn('[acctGbpSave] Places detail fetch failed:', ge);
+    }
+
+    btn.textContent = 'Saving…';
+
+    // ── PATCH the businesses row ──
+    const token = sb.auth.getSession()?.access_token;
+    const patchPayload = {
+      biz_name:            name,
+      google_place_id:     placeId,
+      google_url:          googleUrl,
+      slug:                newSlug,
+      address:             googleAddress,
+      google_phone:        googlePhone,
+      google_website:      googleWebsite,
+      google_rating:       googleRating,
+      google_review_count: googleReviewCount
+    };
+
+    // If user hasn't set a website yet, pre-fill with Google website
+    const currentWebsite = (getVal('bizWebsite') || '').trim();
+    if (!currentWebsite && googleWebsite) patchPayload.website = googleWebsite;
+
+    const patchResp = await fetch(
+      `${SUPABASE_URL}/rest/v1/businesses?user_id=eq.${_user.id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey':        SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type':  'application/json',
+          'Prefer':        'return=representation'
+        },
+        body: JSON.stringify(patchPayload)
+      }
+    );
+    if (!patchResp.ok) {
+      const err = await patchResp.json().catch(() => ({}));
+      throw new Error(err.message || 'Save failed: ' + patchResp.status);
+    }
+
+    // Update in-memory biz
+    Object.assign(_biz || {}, patchPayload);
+    if (!_biz) _biz = patchPayload;
+    window._biz = _biz;
+
+    // Update confirmed card
+    document.getElementById('gbpConfirmedName').textContent = name;
+    document.getElementById('gbpConfirmedAddr').textContent = googleAddress;
+    document.getElementById('gbpConfirmed').style.display  = 'flex';
+    document.getElementById('gbpEmpty').style.display      = 'none';
+
+    // Show detail panel
+    const detailPanel = document.getElementById('gbpDetailPanel');
+    detailPanel.style.display = 'block';
+    document.getElementById('gbpDetailRating').textContent  = googleRating ? `⭐ ${googleRating}` : '—';
+    document.getElementById('gbpDetailReviews').textContent = googleReviewCount ? googleReviewCount.toLocaleString() : '—';
+    document.getElementById('gbpDetailPhone').textContent   = googlePhone || '—';
+    const webEl = document.getElementById('gbpDetailWebsite');
+    if (googleWebsite) {
+      webEl.innerHTML = `<a href="${escAcct(googleWebsite)}" target="_blank" style="color:var(--blue);text-decoration:none;">${escAcct(googleWebsite.replace(/^https?:\/\//,''))}</a>`;
+    } else { webEl.textContent = '—'; }
+
+    // Pre-fill website field if empty
+    if (!currentWebsite && googleWebsite) setVal('bizWebsite', googleWebsite);
+
+    // Update slug display & hidden fields
+    const slugDisplay = document.getElementById('bizSlugDisplay');
+    if (slugDisplay) slugDisplay.textContent = newSlug;
+    setVal('bizName',      name);
+    setVal('bizSlug',      newSlug);
+    setVal('bizGoogleUrl', googleUrl);
+    setVal('bizPlaceId',   placeId);
+
+    status.textContent = '✓ Business saved!';
+    status.style.color = 'var(--green)';
+    btn.textContent = 'Save Business';
+
+    // Collapse search block after short delay
+    setTimeout(() => {
+      document.getElementById('gbpSearchBlock').classList.remove('active');
+      document.getElementById('gbpCancelLink').style.display = 'none';
+      document.getElementById('gbpPickSaveStatus').textContent = '';
+      document.getElementById('gbpSearchInput').value = '';
+      document.getElementById('gbpInpClear').classList.remove('visible');
+      acctGbpResetSelection();
+    }, 1200);
+
+  } catch(e) {
+    status.textContent = '✗ ' + (e.message || 'Could not save — please try again.');
+    status.style.color = 'var(--red)';
+    btn.disabled = false;
+    btn.textContent = 'Save Business';
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   SAVE: CONTACT INFO
+════════════════════════════════════════════════════════ */
+async function saveContactInfo() {
+  const btn = document.getElementById('contactSaveBtn');
+  const status = document.getElementById('contactSaveStatus');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  try {
+    await sb.db.upsert('accounts', {
+      user_id: _user.id,
+      phone:   getVal('contactPhone'),
+      updated_at: new Date().toISOString()
+    }, 'user_id');
+
+    status.textContent = '✓ Saved';
+    status.className   = 'save-status saved';
+  } catch(e) {
+    status.textContent = '✗ Error saving';
+    status.className   = 'save-status error';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Save Changes';
+  setTimeout(() => { status.textContent = ''; status.className = 'save-status'; }, 4000);
+}
+
+/* ════════════════════════════════════════════════════════
+   SAVE: PASSWORD
+════════════════════════════════════════════════════════ */
+async function savePassword(e) {
+  if (e) e.preventDefault();
+  const currentPw = getVal('currentPassword');
+  const newPw     = getVal('newPassword');
+  const confirm   = getVal('confirmPassword');
+  const btn       = document.getElementById('pwSaveBtn');
+  const status    = document.getElementById('pwSaveStatus');
+
+  status.textContent = '';
+  status.className   = 'save-status';
+
+  if (!currentPw) {
+    status.textContent = '✗ Please enter your current password';
+    status.className   = 'save-status error';
+    return;
+  }
+
+  if (!newPw || newPw.length < 8) {
+    status.textContent = '✗ New password must be at least 8 characters';
+    status.className   = 'save-status error';
+    return;
+  }
+
+  if (newPw !== confirm) {
+    status.textContent = '✗ Passwords do not match';
+    status.className   = 'save-status error';
+    return;
+  }
+
+  if (currentPw === newPw) {
+    status.textContent = '✗ New password must be different from current password';
+    status.className   = 'save-status error';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating…';
+
+  try {
+    // First verify current password by re-signing in
+    const signInResult = await sb.auth.signIn(_user.email, currentPw);
+    if (signInResult.error || signInResult.error_description) {
+      throw new Error('Current password is incorrect');
+    }
+
+    // Then update to new password
+    const result = await sb.auth.updatePassword(newPw);
+    if (result.error || result.error_description) throw new Error(result.error_description || result.error);
+
+    status.textContent = '✓ Password updated successfully';
+    status.className   = 'save-status saved';
+    setVal('currentPassword', '');
+    setVal('newPassword', '');
+    setVal('confirmPassword', '');
+    document.getElementById('pwStrengthBar').style.width = '0';
+    document.getElementById('pwStrengthLabel').textContent = '';
+  } catch(e) {
+    status.textContent = '✗ ' + (e.message || 'Failed to update password');
+    status.className   = 'save-status error';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Update Password';
+  setTimeout(() => { status.textContent = ''; status.className = 'save-status'; }, 5000);
+}
+
+/* ════════════════════════════════════════════════════════
+   PASSWORD STRENGTH METER
+════════════════════════════════════════════════════════ */
+function checkPwStrength(pw) {
+  const bar    = document.getElementById('pwStrengthBar');
+  const label  = document.getElementById('pwStrengthLabel');
+  let score = 0;
+  if (pw.length >= 8)  score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+  const levels = [
+    { pct: '0%',   color: '#e5e7eb', text: '' },
+    { pct: '25%',  color: '#ef4444', text: 'Weak' },
+    { pct: '50%',  color: '#f59e0b', text: 'Fair' },
+    { pct: '75%',  color: '#3b82f6', text: 'Good' },
+    { pct: '100%', color: '#22c55e', text: 'Strong' }
+  ];
+
+  const level = levels[Math.min(score, 4)];
+  bar.style.width      = level.pct;
+  bar.style.background = level.color;
+  label.textContent    = level.text;
+  label.style.color    = level.color;
+}
+
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  // Swap SVG: open eye (visible) vs crossed eye (hidden)
+  btn.querySelector('svg').outerHTML = isHidden
+    ? `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+    : `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+}
+
+/* ════════════════════════════════════════════════════════
+   BILLING PORTAL
+════════════════════════════════════════════════════════ */
+async function openBillingPortal() {
+  const btn = document.getElementById('manageBtn');
+  btn.classList.add('loading');
+  btn.textContent = 'Opening…';
+
+  try {
+    // Try serverless endpoint first
+    const resp = await fetch(STRIPE_PORTAL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${sb.auth.getSession()?.access_token}` },
+      body: JSON.stringify({ return_url: location.href })
+    });
+
+    if (resp.ok) {
+      const { url } = await resp.json();
+      window.location.href = url;
+      return;
+    }
+  } catch {}
+
+  // Fallback: direct portal link (no dynamic customer detection)
+  window.location.href = STRIPE_PORTAL_FALLBACK;
+}
+
+/* ════════════════════════════════════════════════════════
+   DELETE ACCOUNT MODAL
+════════════════════════════════════════════════════════ */
+function openDeleteModal() {
+  document.getElementById('deleteModal').classList.add('open');
+  document.getElementById('deleteConfirmInput').value = '';
+  document.getElementById('deleteConfirmBtn').disabled = true;
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteModal').classList.remove('open');
+}
+
+function checkDeleteConfirm() {
+  const val = document.getElementById('deleteConfirmInput').value.trim();
+  document.getElementById('deleteConfirmBtn').disabled = (val !== 'DELETE');
+}
+
+async function handleDeleteAccount() {
+  const btn = document.getElementById('deleteConfirmBtn');
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+
+  try {
+    // Delete business data
+    if (_biz) {
+      await sb.db.delete('businesses', `user_id=eq.${_user.id}`);
+    }
+    // Delete account row
+    await sb.db.delete('accounts', `user_id=eq.${_user.id}`);
+
+    // NOTE: Deleting the auth user itself requires a server-side Supabase admin call.
+    // For now we sign the user out and show a confirmation.
+    // In production: call your /api/delete-account endpoint which uses supabase admin SDK.
+    await sb.auth.signOut();
+    localStorage.clear();
+    window.location.href = 'index.html?deleted=1';
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Delete Forever';
+    showGlobalAlert('error', 'Could not delete account. Please contact support@happyclientele.com');
+    closeDeleteModal();
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   USER MENU
+════════════════════════════════════════════════════════ */
+function initUserMenu(user) {
+  const email   = user.email || '';
+  // Show business name in topbar if available, fall back to email prefix
+  const bizName = (_biz && _biz.biz_name) ? _biz.biz_name : email.split('@')[0];
+  document.getElementById('userMenuEmail').textContent = bizName;
+  document.getElementById('menuEmail').textContent     = email;
+  document.getElementById('userAvatar').textContent    = (bizName[0] || '?').toUpperCase();
+}
+
+function toggleMenu() {
+  document.getElementById('userMenuDropdown').classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.user-menu-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('userMenuDropdown').classList.remove('open');
+  }
+});
+
+async function handleSignOut() {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
+
+/* ════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════ */
+function getVal(id) {
+  return (document.getElementById(id)?.value || '').trim();
+}
+
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
+
+function toSlug(str) {
+  return (str || '')
+    .toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .substring(0, 40);
+}
+
+function showGlobalAlert(type, msg) {
+  if (type === 'error') {
+    document.getElementById('globalErrorMsg').textContent = msg;
+    document.getElementById('globalError').classList.add('show');
+  } else {
+    document.getElementById('globalSuccessMsg').textContent = msg;
+    document.getElementById('globalSuccess').classList.add('show');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

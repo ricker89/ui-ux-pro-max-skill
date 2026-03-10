@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<!-- wifi.html v1.0 — Super Wi-Fi customer page -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Wi-Fi Access</title>
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:  #1a1a1a;
+      --white:  #ffffff;
+      --off:    #f8f8f8;
+      --border: #e8e8e8;
+      --sub:    #6b7280;
+      --green:  #22c55e;
+      --radius: 16px;
+      --shadow: 0 4px 40px rgba(0,0,0,.10);
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--off);
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .card-header {
+      background: var(--black);
+      padding: 28px 28px 24px;
+      text-align: center;
+    }
+
+    .wifi-icon {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      line-height: 1;
+    }
+
+    .biz-name {
+      font-size: 1rem;
+      color: rgba(255,255,255,.65);
+      font-weight: 500;
+      margin-bottom: 6px;
+      letter-spacing: .01em;
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    /* ── Body ── */
+    .card-body {
+      padding: 28px;
+    }
+
+    /* ── Steps ── */
+    .step { display: none; }
+    .step.active { display: block; }
+
+    /* ── Step 1: Lead Capture ── */
+    .step1-desc {
+      font-size: .92rem;
+      color: var(--sub);
+      margin-bottom: 22px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--sub);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: .95rem;
+      font-family: inherit;
+      color: var(--black);
+      background: var(--white);
+      transition: border-color .2s;
+      outline: none;
+    }
+
+    .field input:focus { border-color: var(--black); }
+    .field input.error { border-color: #ef4444; }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity .2s;
+    }
+
+    .btn-primary:hover { opacity: .85; }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+    .skip-link {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      font-size: .82rem;
+      color: var(--sub);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .skip-link:hover { color: var(--black); }
+
+    /* ── Step 2: Wi-Fi Password ── */
+    .wifi-revealed {
+      text-align: center;
+    }
+
+    .wifi-check {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .wifi-reveal-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .wifi-reveal-sub {
+      font-size: .85rem;
+      color: var(--sub);
+      margin-bottom: 24px;
+    }
+
+    .wifi-network-box {
+      background: var(--off);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .wifi-network-label {
+      font-size: .72rem;
+      font-weight: 600;
+      color: var(--sub);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 6px;
+    }
+
+    .wifi-network-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--black);
+      letter-spacing: .02em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .copy-btn {
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 7px;
+      padding: 6px 12px;
+      font-size: .75rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: opacity .2s;
+    }
+
+    .copy-btn:hover { opacity: .8; }
+
+    .wifi-tip {
+      font-size: .78rem;
+      color: var(--sub);
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    /* ── Loader ── */
+    .loader {
+      text-align: center;
+      padding: 40px 28px;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loader-text {
+      font-size: .88rem;
+      color: var(--sub);
+    }
+
+    /* ── Error ── */
+    .error-state {
+      text-align: center;
+      padding: 40px 28px;
+    }
+
+    .error-icon { font-size: 2.5rem; margin-bottom: 14px; }
+    .error-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .error-msg { font-size: .85rem; color: var(--sub); line-height: 1.5; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--black);
+      color: var(--white);
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-size: .85rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: transform .3s, opacity .3s;
+      z-index: 999;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ── Footer ── */
+    .card-footer {
+      padding: 16px 28px 22px;
+      text-align: center;
+    }
+
+    .footer-brand {
+      font-size: .72rem;
+      color: #d1d5db;
+    }
+
+    .footer-brand a { color: #d1d5db; text-decoration: none; }
+    .footer-brand a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <div class="wifi-icon">📶</div>
+      <div class="biz-name" id="bizName">Loading…</div>
+      <div class="card-title">Get the Wi-Fi Password</div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="stateLoader">
+      <div class="loader">
+        <div class="spinner"></div>
+        <div class="loader-text">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div id="stateError" style="display:none;">
+      <div class="error-state">
+        <div class="error-icon">😕</div>
+        <div class="error-title">Business not found</div>
+        <div class="error-msg">This QR code may be out of date.<br>Ask a staff member for the Wi-Fi password.</div>
+      </div>
+    </div>
+
+    <!-- No Wi-Fi configured state -->
+    <div id="stateNoWifi" style="display:none;">
+      <div class="error-state">
+        <div class="error-icon">⚙️</div>
+        <div class="error-title">Wi-Fi not set up yet</div>
+        <div class="error-msg">The owner hasn't configured Wi-Fi access.<br>Ask a staff member for the password.</div>
+      </div>
+    </div>
+
+    <!-- Main funnel -->
+    <div id="stateFunnel" style="display:none;">
+      <div class="card-body">
+
+        <!-- Step 1: Lead Capture -->
+        <div class="step active" id="step1">
+          <p class="step1-desc" id="step1Desc">Enter your email to get instant Wi-Fi access.</p>
+
+          <div class="field" id="fieldName" style="display:none;">
+            <label>Your Name</label>
+            <input type="text" id="inputName" placeholder="Jane Smith" autocomplete="name" />
+          </div>
+
+          <div class="field" id="fieldEmail">
+            <label>Email Address</label>
+            <input type="email" id="inputEmail" placeholder="you@example.com" autocomplete="email" />
+          </div>
+
+          <div class="field" id="fieldPhone" style="display:none;">
+            <label>Phone Number <span style="font-weight:400;text-transform:none;">(optional)</span></label>
+            <input type="tel" id="inputPhone" placeholder="(555) 000-0000" autocomplete="tel" />
+          </div>
+
+          <button class="btn-primary" id="btnGetWifi" onclick="handleGetWifi()">
+            📶 Get Wi-Fi Password
+          </button>
+
+          <span class="skip-link" id="skipLink" style="display:none;" onclick="showPassword()">
+            Skip — just show me the password
+          </span>
+        </div>
+
+        <!-- Step 2: Wi-Fi Revealed -->
+        <div class="step" id="step2">
+          <div class="wifi-revealed">
+            <div class="wifi-check">✅</div>
+            <div class="wifi-reveal-title">You're all set!</div>
+            <div class="wifi-reveal-sub">Here's your Wi-Fi access info</div>
+
+            <div class="wifi-network-box" id="networkNameBox" style="display:none;">
+              <div class="wifi-network-label">Network Name (SSID)</div>
+              <div class="wifi-network-value">
+                <span id="dispNetworkName"></span>
+                <button class="copy-btn" onclick="copyText('dispNetworkName', this)">Copy</button>
+              </div>
+            </div>
+
+            <div class="wifi-network-box">
+              <div class="wifi-network-label">Password</div>
+              <div class="wifi-network-value">
+                <span id="dispPassword"></span>
+                <button class="copy-btn" onclick="copyText('dispPassword', this)">Copy</button>
+              </div>
+            </div>
+
+            <p class="wifi-tip">Tap <strong>Copy</strong> then paste into your Wi-Fi settings. Enjoy your visit! ☕</p>
+          </div>
+        </div>
+
+      </div><!-- /.card-body -->
+    </div><!-- /#stateFunnel -->
+
+    <!-- Footer -->
+    <div class="card-footer">
+      <div class="footer-brand">Powered by <a href="https://happyclientele.com" target="_blank">Happy Clientele</a></div>
+    </div>
+
+  </div><!-- /.card -->
+</div><!-- /.page -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   SUPER WI-FI — wifi.html v1.0
+   Config constants pulled from Supabase wifi_settings table
+══════════════════════════════════════════════════════════ */
+const SUPA_URL   = 'https://dbbryatmoxlzifsurxrm.supabase.co';
+const SUPA_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk';
+const WEBHOOK_URL = 'https://hook.us2.make.com/71c6bp3dkpejjip6aklpnwrtijst1iee';
+const PROD_DOMAIN = 'https://happyclientele.com/';
+
+/* ── Runtime state ── */
+const state = {
+  biz:          null,
+  wifi:         null,
+  email:        '',
+  name:         '',
+  phone:        '',
+  leadSaved:    false
+};
+
+/* ══════════════════════════════════════════════════════════
+   INIT — read ?biz= param and load data
+══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const slug   = (params.get('biz') || '').toLowerCase().trim();
+
+  if (!slug) {
+    showState('error');
+    return;
+  }
+
+  try {
+    // 1. Fetch business
+    const bizRes = await fetch(
+      `${SUPA_URL}/rest/v1/businesses?slug=eq.${encodeURIComponent(slug)}&limit=1`,
+      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }
+    );
+    const bizRows = await bizRes.json();
+    console.log('[wifi] biz fetch status:', bizRes.status, '| rows:', JSON.stringify(bizRows).slice(0,200));
+    console.log('[wifi] slug used:', slug);
+    console.log('[wifi] key prefix:', SUPA_KEY.slice(0,30));
+    if (!bizRows || !bizRows.length) {
+      document.getElementById('stateError').querySelector('.error-msg').innerHTML =
+        `No business found for slug: <strong>${slug}</strong><br>Status: ${bizRes.status}<br>Ask a staff member for the Wi-Fi password.`;
+      showState('error');
+      return;
+    }
+    state.biz = bizRows[0];
+
+    // Update header
+    document.getElementById('bizName').textContent = state.biz.biz_name || slug;
+
+    // 2. Fetch wifi_settings
+    const wifiRes = await fetch(
+      `${SUPA_URL}/rest/v1/wifi_settings?biz_slug=eq.${encodeURIComponent(slug)}&limit=1`,
+      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }
+    );
+    const wifiRows = await wifiRes.json();
+    console.log('[wifi] wifi_settings fetch status:', wifiRes.status, '| rows:', JSON.stringify(wifiRows).slice(0,200));
+
+    if (!wifiRows || !wifiRows.length || !wifiRows[0].password) {
+      showState('noWifi');
+      return;
+    }
+
+    state.wifi = wifiRows[0];
+
+    // 3. Configure UI based on settings
+    initUI();
+    showState('funnel');
+
+  } catch(e) {
+    console.error('[wifi] fetch error:', String(e));
+    showState('error');
+  }
+});
+
+/* ── Set up UI based on wifi_settings ── */
+function initUI() {
+  const w = state.wifi;
+
+  // Step 1 description
+  const desc = document.getElementById('step1Desc');
+  if (desc) desc.textContent = `Enter your email to get instant Wi-Fi access at ${state.biz.biz_name || 'this location'}.`;
+
+  // Field visibility
+  if (w.show_name_field)  document.getElementById('fieldName').style.display  = 'block';
+  if (w.show_phone_field) document.getElementById('fieldPhone').style.display = 'block';
+
+  // Skippable
+  if (w.skippable) document.getElementById('skipLink').style.display = 'block';
+}
+
+/* ══════════════════════════════════════════════════════════
+   STEP 1 — Email capture & lead save
+══════════════════════════════════════════════════════════ */
+async function handleGetWifi() {
+  const emailEl = document.getElementById('inputEmail');
+  const email   = (emailEl?.value || '').trim();
+
+  // Validate email
+  if (!email || !isValidEmail(email)) {
+    emailEl.classList.add('error');
+    emailEl.focus();
+    setTimeout(() => emailEl.classList.remove('error'), 2000);
+    return;
+  }
+
+  state.email = email;
+  state.name  = (document.getElementById('inputName')?.value  || '').trim();
+  state.phone = (document.getElementById('inputPhone')?.value || '').trim();
+
+  const btn = document.getElementById('btnGetWifi');
+  btn.disabled    = true;
+  btn.textContent = 'Saving…';
+
+  // Save lead
+  await saveLead();
+
+  // Fire Make.com webhook for timed review prompt
+  fireWebhook();
+
+  // Show password
+  showPassword();
+
+  btn.disabled    = false;
+  btn.textContent = '📶 Get Wi-Fi Password';
+}
+
+/* ── Skip (no email) ── */
+function showPassword() {
+  const w = state.wifi;
+
+  // Show network name if set
+  if (w.network_name) {
+    document.getElementById('networkNameBox').style.display = 'block';
+    document.getElementById('dispNetworkName').textContent  = w.network_name;
+  }
+
+  // Show password
+  document.getElementById('dispPassword').textContent = w.password;
+
+  // Advance step
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step2').classList.add('active');
+}
+
+/* ── Save lead to Supabase ── */
+async function saveLead() {
+  if (!state.email || state.leadSaved) return;
+
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/leads`, {
+      method:  'POST',
+      headers: {
+        apikey:          SUPA_KEY,
+        Authorization:  `Bearer ${SUPA_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer:         'return=minimal'
+      },
+      body: JSON.stringify({
+        business_slug: state.biz.slug,
+        email:         state.email,
+        incentive:     'wifi_access',
+        code:          '',
+        stars:         0,
+        review_tapped: false,
+        code_sent:     false,
+        source:        'wifi'
+      })
+    });
+    state.leadSaved = true;
+  } catch(e) {
+    // Non-blocking
+  }
+}
+
+/* ── Fire Make.com webhook for review prompt ── */
+async function fireWebhook() {
+  if (!WEBHOOK_URL || !state.email) return;
+  const w   = state.wifi;
+  const biz = state.biz;
+  const delay = w.timer_minutes || 60;
+
+  try {
+    await fetch(WEBHOOK_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type:         'menu_review_prompt',   // reuses same Make.com route
+        email:        state.email,
+        bizName:      biz.biz_name || biz.slug,
+        bizEmail:     biz.email    || '',
+        bizSlug:      biz.slug,
+        reviewUrl:    biz.google_url || '',
+        delaySeconds: delay * 60
+      })
+    });
+  } catch(e) {
+    // Non-blocking
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════════════════ */
+function showState(s) {
+  document.getElementById('stateLoader').style.display  = s === 'loader'  ? '' : 'none';
+  document.getElementById('stateError').style.display   = s === 'error'   ? '' : 'none';
+  document.getElementById('stateNoWifi').style.display  = s === 'noWifi'  ? '' : 'none';
+  document.getElementById('stateFunnel').style.display  = s === 'funnel'  ? '' : 'none';
+}
+
+function isValidEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+
+function copyText(elId, btn) {
+  const val = document.getElementById(elId)?.textContent || '';
+  navigator.clipboard.writeText(val).then(() => {
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = 'Copy', 1800);
+    showToast('Copied to clipboard!');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = 'Copy', 1800);
+    showToast('Copied!');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Handle Enter key on email input
+document.addEventListener('DOMContentLoaded', () => {
+  const emailInput = document.getElementById('inputEmail');
+  if (emailInput) {
+    emailInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleGetWifi();
+    });
+  }
+});
+</script>
+
+</body>
+</html>
