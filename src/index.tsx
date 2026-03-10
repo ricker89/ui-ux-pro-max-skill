@@ -4,10 +4,12 @@ import { cors } from 'hono/cors'
 // $97/mo Stripe Price ID (safe to hardcode — not a secret)
 const STRIPE_PRICE_ID = 'price_1T8ZWZBf4cpCOXU3NlmAq5am'
 
+// Stripe webhook signing secret
+const STRIPE_WEBHOOK_SECRET = 'whsec_lTZPfk65gJkD1PDg0yWGUhu3dReZtEWF'
+
 type Bindings = {
   ASSETS: Fetcher
   STRIPE_SECRET_KEY: string
-  STRIPE_WEBHOOK_SECRET: string
   STRIPE_PORTAL_FALLBACK: string
   SUPABASE_URL: string
   SUPABASE_SERVICE_KEY: string
@@ -178,11 +180,11 @@ app.post('/api/webhook-stripe', async (c) => {
   const sig     = c.req.header('stripe-signature')
   const rawBody = await c.req.text()
 
-  if (!sig || !c.env.STRIPE_WEBHOOK_SECRET) {
-    return c.json({ error: 'Missing signature or secret' }, 400)
+  if (!sig) {
+    return c.json({ error: 'Missing signature' }, 400)
   }
 
-  const verified = await verifyStripeSignature(rawBody, sig, c.env.STRIPE_WEBHOOK_SECRET)
+  const verified = await verifyStripeSignature(rawBody, sig, STRIPE_WEBHOOK_SECRET)
   if (!verified) return c.json({ error: 'Invalid signature' }, 401)
 
   const event = JSON.parse(rawBody) as { type: string; data: { object: any } }
