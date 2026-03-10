@@ -733,8 +733,8 @@ async function handlePasswordSignIn(e) {
   try {
     const data = await sb.auth.signIn(email, password);
 
-    if (data.error || data.error_description || !data.access_token) {
-      const msg = data.error_description || data.message || 'Invalid email or password.';
+    if (data.error || !data.session) {
+      const msg = data.error || 'Invalid email or password.';
       showAlert('error', msg);
       btn.disabled = false;
       btn.classList.remove('loading');

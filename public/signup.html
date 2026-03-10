@@ -1634,8 +1634,8 @@ async function handleSubmit(e) {
         const signInResult = await sb.auth.signIn(email, password);
         dbgLog('[signup] signIn result:', JSON.stringify(signInResult).slice(0, 200));
 
-        const hasSession = !!signInResult?.access_token;
-        const liveToken  = signInResult?.access_token || null;
+        const liveToken  = signInResult?.session?.access_token || null;
+        const hasSession = !!liveToken;
         dbgLog('[signup] hasSession after signIn:', hasSession, '| token prefix:', liveToken?.slice(0,20) || 'NONE');
 
         if (hasSession && liveToken) {
