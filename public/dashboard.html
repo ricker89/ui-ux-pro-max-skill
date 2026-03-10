@@ -1454,81 +1454,28 @@ function activateLocation(loc) {
   renderDashboard();
 }
 
-/* ── Location Selector — injected into topbar dropdown ──── */
+/* ── Location Selector — delegates to topbar.js tbRenderLocSlot ── */
 function renderLocSelector() {
-  // Wait for topbar to have rendered the slot
-  const slot = document.getElementById('tbLocationsSlot');
-  if (!slot) {
-    // Topbar not ready yet — retry once
-    setTimeout(renderLocSelector, 100);
+  if (typeof window.tbRenderLocSlot !== 'function') {
+    setTimeout(renderLocSelector, 100); // topbar not ready yet
     return;
   }
 
-  slot.innerHTML = '';
-
-  if (!_allLocations.length) return;
-
-  // Section divider + label
-  const divider = document.createElement('div');
-  divider.className = 'tb-menu-divider';
-  slot.appendChild(divider);
-
-  const label = document.createElement('div');
-  label.className = 'tb-loc-section-label';
-  label.textContent = 'Locations';
-  slot.appendChild(label);
-
-  _allLocations.forEach(loc => {
-    const status = loc.subscription_status || 'pending';
-    const bCls = status === 'active' || status === 'trialing' ? 'badge-active'
-               : status.startsWith('pending') ? 'badge-pending' : 'badge-inactive';
-    const bLbl = { active:'Active', trialing:'Trial', canceled:'Cancelled',
-                   pending_payment:'Activate', pending:'Pending' }[status] || status;
-    const isSel = loc.id === _activeLocId;
-
-    const div = document.createElement('div');
-    div.className = 'tb-loc-item' + (isSel ? ' tb-loc-active' : '');
-    div.innerHTML = `
-      <div class="tb-loc-item-info">
-        <div class="tb-loc-item-name">${escH(loc.biz_name || 'Unnamed')}</div>
-        ${loc.address ? `<div class="tb-loc-item-addr">${escH(loc.address)}</div>` : ''}
-      </div>
-      <span class="tb-loc-badge ${bCls}">${escH(bLbl)}</span>
-    `;
-    if (!isSel) {
-      div.addEventListener('click', () => {
-        _activeLocId = loc.id;
-        activateLocation(loc);
-        // close topbar dropdown
-        document.getElementById('tbDropdown')?.classList.remove('open');
-        renderLocSelector();
-        const url = new URL(location.href);
-        url.searchParams.set('loc', loc.id);
-        history.replaceState(null, '', url.toString());
-      });
-    } else {
-      div.style.cursor = 'default';
-    }
-    slot.appendChild(div);
+  // Pass locations, active id, and an in-page switch callback
+  window.tbRenderLocSlot(_allLocations, _activeLocId, function(loc) {
+    _activeLocId = loc.id;
+    activateLocation(loc);
+    renderLocSelector(); // re-render to update active highlight
+    const url = new URL(location.href);
+    url.searchParams.set('loc', loc.id);
+    history.replaceState(null, '', url.toString());
   });
 
-  // Add Location link
-  const addLink = document.createElement('a');
-  addLink.href = 'account.html';
-  addLink.className = 'tb-loc-add';
-  addLink.innerHTML = '<span style="color:#16a34a;font-size:1rem;">＋</span> Add Location';
-  slot.appendChild(addLink);
-
-  const divider2 = document.createElement('div');
-  divider2.className = 'tb-menu-divider';
-  slot.appendChild(divider2);
-
-  // Also update the topbar button label to show active location
+  // Keep topbar button label in sync with active location
   const lbl = document.getElementById('tbUsername');
   if (lbl && _biz?.biz_name) lbl.textContent = _biz.biz_name;
 }
 
-// No-ops kept for safety in case any inline handlers still reference them
 function toggleLocDropdown() {}
 function closeLocDropdown() { document.getElementById('tbDropdown')?.classList.remove('open'); }
 
