@@ -1165,8 +1165,7 @@ async function loadPageData() {
     populateContactForm(_user, account);
     populateBillingInfo(account);
 
-    // Init user menu AFTER biz loads so business name is available
-    initUserMenu(_user);
+    // topbar.js handles the user menu — no manual initUserMenu() needed
 
   } catch(e) {
     console.error('[account] loadPageData error:', e);
@@ -1914,29 +1913,8 @@ async function handleDeleteAccount() {
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   USER MENU
-════════════════════════════════════════════════════════ */
-function initUserMenu(user) {
-  const email   = user.email || '';
-  // Show business name in topbar if available, fall back to email prefix
-  const bizName = (_biz && _biz.biz_name) ? _biz.biz_name : email.split('@')[0];
-  document.getElementById('userMenuEmail').textContent = bizName;
-  document.getElementById('menuEmail').textContent     = email;
-  document.getElementById('userAvatar').textContent    = (bizName[0] || '?').toUpperCase();
-}
-
-function toggleMenu() {
-  document.getElementById('userMenuDropdown').classList.toggle('open');
-}
-
-document.addEventListener('click', e => {
-  const wrap = document.querySelector('.user-menu-wrap');
-  if (wrap && !wrap.contains(e.target)) {
-    document.getElementById('userMenuDropdown').classList.remove('open');
-  }
-});
-
+// topbar.js handles sign-out, dropdown, and user menu rendering.
+// These functions are kept only if referenced by inline HTML onclick attributes.
 async function handleSignOut() {
   await sb.auth.signOut();
   window.location.href = 'login.html';
