@@ -1,312 +1,207 @@
 /* ════════════════════════════════════════════════════════════════
-   js/supabase.js
+   js/supabase.js  — Official Supabase SDK wrapper
    ─────────────────────────────────────────────────────────────
-   Shared Supabase client + auth/data helpers.
-   Include this BEFORE any page-specific scripts.
+   Uses the official @supabase/supabase-js v2 SDK loaded from CDN.
+   Exposes the same  sb.auth.*  and  sb.db.*  API that all pages use,
+   plus the same top-level helpers: requireAuth, loadBusiness,
+   loadAccount, saveBusiness.
 
-   SETUP:
-   1. Create a free project at https://supabase.com
-   2. Go to Project Settings → API
-   3. Replace SUPABASE_URL and SUPABASE_ANON_KEY below
-   4. Run the SQL in README.md to create the tables
+   The SDK handles localStorage key naming, token refresh, and RLS
+   correctly — no more hand-rolled session management.
 ════════════════════════════════════════════════════════════════ */
 
 const SUPABASE_URL      = 'https://dbbryatmoxlzifsurxrm.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk';
 
-/* ── Lightweight Supabase REST client (no npm needed) ── */
-const sb = (() => {
-  const headers = () => ({
-    'apikey':        SUPABASE_ANON_KEY,
-    'Authorization': `Bearer ${_getToken() || SUPABASE_ANON_KEY}`,
-    'Content-Type':  'application/json',
-    'Prefer':        'return=representation'
-  });
+/* ── Load the official Supabase SDK from CDN synchronously ──
+   We use a module-style import shim so it works in plain <script> tags. */
+if (typeof window._supabaseClient === 'undefined') {
+  // Will be set after SDK loads (see bottom of file)
+  window._supabaseClient = null;
+}
 
-  function _sessionKey() {
-    // Supabase SDK stores session with full hostname in key
-    // e.g. sb-dbbryatmoxlzifsurxrm.supabase.co-auth-token
-    const host = SUPABASE_URL.split('//')[1]; // dbbryatmoxlzifsurxrm.supabase.co
-    const ref  = host.split('.')[0];          // dbbryatmoxlzifsurxrm
-    // Return both formats; _getToken tries exact first then fallback scan
-    return `sb-${host}-auth-token`;
-  }
-
-  function _sessionKeyShort() {
-    const ref = SUPABASE_URL.split('//')[1].split('.')[0];
-    return `sb-${ref}-auth-token`;
-  }
-
-  // Decode user ID from JWT sub claim — reliable fallback when session.user is missing
-  function _jwtDecode(token) {
-    try {
-      return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
-    } catch { return {}; }
-  }
-
-  function _getToken() {
-    try {
-      // Try both key formats (long hostname + short ref)
-      for (const k of [_sessionKey(), _sessionKeyShort()]) {
-        const raw = localStorage.getItem(k);
-        if (raw) {
-          const s = JSON.parse(raw);
-          if (s?.access_token) return s.access_token;
-        }
+/* ════════════════════════════════════════════════════════════════
+   BOOTSTRAP — creates the real client once the SDK is available
+════════════════════════════════════════════════════════════════ */
+function _getClient() {
+  if (window._supabaseClient) return window._supabaseClient;
+  if (window.supabase?.createClient) {
+    window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: 'sb-session'   // single predictable key
       }
-      // Fallback: scan all localStorage keys for any supabase auth token
-      const key = Object.keys(localStorage).find(k =>
-        (k.includes('supabase') || k.startsWith('sb-')) && k.includes('auth')
-      );
-      if (!key) return null;
-      const s = JSON.parse(localStorage.getItem(key));
-      return s?.access_token || null;
-    } catch { return null; }
+    });
   }
+  return window._supabaseClient;
+}
 
-  /* ── AUTH ── */
-  const auth = {
-    /* Sign up with email + password */
+/* ════════════════════════════════════════════════════════════════
+   HELPER — get current access token for raw REST calls
+════════════════════════════════════════════════════════════════ */
+async function _getToken() {
+  const client = _getClient();
+  if (!client) return SUPABASE_ANON_KEY;
+  const { data } = await client.auth.getSession();
+  return data?.session?.access_token || SUPABASE_ANON_KEY;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   sb  — drop-in replacement, same API as the old hand-rolled client
+════════════════════════════════════════════════════════════════ */
+const sb = {
+
+  /* ── AUTH ─────────────────────────────────────────────────── */
+  auth: {
+
     async signUp(email, password) {
-      const r = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      return r.json();
-    },
-
-    /* Sign in with email + password */
-    async signIn(email, password) {
-      const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await r.json();
-      if (data.access_token) _saveSession(data);
+      const { data, error } = await _getClient().auth.signUp({ email, password });
+      if (error) return { error: error.message };
       return data;
     },
 
-    /* Send magic link (passwordless) */
+    async signIn(email, password) {
+      const { data, error } = await _getClient().auth.signInWithPassword({ email, password });
+      if (error) return { error: error.message };
+      return data;   // { user, session }
+    },
+
     async sendMagicLink(email) {
-      const r = await fetch(`${SUPABASE_URL}/auth/v1/magiclink`, {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+      const { error } = await _getClient().auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: `${location.origin}/dashboard.html` }
       });
-      return r.json();
+      return error ? { error: error.message } : {};
     },
 
-    /* Send password reset email */
     async resetPassword(email) {
-      const r = await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
-        method: 'POST',
-        headers: { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, redirectTo: `${location.origin}/account.html` })
+      const { error } = await _getClient().auth.resetPasswordForEmail(email, {
+        redirectTo: `${location.origin}/account.html`
       });
-      return r.json();
+      return error ? { error: error.message } : {};
     },
 
-    /* Update password (when user is logged in) */
     async updatePassword(newPassword) {
-      const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-        method: 'PUT',
-        headers: { ...headers(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: newPassword })
-      });
-      return r.json();
+      const { data, error } = await _getClient().auth.updateUser({ password: newPassword });
+      return error ? { error: error.message } : data;
     },
 
-    /* Get current session from localStorage */
+    async updateUser(attrs) {
+      const { data, error } = await _getClient().auth.updateUser(attrs);
+      return error ? { error: error.message } : data;
+    },
+
+    /* Returns session object synchronously from cache */
     getSession() {
+      // The SDK caches the session in memory after first load.
+      // For synchronous compat we return what's in localStorage directly.
       try {
-        // Try exact key first
-        let s = null;
-        const exact = localStorage.getItem(_sessionKey());
-        if (exact) s = JSON.parse(exact);
-        if (!s) {
-          const key = Object.keys(localStorage).find(k =>
-            (k.includes('supabase') || k.startsWith('sb-')) && k.includes('auth')
-          );
-          if (!key) return null;
-          s = JSON.parse(localStorage.getItem(key));
+        const raw = localStorage.getItem('sb-session');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          // SDK v2 stores { currentSession, expiresAt } or { access_token, ... }
+          const session = parsed?.currentSession || parsed;
+          if (session?.access_token) return session;
         }
-        if (!s?.access_token) return null;
-        // Check expiry
-        if (s.expires_at && Date.now() / 1000 > s.expires_at) {
-          this.signOut();
-          return null;
+        // Fallback scan for any Supabase key
+        for (const k of Object.keys(localStorage)) {
+          if (!k.startsWith('sb-') || !k.includes('auth')) continue;
+          try {
+            const p = JSON.parse(localStorage.getItem(k));
+            const s = p?.currentSession || p;
+            if (s?.access_token) return s;
+          } catch {}
         }
-        return s;
-      } catch { return null; }
+      } catch {}
+      return null;
     },
 
-    /* Get current user object */
+    /* Returns user object synchronously */
     getUser() {
       const s = this.getSession();
       if (s?.user) return s.user;
-      // Fall back: decode user ID from JWT sub claim and return minimal user object
-      const token = _getToken();
+      // Decode from JWT sub claim as last resort
+      const token = s?.access_token;
       if (!token) return null;
-      const payload = _jwtDecode(token);
-      return payload.sub ? { id: payload.sub, email: payload.email || '' } : null;
+      try {
+        const p = JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+        if (p.sub) return { id: p.sub, email: p.email || '' };
+      } catch {}
+      return null;
     },
 
-    /* Sign out — clear local session */
     async signOut() {
-      const token = _getToken();
-      if (token) {
-        try {
-          await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
-            method: 'POST',
-            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` }
-          });
-        } catch {}
-      }
-      // Clear all supabase/sb- auth keys
+      await _getClient().auth.signOut();
+      // Belt-and-suspenders: clear everything supabase-related
       Object.keys(localStorage)
-        .filter(k => k.includes('supabase') || (k.startsWith('sb-') && k.includes('auth')))
+        .filter(k => k.startsWith('sb-') || k.includes('supabase'))
         .forEach(k => localStorage.removeItem(k));
     },
 
-    /* Handle magic link / OAuth token in URL hash on page load */
-    handleAuthRedirect() {
-      const hash = window.location.hash;
-      if (!hash) return false;
-      const params = new URLSearchParams(hash.replace('#', '?'));
-      const token  = params.get('access_token');
-      const refresh= params.get('refresh_token');
-      const type   = params.get('type');
-      if (token) {
-        const session = {
-          access_token:  token,
-          refresh_token: refresh,
-          token_type:    params.get('token_type') || 'bearer',
-          expires_in:    parseInt(params.get('expires_in') || '3600'),
-          expires_at:    Math.floor(Date.now() / 1000) + parseInt(params.get('expires_in') || '3600'),
-          user:          null // will be fetched below
-        };
-        // Fetch user info
-        return fetch(`${SUPABASE_URL}/auth/v1/user`, {
-          headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${token}` }
-        })
-        .then(r => r.json())
-        .then(user => {
-          session.user = user;
-          _saveSession(session);
-          // Clean hash from URL
-          history.replaceState(null, '', location.pathname + location.search);
-          return { session, type };
-        });
-      }
-      return Promise.resolve(null);
+    async handleAuthRedirect() {
+      // SDK handles this automatically via detectSessionInUrl
+      const { data, error } = await _getClient().auth.getSession();
+      if (data?.session) return { session: data.session };
+      return null;
     }
-  };
+  },
 
-  /* ── INTERNAL: persist session ── */
-  function _saveSession(data) {
-    const key = `sb-${SUPABASE_URL.split('//')[1].split('.')[0]}-auth-token`;
-    const session = {
-      access_token:  data.access_token,
-      refresh_token: data.refresh_token,
-      token_type:    data.token_type || 'bearer',
-      expires_in:    data.expires_in || 3600,
-      expires_at:    data.expires_at || Math.floor(Date.now() / 1000) + (data.expires_in || 3600),
-      user:          data.user
-    };
-    localStorage.setItem(key, JSON.stringify(session));
-  }
-
-  /* ── DATABASE helpers ── */
-  const db = {
-    /* SELECT */
+  /* ── DATABASE (raw REST, identical API to old client) ─────── */
+  db: {
     async select(table, { filter, single, order, limit } = {}) {
-      let url = `${SUPABASE_URL}/rest/v1/${table}?select=*`;
-      if (filter)  url += `&${filter}`;
-      if (order)   url += `&order=${order}`;
-      if (limit)   url += `&limit=${limit}`;
-      const opts = { headers: headers() };
-      if (single) opts.headers['Accept'] = 'application/vnd.pgrst.object+json';
-      const r = await fetch(url, opts);
-      if (!r.ok) {
-        const e = await r.json().catch(() => ({}));
-        throw new Error(e.message || `DB select failed: ${r.status}`);
+      let q = _getClient().from(table).select('*');
+      if (filter) {
+        // filter is a raw PostgREST string like "user_id=eq.xxx"
+        const [col, val] = filter.split('=eq.');
+        if (col && val !== undefined) q = q.eq(col, val);
       }
-      return r.json();
+      if (order) q = q.order(order);
+      if (limit) q = q.limit(limit);
+      if (single) q = q.single();
+      const { data, error } = await q;
+      if (error) throw new Error(error.message);
+      return data;
     },
 
-    /* INSERT */
     async insert(table, data) {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-        method:  'POST',
-        headers: headers(),
-        body:    JSON.stringify(data)
-      });
-      if (!r.ok) {
-        const e = await r.json().catch(() => ({}));
-        throw new Error(e.message || `DB insert failed: ${r.status}`);
-      }
-      const result = await r.json();
-      return Array.isArray(result) ? result[0] : result;
+      const { data: result, error } = await _getClient().from(table).insert(data).select().single();
+      if (error) throw new Error(error.message);
+      return result;
     },
 
-    /* UPDATE */
     async update(table, filter, data) {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, {
-        method:  'PATCH',
-        headers: headers(),
-        body:    JSON.stringify(data)
-      });
-      if (!r.ok) {
-        const e = await r.json().catch(() => ({}));
-        throw new Error(e.message || `DB update failed: ${r.status}`);
-      }
-      const result = await r.json();
-      return Array.isArray(result) ? result[0] : result;
+      const [col, val] = filter.split('=eq.');
+      const { data: result, error } = await _getClient().from(table).update(data).eq(col, val).select().single();
+      if (error) throw new Error(error.message);
+      return result;
     },
 
-    /* UPSERT */
     async upsert(table, data, onConflict = 'id') {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?on_conflict=${onConflict}`, {
-        method:  'POST',
-        headers: { ...headers(), 'Prefer': 'resolution=merge-duplicates,return=representation' },
-        body:    JSON.stringify(data)
-      });
-      if (!r.ok) {
-        const e = await r.json().catch(() => ({}));
-        throw new Error(e.message || `DB upsert failed: ${r.status}`);
-      }
-      const result = await r.json();
-      return Array.isArray(result) ? result[0] : result;
+      const { data: result, error } = await _getClient()
+        .from(table).upsert(data, { onConflict }).select().single();
+      if (error) throw new Error(error.message);
+      return result;
     },
 
-    /* DELETE */
     async delete(table, filter) {
-      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, {
-        method:  'DELETE',
-        headers: headers()
-      });
-      if (!r.ok) {
-        const e = await r.json().catch(() => ({}));
-        throw new Error(e.message || `DB delete failed: ${r.status}`);
-      }
+      const [col, val] = filter.split('=eq.');
+      const { error } = await _getClient().from(table).delete().eq(col, val);
+      if (error) throw new Error(error.message);
       return true;
     }
-  };
-
-  return { auth, db };
-})();
+  }
+};
 
 /* ════════════════════════════════════════════════════════════════
-   HIGH-LEVEL HELPERS — used across pages
+   HIGH-LEVEL HELPERS
 ════════════════════════════════════════════════════════════════ */
 
-/* Require auth — redirects to login if not signed in.
-   Call at top of any protected page. */
 async function requireAuth(redirectTo = 'login.html') {
+  // Let SDK process magic link / OAuth token in URL hash first
   if (window.location.hash.includes('access_token')) {
-    await sb.auth.handleAuthRedirect();
+    await _getClient().auth.getSession();
   }
   const user = sb.auth.getUser();
   if (!user) {
@@ -316,30 +211,28 @@ async function requireAuth(redirectTo = 'login.html') {
   return user;
 }
 
-/* Load the current user's business profile from Supabase.
-   Does NOT filter by user_id in the URL — RLS policy "businesses: own rows"
-   already restricts reads to auth.uid() rows. Passing user_id=eq.X in the
-   URL while the token might be stale/anon causes silent empty results. */
-async function loadBusiness(userId) {
+/* Load current user's business row — RLS filters to auth.uid() automatically */
+async function loadBusiness() {
   try {
-    const token = _getToken();
-    const url   = `${SUPABASE_URL}/rest/v1/businesses?select=*&limit=1`;
-    const r = await fetch(url, {
-      headers: {
-        'apikey':        SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${token || SUPABASE_ANON_KEY}`,
-        'Accept':        'application/json'
-      }
-    });
-    if (!r.ok) {
-      console.warn('[loadBusiness] fetch failed:', r.status, await r.text().catch(()=>''));
-      return null;
-    }
-    const rows = await r.json();
-    console.log('[loadBusiness] rows returned:', rows.length, rows[0]?.biz_name || '—');
-    return (rows && rows.length > 0) ? rows[0] : null;
+    const { data, error } = await _getClient()
+      .from('businesses').select('*').limit(1).maybeSingle();
+    if (error) { console.warn('[loadBusiness]', error.message); return null; }
+    console.log('[loadBusiness] got:', data?.biz_name || '(none)');
+    return data || null;
   } catch(e) {
     console.warn('[loadBusiness] exception:', e);
+    return null;
+  }
+}
+
+/* Load current user's account row — RLS filters to auth.uid() automatically */
+async function loadAccount() {
+  try {
+    const { data, error } = await _getClient()
+      .from('accounts').select('*').limit(1).maybeSingle();
+    if (error) { console.warn('[loadAccount]', error.message); return null; }
+    return data || null;
+  } catch(e) {
     return null;
   }
 }
@@ -347,25 +240,4 @@ async function loadBusiness(userId) {
 /* Save / update business profile */
 async function saveBusiness(userId, data) {
   return sb.db.upsert('businesses', { user_id: userId, ...data }, 'user_id');
-}
-
-/* Load current user's account row.
-   Same pattern: no user_id URL filter, rely on RLS. */
-async function loadAccount(userId) {
-  try {
-    const token = _getToken();
-    const url   = `${SUPABASE_URL}/rest/v1/accounts?select=*&limit=1`;
-    const r = await fetch(url, {
-      headers: {
-        'apikey':        SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${token || SUPABASE_ANON_KEY}`,
-        'Accept':        'application/json'
-      }
-    });
-    if (!r.ok) return null;
-    const rows = await r.json();
-    return (rows && rows.length > 0) ? rows[0] : null;
-  } catch {
-    return null;
-  }
 }

@@ -9,6 +9,7 @@
   <link rel="apple-touch-icon" href="images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/topbar.js?v=2.0"></script>
   <style>
@@ -1151,8 +1152,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadPageData() {
   try {
     const [biz, account] = await Promise.all([
-      loadBusiness(_user.id),
-      loadAccount(_user.id)
+      loadBusiness(),
+      loadAccount()
     ]);
 
     _biz     = biz;
@@ -1307,8 +1308,8 @@ async function saveBusinessProfile() {
   status.className   = 'save-status';
 
   try {
-    const token = sb.auth.getSession()?.access_token;
     const payload = {
+      user_id:          _user.id,
       phone:            getVal('bizPhone').replace(/\D/g,''),
       address:          getVal('bizAddress'),
       website:          getVal('bizWebsite'),
@@ -1320,29 +1321,14 @@ async function saveBusinessProfile() {
       updated_at:       new Date().toISOString()
     };
 
-    // UPSERT — same fix as acctGbpSave: PATCH on missing row is a silent no-op
-    const patchResp = await fetch(
-      `${SUPABASE_URL}/rest/v1/businesses?on_conflict=user_id`,
-      {
-        method: 'POST',
-        headers: {
-          'apikey':        SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${token}`,
-          'Content-Type':  'application/json',
-          'Prefer':        'resolution=merge-duplicates,return=representation'
-        },
-        body: JSON.stringify({ user_id: _user.id, ...payload })
-      }
-    );
-    if (!patchResp.ok) {
-      const err = await patchResp.json().catch(() => ({}));
-      throw new Error(err.message || 'Save failed');
-    }
+    const { data: saved, error } = await window._supabaseClient
+      .from('businesses')
+      .upsert(payload, { onConflict: 'user_id' })
+      .select()
+      .single();
 
-    // Update in-memory biz (read saved row back from Supabase response)
-    const savedRows2 = await patchResp.json().catch(() => []);
-    const savedRow2  = Array.isArray(savedRows2) ? savedRows2[0] : savedRows2;
-    if (savedRow2) { _biz = savedRow2; window._biz = _biz; }
+    if (error) throw new Error(error.message);
+    if (saved) { _biz = saved; window._biz = _biz; }
     else if (_biz) Object.assign(_biz, payload);
 
     // Email change — only if different
@@ -1608,11 +1594,8 @@ async function acctGbpSave() {
 
     btn.textContent = 'Saving…';
 
-    // ── UPSERT the businesses row (INSERT or UPDATE on conflict) ──
-    // Using UPSERT (not PATCH) so new users without a row yet are handled correctly.
-    // PATCH on a missing row returns 200 + [] with 0 rows affected — silent data loss.
-    const token = sb.auth.getSession()?.access_token;
-    const patchPayload = {
+    // ── UPSERT via SDK (handles auth, RLS, and conflict resolution correctly) ──
+    const upsertPayload = {
       user_id:             _user.id,
       biz_name:            name,
       google_place_id:     placeId,
@@ -1628,30 +1611,17 @@ async function acctGbpSave() {
 
     // If user hasn't set a website yet, pre-fill with Google website
     const currentWebsite = (getVal('bizWebsite') || '').trim();
-    if (!currentWebsite && googleWebsite) patchPayload.website = googleWebsite;
+    if (!currentWebsite && googleWebsite) upsertPayload.website = googleWebsite;
 
-    const patchResp = await fetch(
-      `${SUPABASE_URL}/rest/v1/businesses?on_conflict=user_id`,
-      {
-        method: 'POST',
-        headers: {
-          'apikey':        SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${token}`,
-          'Content-Type':  'application/json',
-          'Prefer':        'resolution=merge-duplicates,return=representation'
-        },
-        body: JSON.stringify(patchPayload)
-      }
-    );
-    if (!patchResp.ok) {
-      const err = await patchResp.json().catch(() => ({}));
-      throw new Error(err.message || 'Save failed: ' + patchResp.status);
-    }
+    const { data: savedRow, error: upsertErr } = await window._supabaseClient
+      .from('businesses')
+      .upsert(upsertPayload, { onConflict: 'user_id' })
+      .select()
+      .single();
 
-    // Update in-memory biz (get saved row back from Supabase response)
-    const savedRows = await patchResp.json().catch(() => []);
-    const savedRow  = Array.isArray(savedRows) ? savedRows[0] : savedRows;
-    _biz = savedRow || { ...((_biz) || {}), ...patchPayload };
+    if (upsertErr) throw new Error(upsertErr.message);
+
+    _biz = savedRow || { ...((_biz) || {}), ...upsertPayload };
     window._biz = _biz;
 
     // Update confirmed card
