@@ -285,13 +285,10 @@ async function requireAuth(redirectTo = 'login.html') {
     await sb.auth.handleAuthRedirect();
   }
   const user = sb.auth.getUser();
-  // AUTH GUARD DISABLED — re-enable once redirect loop is resolved
-  // if (!user) {
-  //   const currentPage = location.pathname.split('/').pop() || 'dashboard.html';
-  //   const safePage = currentPage.endsWith('.html') ? currentPage : currentPage + '.html';
-  //   window.location.href = redirectTo + '?next=' + encodeURIComponent(safePage);
-  //   return null;
-  // }
+  if (!user) {
+    window.location.replace(redirectTo);
+    return null;
+  }
   return user;
 }
 

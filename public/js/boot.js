@@ -43,9 +43,8 @@ async function bootWelcomePage() {
   }
 
   if (!token) {
-    log('no token — auth guard disabled for now');
-    // AUTH GUARD DISABLED — re-enable once redirect loop is resolved
-    // window.location.replace('login.html?next=dashboard.html');
+    log('no token — redirecting to login');
+    window.location.replace('login.html');
     return;
   }
 
