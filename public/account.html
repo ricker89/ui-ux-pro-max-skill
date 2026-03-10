@@ -745,15 +745,14 @@ async function makeUniqueSlug(base) {
     .from('locations').select('slug').eq('slug', base).is('deleted_at', null).maybeSingle();
   if (!data) return base; // unique among active locations
 
-  // Try a-, b-, c-, … suffixes
-  const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
-  for (const l of letters) {
-    const candidate = `${l}-${base}`;
+  // Try slug-2, slug-3, slug-4, … until one is free
+  for (let n = 2; n <= 999; n++) {
+    const candidate = `${base}-${n}`;
     const { data: d2 } = await _getClient()
       .from('locations').select('slug').eq('slug', candidate).is('deleted_at', null).maybeSingle();
     if (!d2) return candidate;
   }
-  // Final fallback: timestamp suffix
+  // Unreachable in practice
   return `${base}-${Date.now().toString(36)}`;
 }
 
