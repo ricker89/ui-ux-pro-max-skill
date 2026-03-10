@@ -656,6 +656,23 @@
     }
     .print-pdf-btn:hover { opacity: .85; }
 
+    /* ─── Location selector dropdown ────────────────── */
+    #locDropdownItems .loc-drop-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; cursor: pointer; transition: background .12s;
+      gap: 8px; border-bottom: 1px solid #f3f4f6;
+    }
+    #locDropdownItems .loc-drop-item:hover { background: #f8f8f8; }
+    #locDropdownItems .loc-drop-item.selected { background: #f0fdf4; }
+    #locDropdownItems .loc-drop-name { font-size: .85rem; font-weight: 600; color: #1a1a1a; }
+    #locDropdownItems .loc-drop-addr { font-size: .75rem; color: #6b7280; }
+    #locDropdownItems .loc-drop-badge {
+      font-size: .7rem; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0;
+    }
+    .badge-active   { background: #d1fae5; color: #065f46; }
+    .badge-pending  { background: #fef3c7; color: #92400e; }
+    .badge-inactive { background: #f3f4f6; color: #6b7280; }
+
     /* ─── Debug bar ──────────────────────────────────── */
     #edb {
       display: none;
@@ -774,7 +791,34 @@
 ═══════════════════════════════════════════ -->
 <nav class="topbar">
   <a class="topbar-logo" href="dashboard.html">Happy<span>Clientele.</span></a>
-  <div id="topbarUserArea"></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <!-- Location Selector -->
+    <div id="locSelectorWrap" style="display:none;position:relative;">
+      <button id="locSelectorBtn" onclick="toggleLocDropdown()"
+        style="display:flex;align-items:center;gap:8px;background:#f3f4f6;border:1.5px solid #e8e8e8;
+               border-radius:9px;padding:6px 14px;font-family:inherit;font-size:.83rem;font-weight:600;
+               color:#1a1a1a;cursor:pointer;transition:all .15s;max-width:220px;">
+        <span>📍</span>
+        <span id="locSelectorLabel" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">Loading…</span>
+        <span style="margin-left:2px;color:#6b7280;">▾</span>
+      </button>
+      <div id="locDropdown"
+        style="display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:240px;
+               background:#fff;border:1.5px solid #e8e8e8;border-radius:12px;
+               box-shadow:0 8px 24px rgba(0,0,0,.1);z-index:300;overflow:hidden;">
+        <div id="locDropdownItems"></div>
+        <div style="border-top:1px solid #e8e8e8;">
+          <a href="account.html#add"
+            style="display:flex;align-items:center;gap:8px;padding:10px 14px;
+                   font-size:.82rem;font-weight:600;color:#1a1a1a;text-decoration:none;
+                   background:transparent;transition:background .12s;">
+            <span style="color:#34A853;">＋</span> Add Location
+          </a>
+        </div>
+      </div>
+    </div>
+    <div id="topbarUserArea"></div>
+  </div>
 </nav>
 
 <!-- ═══════════════════════════════════════════
@@ -1337,6 +1381,10 @@ document.addEventListener('keydown', e => {
 
 /* ── Auth & boot ────────────────────────────────────────── */
 
+// All locations for this account
+let _allLocations = [];
+let _activeLocId  = null; // currently selected location id
+
 async function bootDashboard() {
   dbg('boot start');
 
@@ -1360,34 +1408,151 @@ async function bootDashboard() {
   _userId = session.user?.id;
   dbg('userId: ' + _userId);
 
-  // Always make page visible — never leave a blank screen
   document.body.classList.add('auth-ready');
 
-  // Fetch business row via SDK (RLS automatically filters to this user)
   try {
-    dbg('fetching biz...');
-    const biz = await loadBusiness();
-    if (!biz) {
+    dbg('fetching locations…');
+
+    // ── Load all locations for this user from `locations` table ──
+    const { data: locs, error: locErr } = await _getClient()
+      .from('locations')
+      .select('*')
+      .is('deleted_at', null)
+      .order('created_at', { ascending: true });
+
+    if (locErr) dbg('loc err: ' + locErr.message);
+    _allLocations = locs || [];
+    dbg('locations count: ' + _allLocations.length);
+
+    // Determine which location to show from URL param
+    const urlLocId = new URLSearchParams(location.search).get('loc');
+    let picked = null;
+    if (urlLocId) picked = _allLocations.find(l => l.id === urlLocId);
+    if (!picked)  picked = _allLocations.find(l => l.subscription_status === 'active' || l.subscription_status === 'trialing');
+    if (!picked)  picked = _allLocations[0] || null;
+
+    // ── Fall back to legacy `businesses` row if no locations yet ──
+    if (!picked) {
+      dbg('no locations — trying legacy businesses table');
+      const legacyBiz = await loadBusiness();
+      if (legacyBiz) {
+        picked = {
+          id:                  legacyBiz.id,
+          biz_name:            legacyBiz.biz_name,
+          slug:                legacyBiz.slug,
+          google_place_id:     legacyBiz.google_place_id,
+          google_url:          legacyBiz.google_url,
+          address:             legacyBiz.address,
+          phone:               legacyBiz.phone,
+          website:             legacyBiz.website,
+          google_rating:       legacyBiz.google_rating || legacyBiz.rating,
+          google_review_count: legacyBiz.google_review_count || legacyBiz.rating_count,
+          feature_flags:       legacyBiz.feature_flags,
+          incentive:           legacyBiz.incentive,
+          subscription_status: 'active',
+          _legacy:             true,
+        };
+        _allLocations = [picked];
+      }
+    }
+
+    if (!picked) {
       dbg('no biz row');
-      showBootError('No business profile found. Go to <a href="account.html" style="color:#991b1b;text-decoration:underline;">Account Settings</a> to set up your business.');
+      showBootError('No location found. Go to <a href="account.html" style="color:#991b1b;text-decoration:underline;">Account Settings</a> to add a location.');
+      renderLocSelector();
       return;
     }
 
-    _biz = biz;
-    window._biz = _biz;
-    dbg('biz: ' + _biz.biz_name);
-
-    // Parse feature flags
-    if (_biz.feature_flags) {
-      try { _flags = { ..._flags, ...JSON.parse(_biz.feature_flags) }; } catch(e) {}
-    }
-
-    renderDashboard();
+    _activeLocId = picked.id;
+    activateLocation(picked);
+    renderLocSelector();
 
   } catch(e) {
     dbg('boot exception: ' + e);
     showBootError('Unexpected error loading dashboard: ' + e.message + '. Please refresh the page.');
   }
+}
+
+function activateLocation(loc) {
+  _biz    = loc;
+  window._biz = loc;
+
+  // Merge feature flags
+  _flags = { funnel: true, menu: false, wifi: false, print: false };
+  if (loc.feature_flags) {
+    try {
+      const ff = typeof loc.feature_flags === 'string'
+        ? JSON.parse(loc.feature_flags)
+        : loc.feature_flags;
+      _flags = { ..._flags, ...ff };
+    } catch(e) {}
+  }
+  dbg('activate: ' + loc.biz_name);
+  renderDashboard();
+}
+
+/* ── Location Selector (top-right dropdown) ─────────────── */
+function renderLocSelector() {
+  const wrap  = document.getElementById('locSelectorWrap');
+  const lbl   = document.getElementById('locSelectorLabel');
+  const items = document.getElementById('locDropdownItems');
+
+  if (_allLocations.length <= 1) {
+    // Hide selector if only one location — keep topbar clean
+    if (wrap) wrap.style.display = 'none';
+    return;
+  }
+  if (wrap) wrap.style.display = 'block';
+
+  lbl.textContent = _biz?.biz_name || 'Select Location';
+  items.innerHTML = '';
+
+  _allLocations.forEach(loc => {
+    const status = loc.subscription_status || 'pending';
+    const bCls = status === 'active' || status === 'trialing' ? 'badge-active'
+               : status.startsWith('pending') ? 'badge-pending' : 'badge-inactive';
+    const bLbl = { active:'Active', trialing:'Trial', canceled:'Cancelled',
+                   pending_payment:'Pay Now', pending:'Pending' }[status] || status;
+    const isSel = loc.id === _activeLocId;
+
+    const div = document.createElement('div');
+    div.className = 'loc-drop-item' + (isSel ? ' selected' : '');
+    div.innerHTML = `
+      <div style="flex:1;min-width:0;">
+        <div class="loc-drop-name">${escH(loc.biz_name || 'Unnamed')}</div>
+        ${loc.address ? `<div class="loc-drop-addr">${escH(loc.address)}</div>` : ''}
+      </div>
+      <span class="loc-drop-badge ${bCls}">${escH(bLbl)}</span>
+    `;
+    if (!isSel) {
+      div.addEventListener('click', () => {
+        _activeLocId = loc.id;
+        activateLocation(loc);
+        closeLocDropdown();
+        renderLocSelector();
+        const url = new URL(location.href);
+        url.searchParams.set('loc', loc.id);
+        history.replaceState(null, '', url.toString());
+      });
+    } else {
+      div.style.cursor = 'default';
+    }
+    items.appendChild(div);
+  });
+}
+
+function toggleLocDropdown() {
+  const dd = document.getElementById('locDropdown');
+  if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+
+function closeLocDropdown() {
+  const dd = document.getElementById('locDropdown');
+  if (dd) dd.style.display = 'none';
+}
+
+function escH(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function showBootError(msg) {
@@ -1543,13 +1708,23 @@ async function saveFeatureFlag(feature, value) {
   const label = document.getElementById(feature + 'ToggleLabel');
   if (label) label.textContent = value ? 'On' : 'Off';
 
-  if (!_token || !_userId) return;
+  if (!_biz) return;
   try {
-    await fetch(`${SUPA_URL}/rest/v1/businesses?user_id=eq.${_userId}&limit=1`, {
-      method: 'PATCH',
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ feature_flags: JSON.stringify(_flags) })
-    });
+    const flagsJson = JSON.stringify(_flags);
+    if (_biz._legacy || !_activeLocId) {
+      // Legacy: save to businesses table
+      await fetch(`${SUPA_URL}/rest/v1/businesses?user_id=eq.${_userId}&limit=1`, {
+        method: 'PATCH',
+        headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feature_flags: flagsJson })
+      });
+    } else {
+      // New: save to locations table
+      await _getClient()
+        .from('locations')
+        .update({ feature_flags: _flags })
+        .eq('id', _activeLocId);
+    }
     dbg('flags saved: ' + JSON.stringify(_flags));
   } catch(e) { dbg('flag save error: ' + e); }
 }
@@ -2228,6 +2403,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Close webhook modal on backdrop click
   document.getElementById('webhookModal')?.addEventListener('click', e => {
     if (e.target === document.getElementById('webhookModal')) closeWebhookModal();
+  });
+  // Close location dropdown on outside click
+  document.addEventListener('click', e => {
+    const wrap = document.getElementById('locSelectorWrap');
+    if (wrap && !wrap.contains(e.target)) closeLocDropdown();
   });
   bootDashboard();
 });

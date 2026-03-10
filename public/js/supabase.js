@@ -232,3 +232,55 @@ async function loadAccount() {
 async function saveBusiness(userId, data) {
   return sb.db.upsert('businesses', { user_id: userId, ...data }, 'user_id');
 }
+
+/* ════════════════════════════════════════════════════════════════
+   LOCATIONS HELPERS (multi-location)
+════════════════════════════════════════════════════════════════ */
+
+/* Load all locations for current user */
+async function loadLocations() {
+  try {
+    const { data, error } = await _getClient()
+      .from('locations')
+      .select('*')
+      .is('deleted_at', null)
+      .order('created_at', { ascending: true });
+    if (error) { console.warn('[loadLocations]', error.message); return []; }
+    return data || [];
+  } catch(e) {
+    console.warn('[loadLocations] exception:', e);
+    return [];
+  }
+}
+
+/* Save / upsert a location row */
+async function saveLocation(data) {
+  if (data.id) {
+    const { data: result, error } = await _getClient()
+      .from('locations')
+      .update({ ...data, updated_at: new Date().toISOString() })
+      .eq('id', data.id)
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return result;
+  } else {
+    const { data: result, error } = await _getClient()
+      .from('locations')
+      .insert(data)
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return result;
+  }
+}
+
+/* Soft-delete a location */
+async function deleteLocation(locationId) {
+  const { error } = await _getClient()
+    .from('locations')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', locationId);
+  if (error) throw new Error(error.message);
+  return true;
+}
