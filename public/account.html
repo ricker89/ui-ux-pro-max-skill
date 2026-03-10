@@ -111,8 +111,8 @@
     .loc-card-actions { display:flex; gap:8px; flex-shrink:0; align-items:flex-start; margin-top:2px; }
     .btn-loc-delete { background:transparent; border:1.5px solid #fca5a5; color:var(--red); border-radius:7px; padding:5px 11px; font-size:.78rem; font-weight:600; cursor:pointer; transition:all .15s; }
     .btn-loc-delete:hover { background:#fee2e2; }
-    .btn-loc-activate { background:var(--black); color:var(--white); border:none; border-radius:7px; padding:5px 11px; font-size:.78rem; font-weight:600; cursor:pointer; transition:opacity .15s; }
-    .btn-loc-activate:hover { opacity:.8; }
+    .btn-loc-activate { background:#16a34a; color:#fff; border:none; border-radius:7px; padding:5px 11px; font-size:.78rem; font-weight:600; cursor:pointer; transition:background .15s; }
+    .btn-loc-activate:hover { background:#15803d; }
     .loc-empty { padding:20px; text-align:center; color:var(--sub); font-size:.88rem; border:1.5px dashed var(--border); border-radius:10px; }
 
     /* ══ Add-Location Panel (modal-like inline) ══ */
@@ -598,7 +598,7 @@ function buildLocCard(loc) {
       </div>
     </div>
     <div class="loc-card-actions">
-      ${isPaymentPending ? `<button class="btn-loc-activate" onclick="resumePayment('${escH(loc.id)}')">Activate</button>` : ''}
+      ${isPaymentPending ? `<button class="btn-loc-activate" onclick="resumePayment('${escH(loc.id)}')" data-loc-id="${escH(loc.id)}">Activate</button>` : ''}
       <button class="btn-loc-delete" onclick="openDeleteLocModal('${escH(loc.id)}', '${escH(loc.biz_name||'')}')">Delete</button>
     </div>
   `;
@@ -729,7 +729,7 @@ async function addLocSaveAndCheckout() {
     const { url, error: checkErr } = await checkoutRes.json();
     if (checkErr || !url) throw new Error(checkErr || 'No checkout URL returned');
 
-    window.location.href = url;
+    window.open(url, '_blank');  // open Stripe in new tab
 
   } catch(e) {
     status.textContent = '✗ ' + (e.message || 'Failed — please try again.');
@@ -759,6 +759,9 @@ async function makeUniqueSlug(base) {
 async function resumePayment(locationId) {
   const loc = _locations.find(l => l.id === locationId);
   if (!loc) return;
+  // Disable the button immediately to prevent double-clicks
+  const btn = document.querySelector(`[data-loc-id="${locationId}"]`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
   try {
     const checkoutRes = await fetch(STRIPE_CHECKOUT_ENDPOINT, {
       method: 'POST',
@@ -775,10 +778,15 @@ async function resumePayment(locationId) {
     });
     if (checkoutRes.ok) {
       const { url } = await checkoutRes.json();
-      if (url) { window.location.href = url; return; }
+      if (url) { window.open(url, '_blank'); }  // open Stripe in new tab
+    } else {
+      window.open(STRIPE_PORTAL_FALLBACK, '_blank');
     }
-    window.location.href = STRIPE_PORTAL_FALLBACK;
-  } catch { window.location.href = STRIPE_PORTAL_FALLBACK; }
+  } catch { window.open(STRIPE_PORTAL_FALLBACK, '_blank'); }
+  // Re-enable button after a moment
+  setTimeout(() => {
+    if (btn) { btn.disabled = false; btn.textContent = 'Activate'; }
+  }, 3000);
 }
 
 /* ════════════════════════════════════════════════════════

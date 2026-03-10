@@ -91,9 +91,9 @@ app.post('/api/create-checkout', async (c) => {
     return c.json({ error: 'location_id and email are required' }, 400)
   }
 
-  const customerId = await getOrCreateStripeCustomer(email, c.env.STRIPE_SECRET_KEY)
-
-  // Create Checkout session for $97/mo subscription
+  // Create Checkout session for $97/mo subscription.
+  // We use customer_email (not customer ID) so Stripe always shows the
+  // card-entry / signup form instead of the returning-customer login page.
   const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
     headers: {
@@ -101,14 +101,15 @@ app.post('/api/create-checkout', async (c) => {
       'Content-Type':  'application/x-www-form-urlencoded',
     },
     body: new URLSearchParams({
-      customer:               customerId,
-      'line_items[0][price]': STRIPE_PRICE_ID,
-      'line_items[0][quantity]': '1',
-      mode:                   'subscription',
-      success_url:            success_url || `https://happyclientele.com/dashboard?loc=${location_id}&paid=1`,
-      cancel_url:             cancel_url  || `https://happyclientele.com/account`,
-      'metadata[location_id]': location_id,
-      'metadata[user_id]':     userId,
+      customer_email:             email,
+      'line_items[0][price]':     STRIPE_PRICE_ID,
+      'line_items[0][quantity]':  '1',
+      mode:                       'subscription',
+      payment_method_collection:  'always',
+      success_url:                success_url || `https://happyclientele.com/dashboard?loc=${location_id}&paid=1`,
+      cancel_url:                 cancel_url  || `https://happyclientele.com/account`,
+      'metadata[location_id]':    location_id,
+      'metadata[user_id]':        userId,
       'subscription_data[metadata][location_id]': location_id,
       'subscription_data[metadata][user_id]':     userId,
     }).toString()
