@@ -1,10 +1,10 @@
 ---
-name: ckm:brand
-description: Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides.
-argument-hint: "[update|review|create] [args]"
+name: brand
+description: "Brand voice, visual identity, messaging frameworks, asset management, and brand consistency. Use when creating branded content, defining tone of voice, building marketing assets, reviewing brand compliance, or developing style guides. Includes scripts for brand context injection, asset validation, and color extraction."
 metadata:
   author: claudekit
   version: "1.0.0"
+  argument-hint: "[update|review|create] [args]"
 ---
 
 # Brand

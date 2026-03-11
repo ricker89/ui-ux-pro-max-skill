@@ -1,11 +1,11 @@
 ---
-name: ckm:design-system
-description: Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. Use for design tokens, systematic design, brand-compliant presentations.
-argument-hint: "[component or token]"
+name: design-system
+description: "Token architecture, component specifications, and slide generation. Use when creating design tokens, defining component states, building CSS variable systems, configuring spacing/typography scales, or generating brand-compliant presentations. Three-layer tokens (primitive, semantic, component), Chart.js integration, and contextual slide strategies."
 license: MIT
 metadata:
   author: claudekit
   version: "1.0.0"
+  argument-hint: "[component or token]"
 ---
 
 # Design System

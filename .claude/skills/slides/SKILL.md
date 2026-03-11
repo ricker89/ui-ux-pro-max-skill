@@ -1,10 +1,10 @@
 ---
-name: ckm:slides
-description: Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies.
-argument-hint: "[topic] [slide-count]"
+name: slides
+description: "Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies. Use when the user asks to create presentations, pitch decks, or data-driven slides with layout patterns and copywriting optimization."
 metadata:
   author: claudekit
   version: "1.0.0"
+  argument-hint: "[topic] [slide-count]"
 ---
 
 # Slides
