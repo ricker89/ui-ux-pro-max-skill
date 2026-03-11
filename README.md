@@ -496,3 +496,11 @@ See [CLAUDE.md](CLAUDE.md) for detailed development guidelines.
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Compatible Agents
+
+This skill works with:
+
+- [Claude Code](https://claude.ai/code) - Anthropic's official CLI
+- [AdaL](https://sylph.ai/adal) - Self-evolving AI coding agent with MCP support
+
