@@ -504,7 +504,8 @@ def persist_design_system(design_system: dict, page: str = None, output_dir: str
     base_dir = Path(output_dir) if output_dir else Path.cwd()
     
     # Use project name for project-specific folder
-    project_name = design_system.get("project_name", "default")
+    project_name = design_system.get("project_name")
+    project_name = project_name if project_name is not None else "default"
     project_slug = project_name.lower().replace(' ', '-')
     
     design_system_dir = base_dir / "design-system" / project_slug
