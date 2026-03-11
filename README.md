@@ -496,3 +496,9 @@ See [CLAUDE.md](CLAUDE.md) for detailed development guidelines.
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Compatible Agents
+
+This skill works with:
+- [Claude Code](https://claude.com/product/claude-code)
+- [AdaL](https://sylph.ai/) - Self-evolving AI coding agent ([Docs](https://docs.sylph.ai/) | [GitHub](https://github.com/SylphAI-Inc/adal-cli))
