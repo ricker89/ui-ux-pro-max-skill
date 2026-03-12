@@ -716,8 +716,8 @@ async function addLocSaveAndCheckout() {
       body: JSON.stringify({
         location_id: newLoc.id,
         email:       _user.email,
-        success_url: `${location.origin}/dashboard?loc=${newLoc.id}&paid=1`,
-        cancel_url:  `${location.origin}/account`,
+        success_url: `${location.origin}/location.html?loc=${newLoc.id}&paid=1`,
+        cancel_url:  `${location.origin}/account.html`,
       })
     });
 
@@ -775,8 +775,8 @@ async function resumePayment(locationId) {
       body: JSON.stringify({
         location_id: loc.id,
         email:       _user.email,
-        success_url: `${location.origin}/dashboard?loc=${loc.id}&paid=1`,
-        cancel_url:  `${location.origin}/account`,
+        success_url: `${location.origin}/location.html?loc=${loc.id}&paid=1`,
+        cancel_url:  `${location.origin}/account.html`,
       })
     });
     if (checkoutRes.ok) {

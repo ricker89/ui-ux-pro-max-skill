@@ -268,7 +268,8 @@
     // dashboard.html manages the slot itself (knows the active location)
     // so we skip the fetch here and let it call window.tbRenderLocSlot()
     const page = location.pathname.split('/').pop() || '';
-    if (page === 'dashboard.html') return; // dashboard calls tbRenderLocSlot() directly
+    // dashboard.html (overview) and location.html (per-location) both call tbRenderLocSlot() themselves
+    if (page === 'dashboard.html' || page === 'location.html') return;
 
     try {
       const session = await window._supabaseClient.auth.getSession();
@@ -323,7 +324,7 @@
       // Use <a> so it's a real link (navigates to dashboard for that location)
       const el = document.createElement('a');
       el.className = 'tb-loc-item' + (isSel ? ' tb-loc-active' : '');
-      el.href = `dashboard.html?loc=${loc.id}`;
+      el.href = `location.html?loc=${loc.id}`;
       el.innerHTML = `
         <div class="tb-loc-item-info">
           <div class="tb-loc-item-name">${escTb(loc.biz_name || 'Unnamed')}</div>

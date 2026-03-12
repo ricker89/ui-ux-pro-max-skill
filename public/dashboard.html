@@ -1,847 +1,326 @@
 <!DOCTYPE html>
-<!-- dashboard.html v1.1 — universal topbar, sections open by default -->
+<!-- dashboard.html v2.0 — cross-location overview -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>Dashboard — Happy Clientele</title>
-  <link rel="icon" type="image/png" href="images/favicon.png" />
-  <link rel="apple-touch-icon" href="images/favicon.png" />
+  <title>Dashboard — HappyClientele</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="js/supabase.js?v=5.7"></script>
-  <script src="js/topbar.js?v=2.0"></script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="js/supabase.js"></script>
+  <script src="js/topbar.js?v=3.1"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --black:   #1a1a1a;
-      --white:   #ffffff;
-      --off:     #f5f5f7;
-      --border:  #e8e8e8;
-      --sub:     #6b7280;
-      --yellow:  #FDB813;
-      --green:   #34A853;
-      --blue:    #4285F4;
-      --red:     #EA4335;
-      --purple:  #6366f1;
-      --cyan:    #0ea5e9;
-      --radius:  16px;
-      --shadow:  0 2px 16px rgba(0,0,0,.06);
+      --black:  #1a1a1a;
+      --sub:    #6b7280;
+      --border: #e8e8e8;
+      --off:    #f9f9f9;
+      --yellow: #f4c430;
+      --green:  #16a34a;
+      --red:    #dc2626;
+      --purple: #7c3aed;
     }
 
-    html, body {
-      min-height: 100%;
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--off);
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f5f7;
       color: var(--black);
-      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
     }
-    /* auth-ready kept for JS compatibility but no longer hides the page */
-    body.auth-ready { visibility: visible; }
 
-    /* ─── Topbar ─────────────────────────────────────── */
+    /* ── Topbar ─────────────────────────────────────────────── */
     .topbar {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      height: 60px;
+      height: 56px;
+      background: #fff;
+      border-bottom: 1.5px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 0 24px;
       position: sticky;
       top: 0;
       z-index: 100;
     }
     .topbar-logo {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
       color: var(--black);
       text-decoration: none;
+      letter-spacing: -.02em;
     }
     .topbar-logo span { color: var(--yellow); }
-    .topbar-right { display: flex; align-items: center; gap: 8px; }
 
-    /* ─── Page shell ─────────────────────────────────── */
+    /* ── Page ───────────────────────────────────────────────── */
     .page {
       max-width: 900px;
       margin: 0 auto;
-      padding: 32px 20px 80px;
+      padding: 28px 20px 60px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    /* ─── Business Hero Card ─────────────────────────── */
-    .biz-hero {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 32px;
-      box-shadow: var(--shadow);
-    }
-    .biz-hero-top {
+    /* ── Page header ────────────────────────────────────────── */
+    .page-header {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      gap: 16px;
       flex-wrap: wrap;
-      margin-bottom: 24px;
+      gap: 12px;
     }
-    .biz-hero-name {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.5rem;
+    .page-header-left h1 {
+      font-size: 1.45rem;
       font-weight: 800;
-      color: var(--black);
-      line-height: 1.15;
+      letter-spacing: -.02em;
     }
-    .biz-hero-address {
-      font-size: .83rem;
+    .page-header-left p {
+      font-size: .82rem;
       color: var(--sub);
-      margin-top: 4px;
+      margin-top: 3px;
     }
-    .biz-hero-since { display: none; }
-    .biz-hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #f0fdf4;
-      color: #166534;
-      border: 1px solid #bbf7d0;
-      border-radius: 999px;
-      padding: 5px 12px;
-      font-size: .75rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .biz-hero-badge .dot { width:7px;height:7px;border-radius:50%;background:#22c55e; }
 
-    /* Stats row */
-    .biz-stats-row {
+    /* ── Summary stats row ──────────────────────────────────── */
+    .summary-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
     }
-    .biz-stat-card {
-      background: var(--off);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    .stat-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 20px 18px;
     }
-    .biz-stat-icon {
-      font-size: 1.6rem;
-      flex-shrink: 0;
-    }
-    .biz-stat-body { flex: 1; min-width: 0; }
-    .biz-stat-label {
-      font-size: .7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      color: var(--sub);
-      margin-bottom: 6px;
-    }
-    .biz-stat-numbers {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .biz-stat-current {
-      font-family: 'Poppins', sans-serif;
+    .stat-card-icon { font-size: 1.4rem; margin-bottom: 8px; }
+    .stat-card-num {
       font-size: 2rem;
       font-weight: 800;
-      color: var(--black);
+      letter-spacing: -.03em;
       line-height: 1;
     }
-    .biz-stat-started {
-      font-size: .75rem;
-      color: var(--sub);
-      font-weight: 500;
-    }
-    .biz-stat-delta {
-      font-size: .75rem;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 999px;
-    }
-    .biz-stat-delta.up   { background: #dcfce7; color: #166534; }
-    .biz-stat-delta.same { background: #f3f4f6; color: var(--sub); }
-    .biz-stat-stars-row {
-      display: flex; align-items: center; gap: 2px;
-      margin-top: 5px;
-    }
-    .biz-stat-stars-row svg { display: block; }
+    .stat-card-label { font-size: .78rem; color: var(--sub); margin-top: 4px; font-weight: 500; }
 
-    /* ─── Leads card ─────────────────────────────────── */
+    /* ── Location summary cards ─────────────────────────────── */
+    .section-title {
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--sub);
+      margin-bottom: 2px;
+    }
+
+    .loc-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .loc-summary-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      text-decoration: none;
+      color: var(--black);
+      transition: border-color .15s, box-shadow .15s;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .loc-summary-card:hover { border-color: #c0c0c0; box-shadow: 0 4px 16px rgba(0,0,0,.07); }
+    .loc-summary-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .loc-summary-name { font-size: .92rem; font-weight: 700; }
+    .loc-summary-addr { font-size: .75rem; color: var(--sub); }
+    .loc-summary-stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .loc-summary-stat { text-align: center; flex: 1; }
+    .loc-summary-stat-num { font-size: 1.25rem; font-weight: 800; }
+    .loc-summary-stat-label { font-size: .7rem; color: var(--sub); margin-top: 2px; }
+    .ls-badge {
+      font-size: .68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .ls-badge-active   { background: #d1fae5; color: #065f46; }
+    .ls-badge-pending  { background: #fef3c7; color: #92400e; }
+    .ls-badge-inactive { background: #f3f4f6; color: #6b7280; }
+
+    /* ── Leads card ─────────────────────────────────────────── */
     .leads-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 32px;
-      box-shadow: var(--shadow);
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
     }
     .leads-card-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 16px;
       flex-wrap: wrap;
-      margin-bottom: 22px;
+      gap: 12px;
+      margin-bottom: 18px;
     }
-    .leads-card-title { font-size: 1rem; font-weight: 700; color: var(--black); }
-    .leads-card-sub   { font-size: .8rem; color: var(--sub); margin-top: 3px; }
+    .leads-card-title  { font-size: 1rem; font-weight: 700; }
+    .leads-card-sub    { font-size: .78rem; color: var(--sub); margin-top: 3px; }
     .leads-stats {
       display: flex;
-      gap: 28px;
+      gap: 20px;
       flex-wrap: wrap;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
     }
-    .leads-stat { display: flex; flex-direction: column; gap: 3px; }
-    .leads-stat-num   { font-size: 1.9rem; font-weight: 800; color: var(--black); line-height: 1; }
-    .leads-stat-label { font-size: .73rem; color: var(--sub); font-weight: 500; }
-
-    /* toolbar */
+    .leads-stat-num   { font-size: 1.7rem; font-weight: 800; letter-spacing: -.03em; }
+    .leads-stat-label { font-size: .74rem; color: var(--sub); margin-top: 1px; }
     .leads-toolbar {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
     }
     .leads-filter-select {
-      appearance: none; -webkit-appearance: none;
-      background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: 8px;
-      padding: 7px 32px 7px 12px;
-      font-family: inherit; font-size: .82rem; font-weight: 500;
-      color: var(--black); cursor: pointer;
-      transition: border-color .15s;
+      padding: 7px 11px;
+      font-family: inherit;
+      font-size: .82rem;
+      background: var(--off);
+      cursor: pointer;
     }
-    .leads-filter-select:hover, .leads-filter-select:focus { border-color: var(--purple); outline: none; }
-    .leads-showing-label { font-size: .78rem; color: var(--sub); font-weight: 500; }
+    .leads-filter-select:focus { outline: none; border-color: var(--purple); }
+    .leads-loc-filter {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 11px;
+      font-family: inherit;
+      font-size: .82rem;
+      background: var(--off);
+      cursor: pointer;
+    }
+    .leads-loc-filter:focus { outline: none; border-color: var(--purple); }
+    .leads-showing-label { font-size: .78rem; color: var(--sub); }
 
-    /* table */
-    .leads-table-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin-bottom: 0;
+    .btn-csv {
+      background: var(--off);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 7px 14px;
+      font-family: inherit;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .12s;
     }
+    .btn-csv:hover:not(:disabled) { background: #efefef; }
+    .btn-csv:disabled { opacity: .45; cursor: default; }
+
+    .leads-table-wrap { overflow-x: auto; }
     .leads-table {
-      width: 100%; border-collapse: collapse; font-size: .84rem;
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .83rem;
     }
     .leads-table th {
-      background: var(--off);
-      padding: 10px 14px;
       text-align: left;
-      font-weight: 600;
-      color: var(--sub);
+      font-weight: 700;
       font-size: .72rem;
       text-transform: uppercase;
       letter-spacing: .04em;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
+      color: var(--sub);
+      padding: 8px 12px 10px;
+      border-bottom: 1.5px solid var(--border);
     }
     .leads-table td {
-      padding: 11px 14px;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--border);
-      color: var(--black);
       vertical-align: middle;
     }
     .leads-table tr:last-child td { border-bottom: none; }
-    .leads-table tr:hover td { background: var(--off); }
     .leads-empty {
-      text-align: center; padding: 40px 20px;
-      color: var(--sub); font-size: .88rem;
-    }
-    .leads-empty-icon { font-size: 2rem; margin-bottom: 8px; }
-    .tapped-badge {
-      display: inline-block; background: #dcfce7; color: #166534;
-      font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 99px;
-    }
-
-    /* pagination */
-    .leads-pagination {
-      display: flex; align-items: center; justify-content: center;
-      gap: 16px; margin-top: 16px;
-    }
-    .leads-page-btn {
-      background: var(--white); border: 1px solid var(--border);
-      border-radius: 8px; padding: 7px 16px;
-      font-family: inherit; font-size: .82rem; font-weight: 600;
-      color: var(--black); cursor: pointer;
-      transition: background .12s, border-color .12s;
-    }
-    .leads-page-btn:hover:not(:disabled) { background: var(--off); border-color: var(--purple); }
-    .leads-page-btn:disabled { opacity: .35; cursor: not-allowed; }
-    .leads-page-info { font-size: .82rem; color: var(--sub); font-weight: 500; min-width: 80px; text-align: center; }
-
-    .btn-csv {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--black); color: var(--white);
-      border: none; border-radius: 10px; padding: 9px 18px;
-      font-family: inherit; font-size: .82rem; font-weight: 600;
-      cursor: pointer; transition: opacity .15s; text-decoration: none;
-    }
-    .btn-csv:hover { opacity: .85; }
-    .btn-csv:disabled { opacity: .4; cursor: not-allowed; }
-
-    /* ─── Feature sections ───────────────────────────── */
-    .feature-section {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .feature-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 22px 28px;
-      cursor: pointer;
-      user-select: none;
-      transition: background .12s;
-      gap: 16px;
-    }
-    .feature-header:hover { background: #fafafa; }
-
-    .feature-header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex: 1;
-      min-width: 0;
-    }
-    .feature-icon {
-      font-size: 1.4rem;
-      flex-shrink: 0;
-      width: 44px; height: 44px;
-      background: var(--off);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .feature-title-group { flex: 1; min-width: 0; }
-    .feature-title {
-      font-size: .95rem;
-      font-weight: 700;
-      color: var(--black);
-    }
-    .feature-subtitle {
-      font-size: .78rem;
-      color: var(--sub);
-      margin-top: 2px;
-    }
-
-    .feature-header-right {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-shrink: 0;
-    }
-
-    /* Toggle switch */
-    .toggle-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .toggle-label {
-      font-size: .78rem;
-      font-weight: 600;
-      color: var(--sub);
-    }
-    .toggle {
-      position: relative;
-      width: 44px; height: 24px;
-      flex-shrink: 0;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-    .toggle-track {
-      position: absolute;
-      inset: 0;
-      background: #d1d5db;
-      border-radius: 999px;
-      transition: background .2s;
-      cursor: pointer;
-    }
-    .toggle input:checked + .toggle-track { background: #22c55e; }
-    .toggle-thumb {
-      position: absolute;
-      top: 3px; left: 3px;
-      width: 18px; height: 18px;
-      background: #fff;
-      border-radius: 50%;
-      box-shadow: 0 1px 4px rgba(0,0,0,.18);
-      transition: left .2s;
-      pointer-events: none;
-    }
-    .toggle input:checked ~ .toggle-thumb { left: 23px; }
-
-    .chevron {
-      font-size: .75rem;
-      color: var(--sub);
-      transition: transform .25s;
-    }
-    .feature-section.open .chevron { transform: rotate(180deg); }
-
-    /* Body */
-    .feature-body {
-      display: none;
-      border-top: 1px solid var(--border);
-      padding: 28px;
-    }
-    .feature-section.open .feature-body { display: block; }
-
-    /* ─── Feature body internals ─────────────────────── */
-    /* Two column grid used inside feature bodies */
-    .feat-grid {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 32px;
-      align-items: start;
-    }
-    @media (max-width: 640px) {
-      .feat-grid { grid-template-columns: 1fr; }
-    }
-
-    /* QR block (left col) */
-    .qr-block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    }
-    .qr-card-preview {
-      background: var(--black);
-      border-radius: 16px;
-      padding: 20px 18px 16px;
-      width: 210px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-    .qr-card-stars { color: #FDB813; font-size: 1rem; letter-spacing: 2px; }
-    .qr-card-incentive {
-      color: #fff;
-      font-size: .8rem;
-      font-weight: 600;
       text-align: center;
-      line-height: 1.4;
-    }
-    .qr-card-sub {
-      color: rgba(255,255,255,.5);
-      font-size: .65rem;
-      text-align: center;
-    }
-    .qr-card-img-wrap {
-      background: #fff;
-      border-radius: 10px;
-      padding: 8px;
-      width: 140px; height: 140px;
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
-    }
-    .qr-card-img-wrap img { width: 124px; height: 124px; border-radius: 4px; }
-    .qr-card-biz {
-      color: rgba(255,255,255,.75);
-      font-size: .7rem;
-      font-weight: 600;
-      text-align: center;
-    }
-    .qr-card-brand {
-      color: rgba(255,255,255,.3);
-      font-size: .6rem;
-    }
-
-    /* Plain (white bg) QR preview for menu/wifi */
-    .qr-block-plain .qr-card-preview {
-      background: var(--white);
-      border: 1px solid var(--border);
-    }
-    .qr-block-plain .qr-card-stars { color: var(--yellow); }
-    .qr-block-plain .qr-card-incentive { color: var(--black); }
-    .qr-block-plain .qr-card-sub { color: var(--sub); }
-    .qr-block-plain .qr-card-biz { color: var(--sub); }
-    .qr-block-plain .qr-card-brand { color: #ccc; }
-
-    /* QR action buttons */
-    .qr-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 100%;
-    }
-    .btn-qr-action {
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      padding: 9px 16px;
-      border-radius: 9px;
-      font-family: inherit; font-size: .8rem; font-weight: 600;
-      cursor: pointer; transition: all .15s; border: none;
-      width: 100%;
-    }
-    .btn-qr-dl   { background: var(--black); color: #fff; }
-    .btn-qr-dl:hover { opacity: .85; }
-    .btn-qr-print { background: var(--off); color: var(--black); border: 1px solid var(--border); }
-    .btn-qr-print:hover { border-color: var(--black); }
-    .btn-qr-order { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
-    .btn-qr-order:hover { background: #ffedd5; }
-
-    /* Right col: settings */
-    .feat-settings { display: flex; flex-direction: column; gap: 20px; }
-
-    /* Field group */
-    .feat-field { display: flex; flex-direction: column; gap: 7px; }
-    .feat-label {
-      font-size: .75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .05em;
+      padding: 36px 20px;
       color: var(--sub);
-    }
-    .feat-input {
-      border: 1.5px solid var(--border);
-      border-radius: 9px;
-      padding: 10px 13px;
-      font-family: inherit;
       font-size: .88rem;
-      color: var(--black);
-      outline: none;
-      transition: border-color .15s;
-      width: 100%;
     }
-    .feat-input:focus { border-color: var(--purple); }
-
-    /* Chips */
-    .chips-label { font-size: .72rem; color: var(--sub); font-weight: 600; margin-bottom: -2px; }
-    .chips-wrap {
-      display: flex; flex-wrap: wrap; gap: 7px;
-    }
-    .chip {
-      padding: 5px 12px;
-      border: 1.5px solid var(--border);
-      border-radius: 999px;
-      background: var(--white);
-      font-family: inherit;
-      font-size: .78rem;
-      font-weight: 500;
-      color: var(--black);
-      cursor: pointer;
-      transition: all .14s;
-    }
-    .chip:hover { border-color: var(--black); }
-    .chip.active { background: var(--black); color: #fff; border-color: var(--black); }
-
-    /* URL display */
-    .url-row {
-      background: var(--off);
-      border: 1.5px solid var(--border);
-      border-radius: 9px;
-      padding: 10px 13px;
+    .leads-empty-icon { font-size: 2rem; margin-bottom: 10px; }
+    .leads-pagination {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .url-text {
-      font-size: .8rem;
-      color: var(--black);
-      font-family: 'Courier New', monospace;
-      word-break: break-all;
-    }
-    .copy-btn {
-      border: 1.5px solid var(--border);
-      background: var(--white);
-      border-radius: 7px;
-      padding: 6px 11px;
-      font-size: .73rem;
-      font-weight: 600;
-      color: var(--sub);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all .16s;
-      font-family: inherit;
-      flex-shrink: 0;
-    }
-    .copy-btn:hover { border-color: var(--black); color: var(--black); }
-    .copy-btn.copied { border-color: var(--green); color: var(--green); background: #f0fdf4; }
-    .preview-link {
-      font-size: .78rem; color: var(--blue); text-decoration: none;
-      display: inline-flex; align-items: center; gap: 4px;
-    }
-    .preview-link:hover { text-decoration: underline; }
-
-    /* Timer chips row */
-    .timer-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-    .timer-chip {
-      padding: 6px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 999px;
-      background: var(--white);
-      font-family: inherit; font-size: .8rem; font-weight: 500;
-      cursor: pointer; transition: all .14s;
-    }
-    .timer-chip:hover { border-color: var(--black); }
-    .timer-chip.active { background: var(--black); color: #fff; border-color: var(--black); }
-
-    /* Menu source tabs */
-    .menu-src-tab {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 7px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      background: var(--white);
-      font-family: inherit; font-size: .8rem; font-weight: 500; color: var(--sub);
-      cursor: pointer; transition: all .14s;
-    }
-    .menu-src-tab:hover { border-color: var(--black); color: var(--black); }
-    .menu-src-tab.active { background: var(--black); color: #fff; border-color: var(--black); }
-    .feat-hint { font-size: .77rem; color: var(--sub); margin-top: 5px; line-height: 1.5; }
-
-    /* Toggle row inside settings */
-    .feat-toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
-      background: var(--off);
-      border-radius: 10px;
-      border: 1px solid var(--border);
-    }
-    .feat-toggle-row-left { flex: 1; }
-    .feat-toggle-row-label { font-size: .84rem; font-weight: 600; color: var(--black); }
-    .feat-toggle-row-sub   { font-size: .74rem; color: var(--sub); margin-top: 2px; }
-
-    /* Save button */
-    .btn-save {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--black); color: #fff;
-      border: none; border-radius: 10px;
-      padding: 11px 22px;
-      font-family: inherit; font-size: .88rem; font-weight: 600;
-      cursor: pointer; transition: opacity .15s;
-    }
-    .btn-save:hover { opacity: .85; }
-    .save-status { font-size: .78rem; color: var(--green); font-weight: 600; }
-    .save-status.error { color: var(--red); }
-
-    /* Divider inside feature body */
-    .feat-divider { height: 1px; background: var(--border); margin: 20px 0; }
-
-    /* Print section placeholder */
-    .print-coming-soon {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--sub);
-    }
-    .print-coming-soon h3 { font-size: 1rem; color: var(--black); font-weight: 700; margin-bottom: 8px; }
-    .print-coming-soon p  { font-size: .84rem; line-height: 1.6; max-width: 420px; margin: 0 auto 16px; }
-    .print-pdf-btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--black); color: #fff;
-      border: none; border-radius: 10px;
-      padding: 11px 22px;
-      font-family: inherit; font-size: .88rem; font-weight: 600;
-      cursor: pointer; transition: opacity .15s;
-      text-decoration: none;
-    }
-    .print-pdf-btn:hover { opacity: .85; }
-
-    /* ─── Empty / pending state ─────────────────────────── */
-    .no-loc-hero {
-      background: #fffbeb;
-      border: 1.5px solid #f59e0b;
-      border-radius: 16px;
-      padding: 40px 32px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .no-loc-hero .no-loc-icon { font-size: 2.8rem; line-height: 1; }
-    .no-loc-hero h2 { font-size: 1.25rem; font-weight: 800; color: #1a1a1a; margin: 0; }
-    .no-loc-hero p  { font-size: .9rem; color: #6b7280; margin: 0; max-width: 380px; }
-    .no-loc-hero .no-loc-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
-    .no-loc-btn-primary {
-      background: #16a34a; color: #fff; border: 1.5px solid #15803d;
-      border-radius: 8px; padding: 9px 20px; font-size: .88rem; font-weight: 700;
-      cursor: pointer; text-decoration: none; transition: background .15s;
-    }
-    .no-loc-btn-primary:hover { background: #15803d; }
-    .no-loc-btn-secondary {
-      background: #fff; color: #1a1a1a; border: 1.5px solid #e5e7eb;
-      border-radius: 8px; padding: 9px 20px; font-size: .88rem; font-weight: 600;
-      cursor: pointer; text-decoration: none; transition: background .15s;
-    }
-    .no-loc-btn-secondary:hover { background: #f5f5f7; }
-    .no-loc-loc-list { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-    .no-loc-loc-row {
-      display: flex; align-items: center; justify-content: space-between;
-      background: #fff; border: 1.5px solid #e5e7eb; border-radius: 10px;
-      padding: 10px 14px; gap: 12px;
-    }
-    .no-loc-loc-name { font-size: .88rem; font-weight: 700; color: #1a1a1a; }
-    .no-loc-loc-addr { font-size: .76rem; color: #6b7280; }
-    .no-loc-activate-btn {
-      background: #16a34a; color: #fff; border: 1.5px solid #15803d;
-      border-radius: 7px; padding: 5px 13px; font-size: .78rem; font-weight: 700;
-      cursor: pointer; white-space: nowrap; transition: background .15s; flex-shrink: 0;
-    }
-    .no-loc-activate-btn:hover { background: #15803d; }
-
-    /* ─── Paid / welcome banner ──────────────────────────── */
-    #paidBanner {
-      display: none;
-      background: #f0fdf4;
-      border: 1.5px solid #34a853;
-      border-radius: 14px;
-      padding: 18px 22px;
-      display: none;
-      align-items: center;
-      gap: 14px;
-    }
-    #paidBanner.show { display: flex; }
-    #paidBanner .paid-icon { font-size: 2rem; flex-shrink: 0; }
-    #paidBanner .paid-body { flex: 1; }
-    #paidBanner .paid-title { font-size: 1rem; font-weight: 800; color: #065f46; }
-    #paidBanner .paid-sub   { font-size: .84rem; color: #047857; margin-top: 2px; }
-    #paidBanner .paid-close {
-      background: none; border: none; font-size: 1.1rem; color: #6b7280;
-      cursor: pointer; padding: 4px; line-height: 1; flex-shrink: 0;
-    }
-    #paidBanner .paid-close:hover { color: #1a1a1a; }
-
-    /* badge colours (used by loc items inside topbar dropdown) */
-    .badge-active   { background: #d1fae5; color: #065f46; }
-    .badge-pending  { background: #fef3c7; color: #92400e; }
-    .badge-inactive { background: #f3f4f6; color: #6b7280; }
-
-    /* ─── Debug bar ──────────────────────────────────── */
-    #edb {
-      display: none;
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: #111; color: #0f0; font-family: monospace;
-      font-size: 11px; padding: 4px 8px;
-      white-space: nowrap; overflow-x: auto;
-      z-index: 9999;
-    }
-
-    /* ─── PDF upload widget ─────────────────────────────── */
-    .pdf-tab-bar {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
-    .pdf-tab {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1.5px solid var(--border);
-      border-radius: 9px;
-      background: var(--off);
-      font-family: inherit;
-      font-size: .78rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--sub);
-      transition: all .15s;
-    }
-    .pdf-tab.active {
-      background: var(--black);
-      color: #fff;
-      border-color: var(--black);
-    }
-    .pdf-drop-zone {
-      display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 28px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color .15s, background .15s;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .leads-page-btn {
       background: var(--off);
-    }
-    .pdf-drop-zone:hover, .pdf-drop-zone.drag-over {
-      border-color: var(--black);
-      background: #f0f0f0;
-    }
-    .pdf-drop-icon { font-size: 2rem; }
-    .pdf-drop-text { font-size: .84rem; color: var(--sub); }
-    .pdf-drop-sub { font-size: .74rem; color: #aaa; }
-    .pdf-preview {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 14px;
-      border: 1.5px solid #bbf7d0;
-      border-radius: 10px;
-      background: #f0fdf4;
-      margin-top: 8px;
-    }
-    .pdf-preview-icon { font-size: 1.2rem; }
-    .pdf-preview-name { font-size: .83rem; font-weight: 600; flex: 1; word-break: break-all; }
-    .pdf-preview-remove {
-      background: none; border: none; font-size: 1.1rem;
-      cursor: pointer; color: var(--sub); padding: 2px 6px;
-    }
-    .pdf-preview-remove:hover { color: var(--red); }
-    .pdf-upload-note {
-      font-size: .74rem;
-      color: var(--sub);
-      line-height: 1.55;
-      margin-top: 8px;
-      padding: 8px 12px;
-      background: #fffbeb;
-      border: 1px solid #fde68a;
+      border: 1.5px solid var(--border);
       border-radius: 8px;
+      padding: 7px 14px;
+      font-family: inherit;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
     }
-    .pdf-current {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      padding: 9px 12px;
-      background: var(--off);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      margin-top: 6px;
+    .leads-page-btn:disabled { opacity: .4; cursor: default; }
+    .leads-page-info { font-size: .78rem; color: var(--sub); }
+    .tapped-badge {
+      background: #d1fae5;
+      color: #065f46;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
     }
 
-    /* ─── Responsive ─────────────────────────────────── */
+    /* ── Empty state ────────────────────────────────────────── */
+    .no-loc-hero {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 48px 32px;
+      text-align: center;
+    }
+    .no-loc-icon { font-size: 2.8rem; margin-bottom: 16px; }
+    .no-loc-hero h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
+    .no-loc-hero p  { font-size: .9rem; color: var(--sub); max-width: 380px; margin: 0 auto 20px; line-height: 1.6; }
+    .no-loc-btn-primary {
+      display: inline-block;
+      background: var(--black);
+      color: #fff;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-weight: 700;
+      font-size: .92rem;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .no-loc-btn-primary:hover { opacity: .85; }
+
     @media (max-width: 640px) {
-      .topbar { padding: 0 16px; }
-      .page { padding: 16px 12px 60px; gap: 14px; }
-      .biz-hero { padding: 20px; }
-      .biz-stats-row { grid-template-columns: 1fr; }
-      .leads-card { padding: 20px; }
-      .feature-header { padding: 18px 20px; }
-      .feature-body  { padding: 20px; }
-      .feat-grid { grid-template-columns: 1fr; }
-      .biz-hero-name { font-size: 1.2rem; }
+      .page { padding: 16px 12px 60px; gap: 16px; }
+      .summary-row { grid-template-columns: 1fr 1fr; }
+      .leads-card { padding: 18px; }
     }
   </style>
 </head>
 <body>
 
 <!-- Debug bar -->
-<div id="edb"></div>
+<div id="edb" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;color:#0f0;font-size:.72rem;font-family:monospace;padding:4px 8px;z-index:9999;overflow-x:auto;white-space:nowrap;"></div>
 
-<!-- ═══════════════════════════════════════════
-     TOPBAR
-═══════════════════════════════════════════ -->
+<!-- ══ TOPBAR ══ -->
 <nav class="topbar">
   <a class="topbar-logo" href="dashboard.html">Happy<span>Clientele.</span></a>
   <div style="display:flex;align-items:center;gap:12px;">
@@ -849,87 +328,75 @@
   </div>
 </nav>
 
-<!-- ═══════════════════════════════════════════
-     PAGE
-═══════════════════════════════════════════ -->
-<div class="page">
+<!-- ══ PAGE ══ -->
+<div class="page" id="mainPage" style="display:none;">
 
-  <!-- ── Paid / activation welcome banner (shown when ?paid=1) ── -->
-  <div id="paidBanner">
-    <div class="paid-icon">🎉</div>
-    <div class="paid-body">
-      <div class="paid-title">Location activated — you're live!</div>
-      <div class="paid-sub" id="paidBannerSub">Your QR codes and review funnel are ready to share.</div>
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>📊 Dashboard</h1>
+      <p>All locations — combined performance overview</p>
     </div>
-    <button class="paid-close" onclick="dismissPaidBanner()" title="Dismiss">✕</button>
-  </div>
-
-  <!-- ① BUSINESS HERO ─────────────────────── -->
-  <div class="biz-hero" id="bizHero">
-    <div class="biz-hero-top">
-      <div>
-        <div class="biz-hero-name" id="heroBizName">Loading…</div>
-        <div class="biz-hero-address" id="heroBizAddress"></div>
-      </div>
-      <div class="biz-hero-badge" id="bizLiveBadge">
-        <div class="dot"></div> <span id="bizLiveLabel">Live</span>
-      </div>
-    </div>
-
-    <div class="biz-stats-row">
-      <!-- Rating stat -->
-      <div class="biz-stat-card">
-        <div class="biz-stat-icon">⭐</div>
-        <div class="biz-stat-body">
-          <div class="biz-stat-label">Google Rating</div>
-          <div class="biz-stat-numbers">
-            <div class="biz-stat-current" id="statCurrentRating">—</div>
-            <span class="biz-stat-started" id="statStartedRating"></span>
-            <span class="biz-stat-delta" id="statRatingDelta" style="display:none;"></span>
-          </div>
-          <div class="biz-stat-stars-row" id="statStarsRow"></div>
-        </div>
-      </div>
-
-      <!-- Reviews stat -->
-      <div class="biz-stat-card">
-        <div class="biz-stat-icon">💬</div>
-        <div class="biz-stat-body">
-          <div class="biz-stat-label">Google Reviews</div>
-          <div class="biz-stat-numbers">
-            <div class="biz-stat-current" id="statCurrentReviews">—</div>
-            <span class="biz-stat-started" id="statStartedReviews"></span>
-            <span class="biz-stat-delta" id="statReviewsDelta" style="display:none;"></span>
-          </div>
-        </div>
-      </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a href="account.html" style="background:var(--off);border:1.5px solid var(--border);border-radius:9px;padding:8px 16px;font-size:.82rem;font-weight:600;color:var(--black);text-decoration:none;">⚙️ Account</a>
     </div>
   </div>
 
-  <!-- ② CUSTOMER EMAILS ────────────────────── -->
+  <!-- Summary stats -->
+  <div class="summary-row" id="summaryRow">
+    <div class="stat-card">
+      <div class="stat-card-icon">📍</div>
+      <div class="stat-card-num" id="statLocations">—</div>
+      <div class="stat-card-label">Active locations</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon">📬</div>
+      <div class="stat-card-num" id="statTotalLeads">—</div>
+      <div class="stat-card-label">Total leads captured</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon">⭐</div>
+      <div class="stat-card-num" id="statReviewTapped">—</div>
+      <div class="stat-card-label">Review link taps</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-icon">📅</div>
+      <div class="stat-card-num" id="statThisMonth">—</div>
+      <div class="stat-card-label">This month</div>
+    </div>
+  </div>
+
+  <!-- Per-location breakdown -->
+  <div>
+    <div class="section-title">Your Locations</div>
+    <div class="loc-summary-grid" id="locSummaryGrid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- Combined leads table -->
   <div class="leads-card">
     <div class="leads-card-header">
       <div>
         <div class="leads-card-title">📬 Happy Clientele Captured</div>
-        <div class="leads-card-sub">Live feed of contacts from all your active funnels</div>
+        <div class="leads-card-sub">Combined lead feed across all your active locations</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn-csv" id="btnDownloadCSV" onclick="downloadLeadsCSV()" disabled>↓ CSV</button>
-        <button class="btn-csv" id="btnWebhook" onclick="openWebhookModal()">⚡ Webhook</button>
       </div>
     </div>
 
     <div class="leads-stats">
       <div class="leads-stat">
-        <div class="leads-stat-num" id="statTotalLeads">—</div>
-        <div class="leads-stat-label">Total captured</div>
+        <div class="leads-stat-num" id="leadsStatTotal">—</div>
+        <div class="leads-stat-label">Total</div>
       </div>
       <div class="leads-stat">
-        <div class="leads-stat-num" id="statReviewTapped">—</div>
-        <div class="leads-stat-label">Tapped review link</div>
+        <div class="leads-stat-num" id="leadsStatTapped">—</div>
+        <div class="leads-stat-label">Review tapped</div>
       </div>
       <div class="leads-stat">
-        <div class="leads-stat-num" id="statThisMonth">—</div>
+        <div class="leads-stat-num" id="leadsStatMonth">—</div>
         <div class="leads-stat-label">This month</div>
       </div>
     </div>
@@ -945,19 +412,23 @@
         <option value="month">This month</option>
         <option value="year">This year</option>
       </select>
+      <select class="leads-loc-filter" id="leadsLocFilter" onchange="applyLeadsFilter()">
+        <option value="all">All locations</option>
+      </select>
       <span class="leads-showing-label" id="leadsShowingLabel"></span>
     </div>
 
     <div class="leads-table-wrap">
       <div class="leads-empty" id="leadsEmpty">
         <div class="leads-empty-icon">📭</div>
-        <div>No emails captured yet.</div>
-        <div style="margin-top:6px;font-size:.76rem;">Emails appear here as customers scan your QR codes.</div>
+        <div>No leads yet across any location.</div>
+        <div style="margin-top:6px;font-size:.76rem;">Leads appear here as customers scan your QR codes.</div>
       </div>
       <table class="leads-table" id="leadsTable" style="display:none;">
         <thead>
           <tr>
             <th>Email</th>
+            <th>Location</th>
             <th>Source</th>
             <th>Stars</th>
             <th>Review Tapped</th>
@@ -975,438 +446,32 @@
     </div>
   </div>
 
-
-  <!-- ③ REVIEW INCENTIVE FUNNEL ───────────── -->
-  <div class="feature-section open" id="funnelSection">
-    <div class="feature-header" onclick="toggleSection('funnel')">
-      <div class="feature-header-left">
-        <div class="feature-icon">🎯</div>
-        <div class="feature-title-group">
-          <div class="feature-title">Review Incentive Funnel</div>
-          <div class="feature-subtitle">QR code → email capture → reward → Google review request</div>
-        </div>
-      </div>
-      <div class="feature-header-right">
-        <div class="toggle-wrap" onclick="event.stopPropagation()">
-          <span class="toggle-label" id="funnelToggleLabel">On</span>
-          <label class="toggle">
-            <input type="checkbox" id="funnelToggle" checked onchange="saveFeatureFlag('funnel', this.checked)">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <span class="chevron">▼</span>
-      </div>
-    </div>
-    <div class="feature-body" id="funnelBody">
-      <div class="feat-grid">
-
-        <!-- QR preview -->
-        <div class="qr-block">
-          <div class="qr-card-preview">
-            <div class="qr-card-stars">★★★★★</div>
-            <div class="qr-card-incentive" id="funnelQrIncentive">Free item 🎁</div>
-            <div class="qr-card-sub">Scan the QR code below</div>
-            <div class="qr-card-img-wrap">
-              <img id="funnelQrImg" src="" alt="QR" width="124" height="124" />
-            </div>
-            <div class="qr-card-biz" id="funnelQrBizName"></div>
-            <div class="qr-card-brand">Powered by HappyClientele.</div>
-          </div>
-          <div class="qr-actions">
-            <button class="btn-qr-action btn-qr-dl" id="funnelBtnDownload">⬇ Download PNG</button>
-            <button class="btn-qr-action btn-qr-print" onclick="printQR('funnelQrImg', 'funnelQrBizName')">🖨️ Print</button>
-            <button class="btn-qr-action btn-qr-order" onclick="scrollToSection('printSection')">📦 Order Physical</button>
-          </div>
-        </div>
-
-        <!-- Settings -->
-        <div class="feat-settings">
-
-          <div class="feat-field">
-            <div class="feat-label">Review Incentive</div>
-            <input type="text" class="feat-input" id="funnelIncentiveInput"
-              maxlength="60" placeholder="e.g. Free coffee ☕" />
-            <div class="chips-label">Quick picks</div>
-            <div class="chips-wrap" id="funnelChips">
-              <button class="chip" data-val="Free item 🎁">Free item 🎁</button>
-              <button class="chip" data-val="Free dessert 🍮">Free dessert 🍮</button>
-              <button class="chip" data-val="Free drink ☕">Free drink ☕</button>
-              <button class="chip" data-val="Free appetizer 🥗">Free appetizer 🥗</button>
-              <button class="chip" data-val="Free entree 🍽️">Free entree 🍽️</button>
-              <button class="chip" data-val="10% off next visit">10% off next visit</button>
-              <button class="chip" data-val="15% off next visit">15% off next visit</button>
-              <button class="chip" data-val="Monthly giveaway entry 🎰">Monthly giveaway entry 🎰</button>
-              <button class="chip" data-val="Free side 🍟">Free side 🍟</button>
-            </div>
-          </div>
-
-          <div class="feat-divider"></div>
-
-          <div class="feat-field">
-            <div class="feat-label">Your Funnel URL</div>
-            <div class="url-row">
-              <div class="url-text" id="funnelUrlText">—</div>
-              <button class="copy-btn" onclick="copyText('funnelUrlText', this)">Copy</button>
-            </div>
-            <a class="preview-link" id="funnelPreviewLink" href="#" target="_blank" style="margin-top:8px;">
-              🔗 Preview funnel →
-            </a>
-          </div>
-
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <button class="btn-save" onclick="saveFunnelSettings()">Save Changes</button>
-            <span class="save-status" id="funnelSaveStatus"></span>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ④ SUPER MENU ────────────────────────── -->
-  <div class="feature-section open" id="menuSection">
-    <div class="feature-header" onclick="toggleSection('menu')">
-      <div class="feature-header-left">
-        <div class="feature-icon">📋</div>
-        <div class="feature-title-group">
-          <div class="feature-title">Super Menu Funnel</div>
-          <div class="feature-subtitle">Scannable QR menu → email capture → timed review request</div>
-        </div>
-      </div>
-      <div class="feature-header-right">
-        <div class="toggle-wrap" onclick="event.stopPropagation()">
-          <span class="toggle-label" id="menuToggleLabel">Off</span>
-          <label class="toggle">
-            <input type="checkbox" id="menuToggle" onchange="saveFeatureFlag('menu', this.checked)">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <span class="chevron">▼</span>
-      </div>
-    </div>
-    <div class="feature-body" id="menuBody">
-      <div class="feat-grid">
-
-        <!-- QR preview -->
-        <div class="qr-block qr-block-plain">
-          <div class="qr-card-preview">
-            <div class="qr-card-stars">📋</div>
-            <div class="qr-card-incentive">Tap to view our menu</div>
-            <div class="qr-card-sub">Scan to access</div>
-            <div class="qr-card-img-wrap">
-              <img id="menuQrImg" src="" alt="QR" width="124" height="124" />
-            </div>
-            <div class="qr-card-biz" id="menuQrBizName"></div>
-            <div class="qr-card-brand">Powered by HappyClientele.</div>
-          </div>
-          <div class="qr-actions">
-            <button class="btn-qr-action btn-qr-dl" id="menuBtnDownload">⬇ Download PNG</button>
-            <button class="btn-qr-action btn-qr-print" onclick="printQR('menuQrImg', 'menuQrBizName')">🖨️ Print</button>
-            <button class="btn-qr-action btn-qr-order" onclick="scrollToSection('printSection')">📦 Order Physical</button>
-          </div>
-        </div>
-
-        <!-- Settings -->
-        <div class="feat-settings">
-
-          <!-- Menu Source Toggle -->
-          <div class="feat-field">
-            <div class="feat-label">Menu Source</div>
-            <div style="display:flex;gap:8px;margin-top:2px;" id="menuSourceTabs">
-              <button class="menu-src-tab active" id="menuSrcTabCustom" onclick="switchMenuSource('custom')" type="button">
-                📄 Custom URL / PDF
-              </button>
-              <button class="menu-src-tab" id="menuSrcTabGoogle" onclick="switchMenuSource('google')" type="button">
-                <img src="https://www.google.com/favicon.ico" width="14" height="14" style="vertical-align:middle;margin-right:4px;"> Google Menu
-              </button>
-            </div>
-          </div>
-
-          <!-- Custom URL panel -->
-          <div id="menuCustomPanel">
-            <div class="feat-field">
-              <div class="feat-label">Menu File URL</div>
-              <input type="url" class="feat-input" id="menuFileUrl" placeholder="https://yourdomain.com/menu.pdf or Google Drive link" />
-            </div>
-          </div>
-
-          <!-- Google Menu panel -->
-          <div id="menuGooglePanel" style="display:none;">
-            <div class="feat-field">
-              <div class="feat-label">Google Menu URL</div>
-              <div id="menuGoogleUrlDisplay" style="padding:9px 12px;background:var(--off);border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;color:var(--sub);">
-                No Google menu URL found yet. Save your business in Account Settings first.
-              </div>
-              <div class="feat-hint">Pulled automatically from your Google Business Profile. When set, customers will see your Google menu directly.</div>
-            </div>
-          </div>
-
-          <div class="feat-field">
-            <div class="feat-label">Review Request Delay</div>
-            <div class="timer-chips" id="menuTimerChips">
-              <button class="timer-chip" data-val="20">20 min</button>
-              <button class="timer-chip active" data-val="30">30 min</button>
-              <button class="timer-chip" data-val="60">1 hour</button>
-              <button class="timer-chip" data-val="120">2 hours</button>
-              <button class="timer-chip" data-val="0">Off</button>
-            </div>
-          </div>
-
-          <div class="feat-toggle-row">
-            <div class="feat-toggle-row-left">
-              <div class="feat-toggle-row-label">Offer scan incentive?</div>
-              <div class="feat-toggle-row-sub">Show a reward offer when customers scan the menu QR. Off by default — most owners don't need it.</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="menuIncentiveToggle" onchange="toggleMenuIncentive(this.checked)">
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
-          </div>
-
-          <div id="menuIncentiveField" style="display:none;">
-            <div class="feat-field">
-              <div class="feat-label">Menu Scan Incentive</div>
-              <input type="text" class="feat-input" id="menuIncentiveInput" maxlength="60" placeholder="e.g. Free appetizer 🥗" />
-              <div class="chips-wrap" id="menuChips" style="margin-top:8px;">
-                <button class="chip" data-val="Free item 🎁">Free item 🎁</button>
-                <button class="chip" data-val="Free appetizer 🥗">Free appetizer 🥗</button>
-                <button class="chip" data-val="Free drink ☕">Free drink ☕</button>
-                <button class="chip" data-val="10% off next visit">10% off next visit</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="feat-field">
-            <div class="feat-label">Menu Page URL</div>
-            <div class="url-row">
-              <div class="url-text" id="menuUrlText">—</div>
-              <button class="copy-btn" onclick="copyText('menuUrlText', this)">Copy</button>
-            </div>
-            <a class="preview-link" id="menuPreviewLink" href="#" target="_blank" style="margin-top:8px;">
-              🔗 Preview menu page →
-            </a>
-          </div>
-
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <button class="btn-save" onclick="saveMenuSettings()">Save Changes</button>
-            <span class="save-status" id="menuSaveStatus"></span>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ⑤ SUPER WI-FI ───────────────────────── -->
-  <div class="feature-section open" id="wifiSection">
-    <div class="feature-header" onclick="toggleSection('wifi')">
-      <div class="feature-header-left">
-        <div class="feature-icon">📶</div>
-        <div class="feature-title-group">
-          <div class="feature-title">Super Wi-Fi Funnel</div>
-          <div class="feature-subtitle">Wi-Fi password reveal → email capture → timed review request</div>
-        </div>
-      </div>
-      <div class="feature-header-right">
-        <div class="toggle-wrap" onclick="event.stopPropagation()">
-          <span class="toggle-label" id="wifiToggleLabel">Off</span>
-          <label class="toggle">
-            <input type="checkbox" id="wifiToggle" onchange="saveFeatureFlag('wifi', this.checked)">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <span class="chevron">▼</span>
-      </div>
-    </div>
-    <div class="feature-body" id="wifiBody">
-      <div class="feat-grid">
-
-        <!-- QR preview -->
-        <div class="qr-block qr-block-plain">
-          <div class="qr-card-preview">
-            <div class="qr-card-stars">📶</div>
-            <div class="qr-card-incentive">Get the Wi-Fi password</div>
-            <div class="qr-card-sub">Scan to access</div>
-            <div class="qr-card-img-wrap">
-              <img id="wifiQrImg" src="" alt="QR" width="124" height="124" />
-            </div>
-            <div class="qr-card-biz" id="wifiQrBizName"></div>
-            <div class="qr-card-brand">Powered by HappyClientele.</div>
-          </div>
-          <div class="qr-actions">
-            <button class="btn-qr-action btn-qr-dl" id="wifiBtnDownload">⬇ Download PNG</button>
-            <button class="btn-qr-action btn-qr-print" onclick="printQR('wifiQrImg', 'wifiQrBizName')">🖨️ Print</button>
-            <button class="btn-qr-action btn-qr-order" onclick="scrollToSection('printSection')">📦 Order Physical</button>
-          </div>
-        </div>
-
-        <!-- Settings -->
-        <div class="feat-settings">
-
-          <div class="feat-field">
-            <div class="feat-label">Network Name (SSID)</div>
-            <input type="text" class="feat-input" id="wifiNetworkName" placeholder="e.g. Bocashi Guest" />
-          </div>
-
-          <div class="feat-field">
-            <div class="feat-label">Wi-Fi Password</div>
-            <input type="text" class="feat-input" id="wifiPassword" placeholder="e.g. coffee2024" />
-          </div>
-
-          <div class="feat-field">
-            <div class="feat-label">Review Request Delay</div>
-            <div class="timer-chips" id="wifiTimerChips">
-              <button class="timer-chip active" data-val="20">20 min</button>
-              <button class="timer-chip" data-val="30">30 min</button>
-              <button class="timer-chip" data-val="60">1 hour</button>
-              <button class="timer-chip" data-val="120">2 hours</button>
-              <button class="timer-chip" data-val="0">Off</button>
-            </div>
-          </div>
-
-          <div class="feat-toggle-row">
-            <div class="feat-toggle-row-left">
-              <div class="feat-toggle-row-label">Allow skip (make email collection optional)?</div>
-              <div class="feat-toggle-row-sub">Customers can skip the email field and still see the Wi-Fi password.</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="wifiSkippable">
-              <div class="toggle-track"></div>
-              <div class="toggle-thumb"></div>
-            </label>
-          </div>
-
-          <div class="feat-field">
-            <div class="feat-label">Wi-Fi Page URL</div>
-            <div class="url-row">
-              <div class="url-text" id="wifiUrlText">—</div>
-              <button class="copy-btn" onclick="copyText('wifiUrlText', this)">Copy</button>
-            </div>
-            <a class="preview-link" id="wifiPreviewLink" href="#" target="_blank" style="margin-top:8px;">
-              🔗 Preview Wi-Fi page →
-            </a>
-          </div>
-
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <button class="btn-save" onclick="saveWifiSettings()">Save Changes</button>
-            <span class="save-status" id="wifiSaveStatus"></span>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ⑥ PRINTED MATERIALS ──────────────────── -->
-  <div class="feature-section open" id="printSection">
-    <div class="feature-header" onclick="toggleSection('print')">
-      <div class="feature-header-left">
-        <div class="feature-icon">🖨️</div>
-        <div class="feature-title-group">
-          <div class="feature-title">Printed Materials</div>
-          <div class="feature-subtitle">Table stickers, tent cards, window clings — shipped to your door</div>
-        </div>
-      </div>
-      <div class="feature-header-right">
-        <div class="toggle-wrap" onclick="event.stopPropagation()">
-          <span class="toggle-label" id="printToggleLabel">Off</span>
-          <label class="toggle">
-            <input type="checkbox" id="printToggle" onchange="saveFeatureFlag('print', this.checked)">
-            <div class="toggle-track"></div>
-            <div class="toggle-thumb"></div>
-          </label>
-        </div>
-        <span class="chevron">▼</span>
-      </div>
-    </div>
-    <div class="feature-body" id="printBody">
-      <div class="print-coming-soon">
-        <div style="font-size:2.5rem;margin-bottom:12px;">📦</div>
-        <h3>Download your print-ready PDF now</h3>
-        <p>Your QR code and incentive are embedded and ready to print at any local shop — or use as a proof before physical fulfillment ships.</p>
-        <a href="#" class="print-pdf-btn" onclick="downloadPrintPDF(event)">⬇ Download Print-Ready PDF</a>
-        <div style="margin-top:24px;padding:16px;background:var(--off);border-radius:12px;border:1px solid var(--border);">
-          <div style="font-size:.82rem;font-weight:700;color:var(--black);margin-bottom:4px;">🚀 Physical sticker packs — coming soon</div>
-          <div style="font-size:.78rem;color:var(--sub);line-height:1.6;">We're partnering with Prodigi to ship 10 custom table stickers per order directly to your business. White-label, print-on-demand, globally routed. Launching soon.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </div><!-- /.page -->
 
-<!-- WEBHOOK MODAL -->
-<div id="webhookModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:#fff;border-radius:18px;padding:32px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.18);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div>
-        <div style="font-size:1rem;font-weight:700;">⚡ Lead Webhook</div>
-        <div style="font-size:.78rem;color:var(--sub);margin-top:3px;">Instantly push every new lead to your CRM, Zapier, Make.com, or any URL.</div>
-      </div>
-      <button onclick="closeWebhookModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--sub);padding:4px;line-height:1;">✕</button>
-    </div>
-
-    <div style="margin-bottom:14px;">
-      <div style="font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin-bottom:7px;">Webhook URL</div>
-      <input type="url" id="webhookUrlInput" placeholder="https://hooks.zapier.com/hooks/catch/..." 
-        style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-family:inherit;font-size:.88rem;outline:none;transition:border-color .15s;"
-        onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--border)'" />
-    </div>
-
-    <div style="background:var(--off);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:.77rem;color:var(--sub);line-height:1.65;">
-      <strong style="color:var(--black);">Payload sent on each lead:</strong><br>
-      <code style="font-family:monospace;font-size:.74rem;">
-        event, email, source, stars, biz_name, biz_slug, review_tapped, timestamp
-      </code><br><br>
-      Works with <strong>Zapier</strong>, <strong>Make.com</strong>, <strong>n8n</strong>, <strong>Go High Level</strong>, or any webhook receiver.
-    </div>
-
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-      <button onclick="saveWebhookUrl()" style="background:var(--black);color:#fff;border:none;border-radius:9px;padding:10px 20px;font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer;">Save URL</button>
-      <button onclick="testWebhook()" style="background:var(--off);color:var(--black);border:1.5px solid var(--border);border-radius:9px;padding:10px 20px;font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer;">Send Test</button>
-      <button onclick="saveWebhookUrl()" id="webhookClearBtn" style="background:none;border:none;color:var(--sub);font-size:.8rem;cursor:pointer;padding:8px;" title="Clear webhook">&times; Remove</button>
-      <span id="webhookSaveStatus" style="font-size:.78rem;font-weight:600;"></span>
-    </div>
+<!-- Empty state (shown when no locations) -->
+<div class="page" id="emptyPage" style="display:none;">
+  <div class="no-loc-hero">
+    <div class="no-loc-icon">🏪</div>
+    <h2>No locations yet</h2>
+    <p>Add your first Google Business location to get started with QR codes, review funnels, and lead collection.</p>
+    <a href="account.html" class="no-loc-btn-primary">+ Add Your First Location</a>
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════
-     JAVASCRIPT
-═══════════════════════════════════════════ -->
+<!-- ══ JAVASCRIPT ══ -->
 <script>
-/* ── Constants ──────────────────────────────────────────── */
-const SUPA_URL  = 'https://dbbryatmoxlzifsurxrm.supabase.co';
-const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk';
-const GBIZ_KEY  = 'AIzaSyBIUNvxwoItiLeJo-BScNk8-W-yLMY4H5k';
-const WEBHOOK_URL = 'https://hook.us2.make.com/71c6bp3dkpejjip6aklpnwrtijst1iee';
-const BASE_URL  = 'https://happyclientele.com';
+/* ── Constants ──────────────────────────────────────────────────── */
+const SUPA_URL = 'https://dbbryatmoxlzifsurxrm.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk';
 
-let _biz        = null;  // business row from Supabase
-let _token      = null;  // auth token (set by bootDashboard)
+let _token      = null;
 let _userId     = null;
-let _flags      = { funnel: true, menu: false, wifi: false, print: false };
+let _allLocations = [];
+let _allLeads   = [];
+let _leadsPage  = 1;
 
-// Always get a fresh token from the SDK for raw fetch calls
-async function _tok() {
-  const { data } = await window._supabaseClient?.auth.getSession() ?? { data: {} };
-  const t = data?.session?.access_token || _token || SUPA_KEY;
-  _token = t; // keep in sync
-  return t;
-}
-// Sync version for places where we can't await — uses cached _token
-function _tokSync() { return _token || SUPA_KEY; }
-
-/* ── Debug log ──────────────────────────────────────────── */
 function dbg(msg) {
-  console.log('[dash]', msg);
+  console.log('[dash-overview]', msg);
   const bar = document.getElementById('edb');
   if (bar && bar.style.display !== 'none') { bar.innerHTML += msg + ' | '; bar.scrollLeft = 99999; }
 }
@@ -1417,41 +482,43 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* ── Auth & boot ────────────────────────────────────────── */
+function _getClient() { return window._supabaseClient; }
 
-// All locations for this account
-let _allLocations = [];
-let _activeLocId  = null; // currently selected location id
+async function _tok() {
+  const { data } = await _getClient().auth.getSession() ?? { data: {} };
+  const t = data?.session?.access_token || _token || SUPA_KEY;
+  _token = t;
+  return t;
+}
+function _tokSync() { return _token || SUPA_KEY; }
 
+function escH(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── Boot ─────────────────────────────────────────────────────── */
 async function bootDashboard() {
   dbg('boot start');
 
-  // getSession() is async and reads from localStorage + refreshes if needed.
-  // Retry once in case the client initialised slightly after DOMContentLoaded.
   let session = null;
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let i = 0; i < 3; i++) {
     const { data } = await _getClient().auth.getSession();
     session = data?.session;
     if (session?.access_token) break;
-    await new Promise(r => setTimeout(r, 150)); // short wait, then retry
+    await new Promise(r => setTimeout(r, 150));
   }
 
   if (!session?.access_token) {
-    dbg('no session — redirecting to login');
     window.location.replace('login.html');
     return;
   }
 
   _token  = session.access_token;
   _userId = session.user?.id;
-  dbg('userId: ' + _userId);
-
   document.body.classList.add('auth-ready');
 
   try {
-    dbg('fetching locations…');
-
-    // ── Load all locations for this user from `locations` table ──
+    // Load all non-deleted locations for this user
     const { data: locs, error: locErr } = await _getClient()
       .from('locations')
       .select('*')
@@ -1460,837 +527,153 @@ async function bootDashboard() {
 
     if (locErr) dbg('loc err: ' + locErr.message);
     _allLocations = locs || [];
-    dbg('locations count: ' + _allLocations.length);
+    dbg('locations: ' + _allLocations.length);
 
-    // Determine which location to show from URL param
-    const urlLocId = new URLSearchParams(location.search).get('loc');
-    let picked = null;
-    if (urlLocId) picked = _allLocations.find(l => l.id === urlLocId);
-    if (!picked)  picked = _allLocations.find(l => l.subscription_status === 'active' || l.subscription_status === 'trialing');
-    if (!picked)  picked = _allLocations[0] || null;
-
-    // ── Fall back to legacy `businesses` row if no locations yet ──
-    if (!picked) {
-      dbg('no locations — trying legacy businesses table');
-      const legacyBiz = await loadBusiness();
-      if (legacyBiz) {
-        picked = {
-          id:                  legacyBiz.id,
-          biz_name:            legacyBiz.biz_name,
-          slug:                legacyBiz.slug,
-          google_place_id:     legacyBiz.google_place_id,
-          google_url:          legacyBiz.google_url,
-          address:             legacyBiz.address,
-          phone:               legacyBiz.phone,
-          website:             legacyBiz.website,
-          google_rating:       legacyBiz.google_rating || legacyBiz.rating,
-          google_review_count: legacyBiz.google_review_count || legacyBiz.rating_count,
-          feature_flags:       legacyBiz.feature_flags,
-          incentive:           legacyBiz.incentive,
-          subscription_status: 'active',
-          _legacy:             true,
-        };
-        _allLocations = [picked];
-      }
+    // Populate topbar location slot
+    if (typeof window.tbRenderLocSlot === 'function') {
+      window.tbRenderLocSlot(_allLocations, null, null); // no active loc on overview page
+    } else {
+      setTimeout(() => {
+        if (typeof window.tbRenderLocSlot === 'function')
+          window.tbRenderLocSlot(_allLocations, null, null);
+      }, 300);
     }
 
-    if (!picked) {
-      dbg('no biz row — showing empty state');
-      // Has locations but none active yet — show friendly pending state
-      if (_allLocations.length > 0) {
-        showPendingLocState(_allLocations);
-        renderLocSelector();
-      } else {
-        // Truly no locations at all
-        showNoLocState();
-      }
+    if (_allLocations.length === 0) {
+      document.getElementById('emptyPage').style.display = '';
       return;
     }
 
-    _activeLocId = picked.id;
-    activateLocation(picked);
-    renderLocSelector();
+    document.getElementById('mainPage').style.display = '';
 
-    // ── Item 4: ?paid=1 — show welcome banner ──────────────
-    if (new URLSearchParams(location.search).get('paid') === '1') {
-      showPaidBanner(picked);
-      // Clean the URL so refreshing doesn't re-show the banner
-      const cleanUrl = new URL(location.href);
-      cleanUrl.searchParams.delete('paid');
-      history.replaceState(null, '', cleanUrl.toString());
-    }
+    // Load all leads across all locations
+    await loadAllLeads();
+
+    // Render location summary cards
+    renderLocSummaryCards();
 
   } catch(e) {
-    dbg('boot exception: ' + e);
-    showBootError('Unexpected error loading dashboard: ' + e.message + '. Please refresh the page.');
+    dbg('boot error: ' + e);
   }
 }
 
-function activateLocation(loc) {
-  _biz    = loc;
-  window._biz = loc;
-
-  // Merge feature flags
-  _flags = { funnel: true, menu: false, wifi: false, print: false };
-  if (loc.feature_flags) {
-    try {
-      const ff = typeof loc.feature_flags === 'string'
-        ? JSON.parse(loc.feature_flags)
-        : loc.feature_flags;
-      _flags = { ..._flags, ...ff };
-    } catch(e) {}
-  }
-  dbg('activate: ' + loc.biz_name);
-  renderDashboard();
-}
-
-/* ── Location Selector — delegates to topbar.js tbRenderLocSlot ── */
-function renderLocSelector() {
-  if (typeof window.tbRenderLocSlot !== 'function') {
-    setTimeout(renderLocSelector, 100); // topbar not ready yet
-    return;
-  }
-
-  // Pass locations, active id, and an in-page switch callback
-  window.tbRenderLocSlot(_allLocations, _activeLocId, function(loc) {
-    _activeLocId = loc.id;
-    activateLocation(loc);
-    renderLocSelector(); // re-render to update active highlight
-    const url = new URL(location.href);
-    url.searchParams.set('loc', loc.id);
-    history.replaceState(null, '', url.toString());
-  });
-
-  // Keep topbar button label in sync with active location
-  const lbl = document.getElementById('tbUsername');
-  if (lbl && _biz?.biz_name) lbl.textContent = _biz.biz_name;
-}
-
-function toggleLocDropdown() {}
-function closeLocDropdown() { document.getElementById('tbDropdown')?.classList.remove('open'); }
-
-function escH(str) {
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function showBootError(msg) {
-  document.body.classList.add('auth-ready');
-  const hero = document.getElementById('bizHero');
-  if (hero) hero.insertAdjacentHTML('beforebegin',
-    `<div style="background:#fee2e2;border:1.5px solid #fca5a5;color:#991b1b;padding:16px 20px;
-      border-radius:14px;font-size:.92rem;font-weight:500;">
-      ⚠️ ${msg}
-    </div>`
-  );
-}
-
-/* ── Item 3: Pending-locations empty state ───────────────── */
-function showPendingLocState(locations) {
-  document.body.classList.add('auth-ready');
-  const hero = document.getElementById('bizHero');
-  if (!hero) return;
-
-  const rows = locations.map(loc => `
-    <div class="no-loc-loc-row">
-      <div>
-        <div class="no-loc-loc-name">${escH(loc.biz_name || 'Unnamed Location')}</div>
-        ${loc.address ? `<div class="no-loc-loc-addr">${escH(loc.address)}</div>` : ''}
-      </div>
-      <button class="no-loc-activate-btn" onclick="resumeActivate('${escH(loc.id)}')">Activate</button>
-    </div>
-  `).join('');
-
-  hero.outerHTML = `
-    <div class="no-loc-hero" id="bizHero">
-      <div class="no-loc-icon">📍</div>
-      <h2>Complete setup to go live</h2>
-      <p>You have location${locations.length > 1 ? 's' : ''} saved but ${locations.length > 1 ? 'none are' : 'it\'s not'} active yet.
-         Click <strong>Activate</strong> to complete payment and go live.</p>
-      <div class="no-loc-loc-list">${rows}</div>
-      <div class="no-loc-actions">
-        <a href="account.html" class="no-loc-btn-secondary">+ Add Location</a>
-      </div>
-    </div>
-  `;
-}
-
-function showNoLocState() {
-  document.body.classList.add('auth-ready');
-  const hero = document.getElementById('bizHero');
-  if (!hero) return;
-  hero.outerHTML = `
-    <div class="no-loc-hero" id="bizHero">
-      <div class="no-loc-icon">🏪</div>
-      <h2>No locations yet</h2>
-      <p>Add your first Google Business location to get started with QR codes, review funnels, and more.</p>
-      <div class="no-loc-actions">
-        <a href="account.html" class="no-loc-btn-primary">+ Add Your First Location</a>
-      </div>
-    </div>
-  `;
-}
-
-async function resumeActivate(locationId) {
-  const loc = _allLocations.find(l => l.id === locationId);
-  if (!loc) return;
-  const btn = document.querySelector(`button[onclick="resumeActivate('${locationId}')"]`);
-  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+/* ── Load ALL leads ────────────────────────────────────────────── */
+async function loadAllLeads() {
   try {
-    const session = await _getClient().auth.getSession();
-    const token   = session?.data?.session?.access_token;
-    const res = await fetch('/api/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({
-        location_id: loc.id,
-        email:       session?.data?.session?.user?.email,
-        success_url: `${location.origin}/dashboard?loc=${loc.id}&paid=1`,
-        cancel_url:  `${location.origin}/dashboard`,
-      })
-    });
-    if (res.ok) {
-      const { url } = await res.json();
-      if (url) { window.open(url, '_blank'); return; }
-    }
-  } catch(e) { console.warn('[resumeActivate]', e); }
-  if (btn) { btn.disabled = false; btn.textContent = 'Activate'; }
-}
+    const tok = await _tok();
+    // Fetch up to 2000 leads across all locations for this user's locations
+    // We join via location_id or fall back to business_slug matching
+    // For efficiency: fetch leads for all slugs belonging to this user's locations
+    const slugs = _allLocations.map(l => l.slug).filter(Boolean);
+    if (!slugs.length) { _allLeads = []; renderLeads(); return; }
 
-/* ── Item 4: Paid / welcome banner ──────────────────────── */
-function showPaidBanner(loc) {
-  const banner = document.getElementById('paidBanner');
-  const sub    = document.getElementById('paidBannerSub');
-  if (!banner) return;
-  if (sub && loc?.biz_name) {
-    sub.textContent = `${loc.biz_name} is live. Your QR codes and review funnel are ready to share.`;
-  }
-  banner.classList.add('show');
-  // Auto-dismiss after 12 seconds
-  setTimeout(dismissPaidBanner, 12000);
-}
-
-function dismissPaidBanner() {
-  const banner = document.getElementById('paidBanner');
-  if (banner) banner.classList.remove('show');
-}
-
-/* ── Render everything ──────────────────────────────────── */
-function renderDashboard() {
-  const slug = _biz.slug || 'your-business';
-
-  // Topbar
-  const name = _biz.biz_name || 'Your Business';
-  const el = id => document.getElementById(id);
-  // topbar pill is handled by topbar.js — no manual update needed
-
-  // Hero
-  el('heroBizName').textContent = name;
-
-  // URLs
-  const funnelUrl = `${BASE_URL}/funnel.html?biz=${slug}`;
-  const menuUrl   = `${BASE_URL}/menu.html?biz=${slug}`;
-  const wifiUrl   = `${BASE_URL}/wifi.html?biz=${slug}`;
-
-  el('funnelUrlText').textContent   = funnelUrl;
-  el('funnelPreviewLink').href      = funnelUrl;
-  el('menuUrlText').textContent     = menuUrl;
-  el('menuPreviewLink').href        = menuUrl;
-  el('wifiUrlText').textContent     = wifiUrl;
-  el('wifiPreviewLink').href        = wifiUrl;
-
-  // QR biz names
-  ['funnelQrBizName','menuQrBizName','wifiQrBizName'].forEach(id => { el(id).textContent = name; });
-
-  // Incentive
-  const incentive = _biz.incentive || 'Scan to leave a review';
-  el('funnelIncentiveInput').value  = incentive;
-  el('funnelQrIncentive').textContent = incentive;
-
-  // QR images
-  generateQR('funnel', funnelUrl);
-  generateQR('menu',   menuUrl);
-  generateQR('wifi',   wifiUrl);
-
-  // Google URL
-  // Google review URL no longer shown in UI
-
-  // Feature toggles
-  applyFlags();
-
-  // Google stats
-  fetchGoogleStats();
-
-  // Leads
-  setTimeout(loadLeads, 400);
-  setTimeout(loadWebhookUrl, 500);
-
-  // Load menu & wifi settings
-  setTimeout(loadMenuSettings,  600);
-  setTimeout(loadWifiSettings,  700);
-}
-
-/* ── QR generation ──────────────────────────────────────── */
-function generateQR(feature, url) {
-  const encoded = encodeURIComponent(url);
-  const src = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encoded}&ecc=H`;
-  const imgId = { funnel: 'funnelQrImg', menu: 'menuQrImg', wifi: 'wifiQrImg' }[feature];
-  const img = document.getElementById(imgId);
-  if (img) { img.src = src; img.dataset.url = url; }
-
-  // Download button
-  const dlId = { funnel: 'funnelBtnDownload', menu: 'menuBtnDownload', wifi: 'wifiBtnDownload' }[feature];
-  const btn = document.getElementById(dlId);
-  if (btn) btn.onclick = () => downloadQR(src, feature);
-}
-
-function downloadQR(src, feature) {
-  const a = document.createElement('a');
-  a.href = src; a.download = `${feature}-qr-${_biz?.slug || 'hc'}.png`; a.click();
-}
-
-function printQR(imgId, bizNameId) {
-  const img     = document.getElementById(imgId);
-  const bizEl   = document.getElementById(bizNameId);
-  const imgSrc  = img?.src || '';
-  const bizName = bizEl?.textContent || (_biz?.biz_name || 'HappyClientele');
-
-  // Build a minimal print-only popup with just the QR card
-  const win = window.open('', '_blank', 'width=400,height=500');
-  win.document.write(`<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Print QR Code</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; background: #fff;
-    }
-    .card {
-      text-align: center;
-      border: 1.5px solid #e8e8e8;
-      border-radius: 16px;
-      padding: 28px 32px 24px;
-      width: 260px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.07);
-    }
-    .card img { width: 160px; height: 160px; margin: 12px 0; }
-    .biz { font-size: .9rem; font-weight: 700; color: #1a1a1a; margin-top: 4px; }
-    .brand { font-size: .7rem; color: #9ca3af; margin-top: 8px; letter-spacing: .03em; }
-    @media print {
-      body { min-height: unset; }
-      .card { box-shadow: none; border-color: #ddd; }
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <img src="${imgSrc}" alt="QR Code" />
-    <div class="biz">${bizName}</div>
-    <div class="brand">Powered by HappyClientele.</div>
-  </div>
-  <scr\`+\`ipt>
-    window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };
-  <\/script>
-</body>
-</html>`);
-  win.document.close();
-}
-
-/* ── Feature flags ──────────────────────────────────────── */
-function applyFlags() {
-  ['funnel','menu','wifi','print'].forEach(f => {
-    const on = !!_flags[f];
-    const toggle = document.getElementById(f + 'Toggle');
-    const label  = document.getElementById(f + 'ToggleLabel');
-    if (toggle) toggle.checked = on;
-    if (label)  label.textContent = on ? 'On' : 'Off';
-  });
-}
-
-async function saveFeatureFlag(feature, value) {
-  _flags[feature] = value;
-  const label = document.getElementById(feature + 'ToggleLabel');
-  if (label) label.textContent = value ? 'On' : 'Off';
-
-  if (!_biz) return;
-  try {
-    const flagsJson = JSON.stringify(_flags);
-    if (_biz._legacy || !_activeLocId) {
-      // Legacy: save to businesses table
-      await fetch(`${SUPA_URL}/rest/v1/businesses?user_id=eq.${_userId}&limit=1`, {
-        method: 'PATCH',
-        headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feature_flags: flagsJson })
-      });
-    } else {
-      // New: save to locations table
-      await _getClient()
-        .from('locations')
-        .update({ feature_flags: _flags })
-        .eq('id', _activeLocId);
-    }
-    dbg('flags saved: ' + JSON.stringify(_flags));
-  } catch(e) { dbg('flag save error: ' + e); }
-}
-
-/* ── Section collapse / expand ──────────────────────────── */
-function toggleSection(feature) {
-  const section = document.getElementById(feature + 'Section');
-  if (section) section.classList.toggle('open');
-}
-
-function scrollToSection(id) {
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-/* ── Google stats ───────────────────────────────────────── */
-async function fetchGoogleStats() {
-  const placeId = _biz?.google_place_id;
-  if (!placeId) { dbg('no placeId'); return; }
-
-  // Show address placeholder
-  document.getElementById('heroBizAddress').textContent = 'Loading…';
-
-  try {
+    // Build slug filter: business_slug=in.(slug1,slug2,...)
+    const slugParam = slugs.map(s => encodeURIComponent(s)).join(',');
     const res = await fetch(
-      `https://places.googleapis.com/v1/places/${placeId}?fields=displayName,formattedAddress,rating,userRatingCount`,
-      { headers: { 'X-Goog-Api-Key': GBIZ_KEY, 'X-Goog-FieldMask': 'displayName,formattedAddress,rating,userRatingCount' } }
+      `${SUPA_URL}/rest/v1/leads?business_slug=in.(${slugParam})&order=created_at.desc&limit=2000`,
+      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${tok}`, Accept: 'application/json' } }
     );
-    const data = await res.json();
-    if (!res.ok) { dbg('places error ' + res.status + ': ' + JSON.stringify(data).slice(0,200)); document.getElementById('heroBizAddress').textContent = ''; return; }
-
-    const currentRating  = data.rating || 0;
-    const currentReviews = data.userRatingCount || 0;
-    const address        = data.formattedAddress || '';
-
-    document.getElementById('heroBizAddress').textContent = address;
-
-    renderStats(currentRating, currentReviews);
-
-  } catch(e) { dbg('places exception: ' + e); }
-}
-
-function renderStats(currentRating, currentReviews) {
-  const startRating  = parseFloat(_biz.starting_rating  || currentRating);
-  const startReviews = parseInt(_biz.starting_review_count || currentReviews, 10);
-
-  // Rating
-  document.getElementById('statCurrentRating').textContent = currentRating.toFixed(1);
-  document.getElementById('statStartedRating').textContent  = `Started at ${startRating.toFixed(1)}`;
-
-  const ratingDiff = (currentRating - startRating);
-  const rDeltaEl = document.getElementById('statRatingDelta');
-  if (Math.abs(ratingDiff) >= 0.1) {
-    rDeltaEl.textContent  = (ratingDiff > 0 ? '+' : '') + ratingDiff.toFixed(1);
-    rDeltaEl.className    = 'biz-stat-delta ' + (ratingDiff >= 0 ? 'up' : 'same');
-    rDeltaEl.style.display = '';
-  }
-
-  // Stars
-  const starsRow = document.getElementById('statStarsRow');
-  if (starsRow) {
-    const full  = Math.floor(currentRating);
-    const half  = (currentRating - full) >= 0.3 ? 1 : 0;
-    const empty = 5 - full - half;
-    const W = 16, gold = '#FBBF24', grey = '#D1D5DB';
-    const SF = `<svg width="${W}" height="${W}" viewBox="0 0 20 20" fill="${gold}" xmlns="http://www.w3.org/2000/svg"><polygon points="10,1 12.9,7 19.5,7.6 14.5,12 16.2,18.5 10,15 3.8,18.5 5.5,12 0.5,7.6 7.1,7"/></svg>`;
-    const SH = `<svg width="${W}" height="${W}" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hg2"><stop offset="50%" stop-color="${gold}"/><stop offset="50%" stop-color="${grey}"/></linearGradient></defs><polygon points="10,1 12.9,7 19.5,7.6 14.5,12 16.2,18.5 10,15 3.8,18.5 5.5,12 0.5,7.6 7.1,7" fill="url(#hg2)"/></svg>`;
-    const SE = `<svg width="${W}" height="${W}" viewBox="0 0 20 20" fill="${grey}" xmlns="http://www.w3.org/2000/svg"><polygon points="10,1 12.9,7 19.5,7.6 14.5,12 16.2,18.5 10,15 3.8,18.5 5.5,12 0.5,7.6 7.1,7"/></svg>`;
-    starsRow.innerHTML = SF.repeat(full) + (half ? SH : '') + SE.repeat(empty);
-  }
-
-  // Reviews
-  document.getElementById('statCurrentReviews').textContent = currentReviews.toLocaleString();
-  document.getElementById('statStartedReviews').textContent  = `Started at ${startReviews.toLocaleString()}`;
-
-  const reviewDiff = currentReviews - startReviews;
-  const rvDeltaEl = document.getElementById('statReviewsDelta');
-  if (reviewDiff > 0) {
-    rvDeltaEl.textContent   = `+${reviewDiff.toLocaleString()} since joining`;
-    rvDeltaEl.className     = 'biz-stat-delta up';
-    rvDeltaEl.style.display  = '';
-  }
-
-  // Active since — use created_at only (stable, never changes)
-  const rawDate = _biz?.created_at;
-  const liveLabel = document.getElementById('bizLiveLabel');
-  if (liveLabel && rawDate) {
-    const d = new Date(rawDate);
-    const label = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    liveLabel.textContent = 'Live since ' + label;
-  }
-}
-
-/* ── Topbar handled by js/topbar.js ─────────────────────── */
-
-/* ── Copy helper ────────────────────────────────────────── */
-function copyText(elId, btn) {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  navigator.clipboard.writeText(el.textContent.trim()).then(() => {
-    btn.textContent = '✓ Copied';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-/* ── Chips ──────────────────────────────────────────────── */
-function initChips(wrapId, inputId, onSelect) {
-  const wrap  = document.getElementById(wrapId);
-  const input = document.getElementById(inputId);
-  if (!wrap || !input) return;
-  wrap.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      wrap.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      input.value = chip.dataset.val;
-      if (onSelect) onSelect(chip.dataset.val);
-    });
-  });
-  input.addEventListener('input', () => {
-    if (onSelect) onSelect(input.value);
-  });
-}
-
-function initTimerChips(wrapId) {
-  const wrap = document.getElementById(wrapId);
-  if (!wrap) return;
-  wrap.querySelectorAll('.timer-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      wrap.querySelectorAll('.timer-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-    });
-  });
-}
-
-function getActiveTimerVal(wrapId) {
-  const wrap = document.getElementById(wrapId);
-  const active = wrap?.querySelector('.timer-chip.active');
-  return active ? parseInt(active.dataset.val, 10) : 30;
-}
-
-function setActiveTimerChip(wrapId, val) {
-  const wrap = document.getElementById(wrapId);
-  if (!wrap) return;
-  wrap.querySelectorAll('.timer-chip').forEach(c => {
-    c.classList.toggle('active', parseInt(c.dataset.val, 10) === val);
-  });
-}
-
-/* ── Menu incentive toggle ──────────────────────────────── */
-function toggleMenuIncentive(on) {
-  document.getElementById('menuIncentiveField').style.display = on ? '' : 'none';
-}
-
-/* ── Funnel save ────────────────────────────────────────── */
-async function saveFunnelSettings() {
-  const incentive = document.getElementById('funnelIncentiveInput').value.trim();
-  document.getElementById('funnelQrIncentive').textContent = incentive || 'Scan to leave a review';
-  const statusEl = document.getElementById('funnelSaveStatus');
-  statusEl.textContent = '';
-
-  try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/businesses?user_id=eq.${_userId}&limit=1`, {
-      method: 'PATCH',
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ incentive })
-    });
-    if (res.ok) {
-      _biz.incentive = incentive;
-      statusEl.textContent = '✓ Saved';
-      statusEl.className = 'save-status';
-      setTimeout(() => { statusEl.textContent = ''; }, 3000);
-    } else {
-      statusEl.textContent = '✗ Error saving';
-      statusEl.className = 'save-status error';
+    if (!res.ok) { dbg('leads fetch failed ' + res.status); _allLeads = []; }
+    else {
+      const rows = await res.json();
+      _allLeads = (rows || []).map(r => ({
+        ...r,
+        created_at: r.created_at ? new Date(r.created_at).getTime() : 0
+      }));
     }
-  } catch(e) {
-    statusEl.textContent = '✗ Network error';
-    statusEl.className = 'save-status error';
-  }
+    dbg('all leads: ' + _allLeads.length);
+    renderLeads();
+  } catch(e) { dbg('loadAllLeads error: ' + e); }
 }
 
-/* ── Menu save / load ───────────────────────────────────── */
-/* ═══════════════════════════════════════════════════════
-   PDF UPLOAD WIDGET
-═══════════════════════════════════════════════════════ */
-function switchPdfTab(tab) {
-  const uploadPanel = document.getElementById('pdfUploadPanel');
-  const urlPanel    = document.getElementById('pdfUrlPanel');
-  const tabUpload   = document.getElementById('pdftab-upload');
-  const tabUrl      = document.getElementById('pdftab-url');
-  if (!uploadPanel || !urlPanel) return;
-  if (tab === 'upload') {
-    uploadPanel.style.display = '';
-    urlPanel.style.display    = 'none';
-    tabUpload.classList.add('active');
-    tabUrl.classList.remove('active');
-  } else {
-    uploadPanel.style.display = 'none';
-    urlPanel.style.display    = '';
-    tabUpload.classList.remove('active');
-    tabUrl.classList.add('active');
-  }
-}
+/* ── Render per-location summary cards ─────────────────────────── */
+function renderLocSummaryCards() {
+  const grid = document.getElementById('locSummaryGrid');
+  if (!grid) return;
 
-function handlePdfFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
-    alert('Please select a PDF file.');
-    input.value = '';
-    return;
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    alert('PDF must be under 10 MB. Please compress it or use a URL instead.');
-    input.value = '';
-    return;
-  }
-  // Show preview with filename
-  const drop    = document.getElementById('pdfDropZone');
-  const preview = document.getElementById('pdfPreview');
-  const nameEl  = document.getElementById('pdfPreviewName');
-  if (drop)    drop.style.display    = 'none';
-  if (preview) preview.style.display = 'flex';
-  if (nameEl)  nameEl.textContent    = file.name;
+  // Count leads per slug
+  const leadsBySlug = {};
+  _allLeads.forEach(lead => {
+    const s = lead.business_slug || '';
+    leadsBySlug[s] = (leadsBySlug[s] || 0) + 1;
+  });
 
-  // Since we can't host files server-side, prompt user to upload to Drive/Dropbox
-  // and paste the URL. Show the note more prominently.
-  const note = document.querySelector('#pdfUploadPanel .pdf-upload-note');
-  if (note) {
-    note.innerHTML = '📎 <strong>File selected:</strong> ' + file.name + '<br>To use this file, upload it to <strong>Google Drive</strong> or <strong>Dropbox</strong>, set sharing to "Anyone with link", then paste the URL in the <strong>URL tab</strong>.';
-    note.style.display = 'block';
-  }
-}
+  const activeCount = _allLocations.filter(l =>
+    l.subscription_status === 'active' || l.subscription_status === 'trialing'
+  ).length;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('statLocations', activeCount);
 
-function removePdfFile() {
-  const input   = document.getElementById('pdfFileInput');
-  const drop    = document.getElementById('pdfDropZone');
-  const preview = document.getElementById('pdfPreview');
-  if (input)   input.value = '';
-  if (drop)    drop.style.display    = 'flex';
-  if (preview) preview.style.display = 'none';
-}
+  grid.innerHTML = _allLocations.map(loc => {
+    const status = loc.subscription_status || 'pending';
+    const bCls = (status === 'active' || status === 'trialing') ? 'ls-badge-active'
+               : status.startsWith('pending') ? 'ls-badge-pending' : 'ls-badge-inactive';
+    const bLbl = { active: 'Active', trialing: 'Trial', canceled: 'Cancelled',
+                   pending_payment: 'Pending', pending: 'Pending' }[status] || status;
+    const locLeads = leadsBySlug[loc.slug] || 0;
+    const locTapped = _allLeads.filter(r => r.business_slug === loc.slug && r.review_tapped).length;
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    const locMonth = _allLeads.filter(r => r.business_slug === loc.slug && r.created_at >= monthStart).length;
 
-function clearMenuUrl() {
-  document.getElementById('menuFileUrl').value = '';
-  const wrap = document.getElementById('pdfCurrentWrap');
-  if (wrap) wrap.style.display = 'none';
-}
+    return `
+      <a class="loc-summary-card" href="location.html?loc=${escH(loc.id)}">
+        <div class="loc-summary-card-top">
+          <div>
+            <div class="loc-summary-name">${escH(loc.biz_name || 'Unnamed')}</div>
+            ${loc.address ? `<div class="loc-summary-addr">${escH(loc.address)}</div>` : ''}
+          </div>
+          <span class="ls-badge ${bCls}">${escH(bLbl)}</span>
+        </div>
+        <div class="loc-summary-stats">
+          <div class="loc-summary-stat">
+            <div class="loc-summary-stat-num">${locLeads}</div>
+            <div class="loc-summary-stat-label">Leads</div>
+          </div>
+          <div class="loc-summary-stat">
+            <div class="loc-summary-stat-num">${locTapped}</div>
+            <div class="loc-summary-stat-label">Reviews</div>
+          </div>
+          <div class="loc-summary-stat">
+            <div class="loc-summary-stat-num">${locMonth}</div>
+            <div class="loc-summary-stat-label">This month</div>
+          </div>
+        </div>
+      </a>
+    `;
+  }).join('');
 
-// Drag-and-drop highlight on the drop zone
-document.addEventListener('DOMContentLoaded', () => {
-  const zone = document.getElementById('pdfDropZone');
-  if (zone) {
-    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-      e.preventDefault();
-      zone.classList.remove('drag-over');
-      const file = e.dataTransfer.files[0];
-      if (file) {
-        const inp = document.getElementById('pdfFileInput');
-        // Manually trigger handler
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        inp.files = dt.files;
-        handlePdfFile(inp);
-      }
+  // Populate location filter dropdown
+  const locFilter = document.getElementById('leadsLocFilter');
+  if (locFilter) {
+    // keep first "All locations" option
+    while (locFilter.options.length > 1) locFilter.remove(1);
+    _allLocations.forEach(loc => {
+      const opt = document.createElement('option');
+      opt.value = loc.slug;
+      opt.textContent = loc.biz_name || loc.slug;
+      locFilter.appendChild(opt);
     });
   }
-});
-
-/* ── Menu source toggle ─────────────────────────── */
-function switchMenuSource(src) {
-  const customPanel  = document.getElementById('menuCustomPanel');
-  const googlePanel  = document.getElementById('menuGooglePanel');
-  const tabCustom    = document.getElementById('menuSrcTabCustom');
-  const tabGoogle    = document.getElementById('menuSrcTabGoogle');
-  if (src === 'google') {
-    customPanel.style.display  = 'none';
-    googlePanel.style.display  = '';
-    tabCustom.classList.remove('active');
-    tabGoogle.classList.add('active');
-    // Show google menu url if available
-    const gUrl = _biz?.google_menu_url || '';
-    const dispEl = document.getElementById('menuGoogleUrlDisplay');
-    if (dispEl) {
-      if (gUrl) {
-        dispEl.innerHTML = `<a href="${gUrl}" target="_blank" style="color:var(--blue);text-decoration:none;word-break:break-all;">${gUrl}</a>`;
-      } else {
-        dispEl.textContent = 'No Google menu URL found. Google menus are only available on certain business profiles.';
-      }
-    }
-  } else {
-    customPanel.style.display  = '';
-    googlePanel.style.display  = 'none';
-    tabCustom.classList.add('active');
-    tabGoogle.classList.remove('active');
-  }
-  // Store current choice in hidden input (read by saveMenuSettings)
-  let inp = document.getElementById('menuSourceVal');
-  if (!inp) { inp = document.createElement('input'); inp.type='hidden'; inp.id='menuSourceVal'; document.body.appendChild(inp); }
-  inp.value = src;
 }
 
-async function loadMenuSettings() {
-  if (!_biz?.slug) return;
-  try {
-    const res = await fetch(
-      `${SUPA_URL}/rest/v1/menus?biz_slug=eq.${encodeURIComponent(_biz.slug)}&limit=1`,
-      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, Accept: 'application/json' } }
-    );
-    if (!res.ok) return;
-    const rows = await res.json();
-    if (!rows?.length) return;
-    const row = rows[0];
-    // Restore menu source (custom vs google)
-    const src = row.menu_source || 'custom';
-    switchMenuSource(src);
-    if (src === 'custom' && row.menu_url) {
-      document.getElementById('menuFileUrl').value = row.menu_url;
-      // Show current PDF card
-      const wrap = document.getElementById('pdfCurrentWrap');
-      const link = document.getElementById('pdfCurrentLink');
-      if (wrap && link) {
-        link.href = row.menu_url;
-        link.textContent = row.menu_url.length > 50 ? row.menu_url.slice(0, 47) + '…' : row.menu_url;
-        wrap.style.display = 'flex';
-      }
-      // Switch to URL tab so the existing link is visible
-      switchPdfTab('url');
-    }
-    if (row.timer_minutes !== undefined) setActiveTimerChip('menuTimerChips', row.timer_minutes);
-    if (row.incentive) {
-      document.getElementById('menuIncentiveToggle').checked = true;
-      toggleMenuIncentive(true);
-      document.getElementById('menuIncentiveInput').value = row.incentive;
-    }
-    dbg('menu settings loaded');
-  } catch(e) { dbg('loadMenuSettings error: ' + e); }
-}
+/* ── Render leads table ─────────────────────────────────────────── */
+function applyLeadsFilter() { _leadsPage = 1; renderLeads(); }
+function changeLeadsPage(dir) { _leadsPage = Math.max(1, _leadsPage + dir); renderLeads(); }
 
-async function saveMenuSettings() {
-  const statusEl = document.getElementById('menuSaveStatus');
-  statusEl.textContent = '';
-  const menuSource = (document.getElementById('menuSourceVal')?.value || 'custom');
-  const payload = {
-    biz_slug:      _biz.slug,
-    menu_url:      menuSource === 'custom' ? document.getElementById('menuFileUrl').value.trim() : null,
-    menu_source:   menuSource,
-    timer_minutes: getActiveTimerVal('menuTimerChips'),
-    incentive:     document.getElementById('menuIncentiveToggle').checked
-                    ? document.getElementById('menuIncentiveInput').value.trim()
-                    : null,
-    active: true
-  };
-  try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/menus?biz_slug=eq.${encodeURIComponent(_biz.slug)}`, {
-      method: 'PATCH',
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify(payload)
-    });
-    // If no row exists yet, insert
-    if (res.status === 404 || res.status === 200 || res.ok) {
-      await fetch(`${SUPA_URL}/rest/v1/menus`, {
-        method: 'POST',
-        headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
-        body: JSON.stringify(payload)
-      });
-    }
-    statusEl.textContent = '✓ Saved';
-    statusEl.className = 'save-status';
-    setTimeout(() => { statusEl.textContent = ''; }, 3000);
-  } catch(e) {
-    statusEl.textContent = '✗ Error'; statusEl.className = 'save-status error';
-  }
-}
-
-/* ── Wi-Fi save / load ──────────────────────────────────── */
-async function loadWifiSettings() {
-  if (!_biz?.slug) return;
-  try {
-    const res = await fetch(
-      `${SUPA_URL}/rest/v1/wifi_settings?biz_slug=eq.${encodeURIComponent(_biz.slug)}&limit=1`,
-      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, Accept: 'application/json' } }
-    );
-    if (!res.ok) return;
-    const rows = await res.json();
-    if (!rows?.length) return;
-    const row = rows[0];
-    if (row.network_name)    document.getElementById('wifiNetworkName').value = row.network_name;
-    if (row.password)        document.getElementById('wifiPassword').value    = row.password;
-    if (row.timer_minutes !== undefined) setActiveTimerChip('wifiTimerChips', row.timer_minutes);
-    document.getElementById('wifiSkippable').checked = !!row.skippable;
-    // show_name_field removed from UI
-    dbg('wifi settings loaded');
-  } catch(e) { dbg('loadWifiSettings error: ' + e); }
-}
-
-async function saveWifiSettings() {
-  const statusEl = document.getElementById('wifiSaveStatus');
-  statusEl.textContent = '';
-  const payload = {
-    biz_slug:       _biz.slug,
-    network_name:   document.getElementById('wifiNetworkName').value.trim(),
-    password:       document.getElementById('wifiPassword').value.trim(),
-    timer_minutes:  getActiveTimerVal('wifiTimerChips'),
-    skippable:      document.getElementById('wifiSkippable').checked,
-    skippable:      document.getElementById('wifiSkippable').checked,
-    active: true
-  };
-  try {
-    await fetch(`${SUPA_URL}/rest/v1/wifi_settings`, {
-      method: 'POST',
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
-      body: JSON.stringify(payload)
-    });
-    statusEl.textContent = '✓ Saved'; statusEl.className = 'save-status';
-    setTimeout(() => { statusEl.textContent = ''; }, 3000);
-  } catch(e) {
-    statusEl.textContent = '✗ Error'; statusEl.className = 'save-status error';
-  }
-}
-
-/* ── Leads ──────────────────────────────────────────────── */
-let _allLeads  = [];
-let _leadsPage = 1;
-
-async function loadLeads() {
-  if (!_biz?.slug || !_token) return;
-  try {
-    const res = await fetch(
-      `${SUPA_URL}/rest/v1/leads?business_slug=eq.${encodeURIComponent(_biz.slug)}&order=created_at.desc&limit=500`,
-      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, Accept: 'application/json' } }
-    );
-    if (!res.ok) return;
-    const rows = await res.json();
-    _allLeads = (rows || []).map(r => ({
-      ...r,
-      created_at: r.created_at ? new Date(r.created_at).getTime() : 0
-    }));
-    dbg('leads: ' + _allLeads.length);
-    renderLeads(_allLeads);
-  } catch(e) { dbg('loadLeads error: ' + e); }
-}
-
-function applyLeadsFilter() { _leadsPage = 1; renderLeads(_allLeads); }
-function changeLeadsPage(dir) { _leadsPage = Math.max(1, _leadsPage + dir); renderLeads(_allLeads); }
-
-function renderLeads(rows) {
-  const now        = new Date();
-  const nowMs      = Date.now();
+function renderLeads() {
+  const rows   = _allLeads;
+  const now    = new Date();
+  const nowMs  = Date.now();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const total      = rows.length;
+  const total  = rows.length;
 
-  // Stats (all-time)
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   set('statTotalLeads',   total);
+  set('leadsStatTotal',   total);
+  set('leadsStatTapped',  rows.filter(r => r.review_tapped).length);
+  set('leadsStatMonth',   rows.filter(r => r.created_at >= monthStart).length);
   set('statReviewTapped', rows.filter(r => r.review_tapped).length);
   set('statThisMonth',    rows.filter(r => r.created_at >= monthStart).length);
 
@@ -2300,21 +683,25 @@ function renderLeads(rows) {
   const toolbar = document.getElementById('leadsToolbar');
   if (toolbar) toolbar.style.display = total > 0 ? '' : 'none';
 
-  // Filter
+  // Date filter
   const fv = document.getElementById('leadsDateFilter')?.value || 'all';
   let filtered = rows;
   const yearStart = new Date(now.getFullYear(), 0, 1).getTime();
-  if (fv === 'today')  filtered = rows.filter(r => r.created_at >= todayStart);
+  if (fv === 'today') filtered = rows.filter(r => r.created_at >= todayStart);
   else if (fv === 'month') filtered = rows.filter(r => r.created_at >= monthStart);
   else if (fv === 'year')  filtered = rows.filter(r => r.created_at >= yearStart);
   else if (!isNaN(Number(fv))) { const cut = nowMs - Number(fv)*86400000; filtered = rows.filter(r => r.created_at >= cut); }
 
+  // Location filter
+  const lf = document.getElementById('leadsLocFilter')?.value || 'all';
+  if (lf !== 'all') filtered = filtered.filter(r => r.business_slug === lf);
+
   // Pagination
-  const PAGE = 20;
+  const PAGE = 25;
   const totalF = filtered.length;
   const totalP = Math.max(1, Math.ceil(totalF / PAGE));
   if (_leadsPage > totalP) _leadsPage = totalP;
-  const start   = (_leadsPage - 1) * PAGE;
+  const start    = (_leadsPage - 1) * PAGE;
   const pageRows = filtered.slice(start, start + PAGE);
 
   const showEl = document.getElementById('leadsShowingLabel');
@@ -2329,13 +716,12 @@ function renderLeads(rows) {
   const piEl = document.getElementById('leadsPageInfo');
   if (piEl) piEl.textContent = `Page ${_leadsPage} of ${totalP}`;
 
-  // Table
   const empty = document.getElementById('leadsEmpty');
   const table = document.getElementById('leadsTable');
   const tbody = document.getElementById('leadsTableBody');
 
   if (totalF === 0) {
-    if (empty) { empty.style.display = ''; empty.querySelector('div:not(.leads-empty-icon)').textContent = total === 0 ? 'No emails captured yet.' : 'No results for this time period.'; }
+    if (empty) { empty.style.display = ''; }
     if (table) table.style.display = 'none';
     if (pag)   pag.style.display   = 'none';
     return;
@@ -2344,174 +730,88 @@ function renderLeads(rows) {
   if (table) table.style.display = '';
   if (!tbody) return;
 
+  // Build a slug→name map for the Location column
+  const slugToName = {};
+  _allLocations.forEach(l => { if (l.slug) slugToName[l.slug] = l.biz_name || l.slug; });
+
   const srcMap = { funnel: 'QR', menu: 'Menu', wifi: 'Wi-Fi' };
   const srcColor = { funnel: '#10b981', menu: '#6366f1', wifi: '#0ea5e9' };
+
   tbody.innerHTML = pageRows.map(r => {
     const dt    = r.created_at ? new Date(r.created_at) : null;
     const dStr  = dt ? dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
     const tStr  = dt ? dt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}) : '';
-    const stars = r.stars ? '⭐'.repeat(Math.min(5, r.stars)) : '—';
-    const tapped = r.review_tapped ? '<span class="tapped-badge">✓ Tapped</span>' : '<span style="color:#9ca3af;font-size:.76rem;">Not yet</span>';
-    const email  = r.email ? `<span style="font-weight:500;">${escHtml(r.email)}</span>` : '<span style="color:#9ca3af;font-style:italic;">skipped</span>';
+    const stars  = r.stars ? '⭐'.repeat(Math.min(5, r.stars)) : '—';
+    const tapped = r.review_tapped
+      ? '<span class="tapped-badge">✓ Tapped</span>'
+      : '<span style="color:#9ca3af;font-size:.76rem;">Not yet</span>';
+    const email  = r.email
+      ? `<span style="font-weight:500;">${escH(r.email)}</span>`
+      : '<span style="color:#9ca3af;font-style:italic;">skipped</span>';
     const sLabel = r.source ? (srcMap[r.source] || r.source) : '—';
     const sBadge = r.source
       ? `<span style="display:inline-block;background:${srcColor[r.source]||'#9ca3af'};color:#fff;font-size:.71rem;font-weight:600;padding:2px 8px;border-radius:999px;">${sLabel}</span>`
       : '<span style="color:#9ca3af;">—</span>';
-    return `<tr><td>${email}</td><td>${sBadge}</td><td>${stars}</td><td>${tapped}</td><td style="white-space:nowrap;"><span style="font-weight:500;">${dStr}</span><br><span style="font-size:.74rem;color:#9ca3af;">${tStr}</span></td></tr>`;
+    const locName = slugToName[r.business_slug] || r.business_slug || '—';
+    const locDisplay = `<span style="font-size:.78rem;color:#374151;font-weight:500;">${escH(locName)}</span>`;
+    return `<tr>
+      <td>${email}</td>
+      <td>${locDisplay}</td>
+      <td>${sBadge}</td>
+      <td>${stars}</td>
+      <td>${tapped}</td>
+      <td style="white-space:nowrap;"><span style="font-weight:500;">${dStr}</span><br><span style="font-size:.74rem;color:#9ca3af;">${tStr}</span></td>
+    </tr>`;
   }).join('');
 }
 
+/* ── CSV Download ─────────────────────────────────────────────── */
 function downloadLeadsCSV() {
   if (!_allLeads.length) return;
-  const fv = document.getElementById('leadsDateFilter')?.value || 'all';
+  const fv  = document.getElementById('leadsDateFilter')?.value || 'all';
+  const lf  = document.getElementById('leadsLocFilter')?.value  || 'all';
   const now = new Date(), nowMs = Date.now();
   const todayStart = new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
   const monthStart = new Date(now.getFullYear(),now.getMonth(),1).getTime();
   let exp = _allLeads;
-  if (fv==='today') exp = _allLeads.filter(r=>r.created_at>=todayStart);
-  else if (fv==='month') exp = _allLeads.filter(r=>r.created_at>=monthStart);
-  else if (!isNaN(Number(fv))) { const c=nowMs-Number(fv)*86400000; exp=_allLeads.filter(r=>r.created_at>=c); }
+  if (fv==='today') exp = exp.filter(r=>r.created_at>=todayStart);
+  else if (fv==='month') exp = exp.filter(r=>r.created_at>=monthStart);
+  else if (!isNaN(Number(fv))) { const c=nowMs-Number(fv)*86400000; exp=exp.filter(r=>r.created_at>=c); }
+  if (lf !== 'all') exp = exp.filter(r => r.business_slug === lf);
+
+  const slugToName = {};
+  _allLocations.forEach(l => { if (l.slug) slugToName[l.slug] = l.biz_name || l.slug; });
   const srcMap = { funnel:'QR', menu:'Menu', wifi:'Wi-Fi' };
-  const headers = ['Email','Source','Stars','Review Tapped','Date','Time'];
-  const rowsCsv = exp.map(r=>{
-    const dt=r.created_at?new Date(r.created_at):null;
-    return [r.email||'', r.source?(srcMap[r.source]||r.source):'', r.stars||'', r.review_tapped?'Yes':'No',
+  const headers = ['Email','Location','Source','Stars','Review Tapped','Date','Time'];
+  const rowsCsv = exp.map(r => {
+    const dt  = r.created_at ? new Date(r.created_at) : null;
+    const loc = slugToName[r.business_slug] || r.business_slug || '';
+    return [
+      r.email||'', loc,
+      r.source?(srcMap[r.source]||r.source):'',
+      r.stars||'', r.review_tapped?'Yes':'No',
       dt?dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'',
-      dt?dt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}):''];
+      dt?dt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}):''
+    ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
   });
-  const csv=[headers,...rowsCsv].map(row=>row.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=`leads-${_biz?.slug||'export'}-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  const csv  = [headers.join(','), ...rowsCsv].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `happyclientele-leads-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
   URL.revokeObjectURL(url);
 }
 
-function escHtml(str) {
-  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-/* ── Print PDF stub ─────────────────────────────────────── */
-function downloadPrintPDF(e) {
-  e.preventDefault();
-  alert('Print-ready PDF download coming soon. Your QR code and incentive are already generated — this button will trigger a download in the next update.');
-}
-
-/* ── Webhook modal ───────────────────────────────────────── */
-let _webhookUrl = '';
-
-async function loadWebhookUrl() {
-  if (!_token) return;
-  try {
-    const res = await fetch(
-      `${SUPA_URL}/rest/v1/businesses?select=webhook_url&user_id=eq.${_userId}&limit=1`,
-      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, Accept: 'application/json' } }
-    );
-    if (res.ok) {
-      const rows = await res.json();
-      if (rows?.[0]?.webhook_url) {
-        _webhookUrl = rows[0].webhook_url;
-        const inp = document.getElementById('webhookUrlInput');
-        if (inp) inp.value = _webhookUrl;
-      }
-    }
-  } catch(e) { dbg('loadWebhookUrl: ' + e); }
-}
-
-function openWebhookModal() {
-  const m = document.getElementById('webhookModal');
-  if (m) m.style.display = 'flex';
-  loadWebhookUrl();
-}
-
-function closeWebhookModal() {
-  const m = document.getElementById('webhookModal');
-  if (m) m.style.display = 'none';
-}
-
-async function saveWebhookUrl() {
-  const url = document.getElementById('webhookUrlInput').value.trim();
-  const statusEl = document.getElementById('webhookSaveStatus');
-  if (url && !url.startsWith('http')) {
-    statusEl.textContent = '✗ Must be a valid https:// URL'; statusEl.style.color = 'var(--red)'; return;
-  }
-  try {
-    await fetch(`${SUPA_URL}/rest/v1/businesses?user_id=eq.${_userId}&limit=1`, {
-      method: 'PATCH',
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ webhook_url: url || null })
-    });
-    _webhookUrl = url;
-    statusEl.textContent = url ? '✓ Saved' : '✓ Cleared';
-    statusEl.style.color = 'var(--green)';
-    setTimeout(() => { statusEl.textContent = ''; closeWebhookModal(); }, 1500);
-  } catch(e) {
-    statusEl.textContent = '✗ Error saving'; statusEl.style.color = 'var(--red)';
-  }
-}
-
-async function testWebhook() {
-  const url = document.getElementById('webhookUrlInput').value.trim();
-  if (!url) { alert('Enter a webhook URL first.'); return; }
-  const statusEl = document.getElementById('webhookSaveStatus');
-  statusEl.textContent = 'Sending test…'; statusEl.style.color = 'var(--sub)';
-  try {
-    await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        event:        'lead.test',
-        source:       'dashboard_test',
-        email:        'test@example.com',
-        biz_name:     _biz?.biz_name || '',
-        biz_slug:     _biz?.slug || '',
-        stars:        null,
-        review_tapped: false,
-        timestamp:    new Date().toISOString()
-      }),
-      mode: 'no-cors'
-    });
-    statusEl.textContent = '✓ Test sent — check your endpoint';
-    statusEl.style.color = 'var(--green)';
-  } catch(e) {
-    statusEl.textContent = '✗ Could not reach URL'; statusEl.style.color = 'var(--red)';
-  }
-}
-
-async function fireWebhook(lead) {
-  if (!_webhookUrl) return;
-  try {
-    fetch(_webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        event:         'lead.captured',
-        email:         lead.email || null,
-        source:        lead.source || 'funnel',
-        stars:         lead.stars || null,
-        biz_name:      _biz?.biz_name || '',
-        biz_slug:      _biz?.slug || '',
-        review_tapped: lead.review_tapped || false,
-        timestamp:     new Date().toISOString()
-      }),
-      mode: 'no-cors'
-    });
-    dbg('webhook fired for: ' + (lead.email || 'anon'));
-  } catch(e) { dbg('webhook error: ' + e); }
-}
-
-/* ── Init chips & timers on DOM ready ───────────────────── */
+/* ── Start ────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  initChips('funnelChips', 'funnelIncentiveInput', val => {
-    document.getElementById('funnelQrIncentive').textContent = val || 'Scan to leave a review';
-  });
-  initChips('menuChips', 'menuIncentiveInput');
-  initTimerChips('menuTimerChips');
-  initTimerChips('wifiTimerChips');
-  // Close webhook modal on backdrop click
-  document.getElementById('webhookModal')?.addEventListener('click', e => {
-    if (e.target === document.getElementById('webhookModal')) closeWebhookModal();
-  });
-  bootDashboard();
+  // Topbar sets up auth; wait for it, then boot
+  const tryBoot = () => {
+    if (window._supabaseClient) { bootDashboard(); return; }
+    setTimeout(tryBoot, 80);
+  };
+  tryBoot();
 });
 </script>
 </body>
