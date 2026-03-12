@@ -459,27 +459,41 @@ document.addEventListener('DOMContentLoaded', async () => {
   let biz = null;
   let fetchStatus = '', fetchBody = '';
   try {
-    const res = await fetch(
-      `${SUPA_URL}/rest/v1/businesses?slug=eq.${encodeURIComponent(rawSlug)}&select=biz_name,slug,google_url,incentive&limit=1`,
+    // 1. Try `locations` table first (new multi-location system)
+    const locRes = await fetch(
+      `${SUPA_URL}/rest/v1/locations?slug=eq.${encodeURIComponent(rawSlug)}&deleted_at=is.null&select=biz_name,slug,google_url,incentive&limit=1`,
       { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }
     );
-    fetchStatus = String(res.status);
-    const text  = await res.text();
-    fetchBody   = text.slice(0, 200);
-    if (res.ok) {
-      const rows = JSON.parse(text);
-      if (rows && rows.length > 0) {
-        const r = rows[0];
-        biz = {
-          name:      r.biz_name    || 'Your Business',
-          emoji:     '⭐',
-          logo:      '',
-          googleUrl: r.google_url  || '',
-          incentive: incentiveParam || r.incentive || '',
-          slug:      r.slug        || rawSlug
-        };
-      } else {
-        fetchBody = 'rows=0 — slug not found or RLS blocking';
+    fetchStatus = String(locRes.status);
+    if (locRes.ok) {
+      const locRows = await locRes.json();
+      if (locRows && locRows.length > 0) {
+        const r = locRows[0];
+        biz = { name: r.biz_name || 'Your Business', emoji: '⭐', logo: '',
+                googleUrl: r.google_url || '', incentive: incentiveParam || r.incentive || '',
+                slug: r.slug || rawSlug };
+      }
+    }
+
+    // 2. Fall back to legacy `businesses` table
+    if (!biz) {
+      const bizRes = await fetch(
+        `${SUPA_URL}/rest/v1/businesses?slug=eq.${encodeURIComponent(rawSlug)}&select=biz_name,slug,google_url,incentive&limit=1`,
+        { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }
+      );
+      fetchStatus = String(bizRes.status);
+      const text  = await bizRes.text();
+      fetchBody   = text.slice(0, 200);
+      if (bizRes.ok) {
+        const rows = JSON.parse(text);
+        if (rows && rows.length > 0) {
+          const r = rows[0];
+          biz = { name: r.biz_name || 'Your Business', emoji: '⭐', logo: '',
+                  googleUrl: r.google_url || '', incentive: incentiveParam || r.incentive || '',
+                  slug: r.slug || rawSlug };
+        } else {
+          fetchBody = 'rows=0 — slug not found in locations or businesses tables';
+        }
       }
     }
   } catch(e) { fetchStatus = 'EXCEPTION'; fetchBody = String(e); }

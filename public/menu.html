@@ -359,23 +359,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!rawSlug) { showError('No ?biz= in URL.'); return; }
   state.bizSlug = rawSlug;
 
-  // Fetch biz + menu in parallel
+  // Fetch biz (locations-first, businesses fallback) + menu in parallel
   try {
-    const [bizRes, menuRes] = await Promise.all([
+    const [locRes, bizRes, menuRes] = await Promise.all([
+      fetch(`${SUPA_URL}/rest/v1/locations?slug=eq.${encodeURIComponent(rawSlug)}&deleted_at=is.null&select=biz_name,slug,google_url,incentive&limit=1`,
+        { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }),
       fetch(`${SUPA_URL}/rest/v1/businesses?slug=eq.${encodeURIComponent(rawSlug)}&select=biz_name,slug,google_url,incentive&limit=1`,
         { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }),
       fetch(`${SUPA_URL}/rest/v1/menus?biz_slug=eq.${encodeURIComponent(rawSlug)}&limit=1`,
         { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } })
     ]);
 
-    if (!bizRes.ok) { showError(`Business fetch ${bizRes.status}`); return; }
-
-    const bizRows  = await bizRes.json();
+    const locRows  = locRes.ok  ? await locRes.json()  : [];
+    const bizRows  = bizRes.ok  ? await bizRes.json()  : [];
     const menuRows = menuRes.ok ? await menuRes.json() : [];
 
-    if (!bizRows || !bizRows.length) { showError('Business not found.'); return; }
+    // Prefer locations table, fall back to businesses
+    const r = (locRows && locRows.length) ? locRows[0]
+            : (bizRows && bizRows.length) ? bizRows[0]
+            : null;
 
-    const r = bizRows[0];
+    if (!r) { showError('Business not found.'); return; }
+
     state.biz = {
       name:      r.biz_name   || 'Your Business',
       googleUrl: r.google_url || '',

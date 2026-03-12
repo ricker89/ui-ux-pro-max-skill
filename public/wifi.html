@@ -445,22 +445,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
-    // 1. Fetch business
-    const bizRes = await fetch(
-      `${SUPA_URL}/rest/v1/businesses?slug=eq.${encodeURIComponent(slug)}&limit=1`,
-      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }
-    );
-    const bizRows = await bizRes.json();
-    console.log('[wifi] biz fetch status:', bizRes.status, '| rows:', JSON.stringify(bizRows).slice(0,200));
-    console.log('[wifi] slug used:', slug);
-    console.log('[wifi] key prefix:', SUPA_KEY.slice(0,30));
-    if (!bizRows || !bizRows.length) {
+    // 1. Try `locations` table first, fall back to `businesses`
+    const [locRes, bizRes] = await Promise.all([
+      fetch(`${SUPA_URL}/rest/v1/locations?slug=eq.${encodeURIComponent(slug)}&deleted_at=is.null&limit=1`,
+        { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } }),
+      fetch(`${SUPA_URL}/rest/v1/businesses?slug=eq.${encodeURIComponent(slug)}&limit=1`,
+        { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Accept: 'application/json' } })
+    ]);
+
+    const locRows = locRes.ok ? await locRes.json() : [];
+    const bizRows = bizRes.ok ? await bizRes.json() : [];
+
+    const bizRow = (locRows && locRows.length) ? locRows[0]
+                 : (bizRows && bizRows.length) ? bizRows[0]
+                 : null;
+
+    console.log('[wifi] slug:', slug, '| locRows:', locRows.length, '| bizRows:', bizRows.length);
+
+    if (!bizRow) {
       document.getElementById('stateError').querySelector('.error-msg').innerHTML =
-        `No business found for slug: <strong>${slug}</strong><br>Status: ${bizRes.status}<br>Ask a staff member for the Wi-Fi password.`;
+        `No business found for slug: <strong>${slug}</strong><br>Ask a staff member for the Wi-Fi password.`;
       showState('error');
       return;
     }
-    state.biz = bizRows[0];
+    state.biz = bizRow;
 
     // Update header
     document.getElementById('bizName').textContent = state.biz.biz_name || slug;
