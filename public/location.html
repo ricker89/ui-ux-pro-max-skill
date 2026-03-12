@@ -495,6 +495,53 @@
     .btn-qr-order { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
     .btn-qr-order:hover { background: #ffedd5; }
 
+    /* QR style picker */
+    .qr-style-row {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;
+    }
+    .qr-style-chip {
+      padding: 5px 11px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      font-size: .74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .12s;
+      font-family: inherit;
+      color: var(--black);
+    }
+    .qr-style-chip:hover { border-color: #aaa; }
+    .qr-style-chip.selected { border-color: var(--black); background: var(--black); color: #fff; }
+
+    /* Hidden print frame — shown ONLY during @media print */
+    #printFrame {
+      display: none;
+    }
+    @media print {
+      body > *:not(#printFrame) { display: none !important; }
+      #printFrame {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 100vh;
+      }
+      #printFrame .pf-card {
+        text-align: center;
+        border: 1.5px solid #e8e8e8;
+        border-radius: 16px;
+        padding: 28px 32px 24px;
+        width: 260px;
+      }
+      #printFrame .pf-card img { width: 200px; height: 200px; }
+      #printFrame .pf-stars { font-size: 1.1rem; color: #FDB813; margin-bottom: 6px; }
+      #printFrame .pf-incentive { font-size: .9rem; font-weight: 700; margin-bottom: 4px; }
+      #printFrame .pf-sub { font-size: .72rem; color: #6b7280; margin-bottom: 10px; }
+      #printFrame .pf-biz { font-size: .85rem; font-weight: 700; margin-top: 8px; }
+      #printFrame .pf-brand { font-size: .65rem; color: #9ca3af; margin-top: 6px; }
+    }
+
     /* Right col: settings */
     .feat-settings { display: flex; flex-direction: column; gap: 20px; }
 
@@ -1013,9 +1060,20 @@
             <div class="qr-card-biz" id="funnelQrBizName"></div>
             <div class="qr-card-brand">Powered by HappyClientele.</div>
           </div>
+          <!-- QR Style picker -->
+          <div style="margin-top:10px;">
+            <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin-bottom:6px;">QR Style</div>
+            <div class="qr-style-row" id="funnelStyleRow">
+              <button class="qr-style-chip selected" data-style="classic" onclick="setQrStyle('funnel','classic',this)">Classic</button>
+              <button class="qr-style-chip" data-style="rounded" onclick="setQrStyle('funnel','rounded',this)">Rounded</button>
+              <button class="qr-style-chip" data-style="dark" onclick="setQrStyle('funnel','dark',this)">Dark</button>
+              <button class="qr-style-chip" data-style="green" onclick="setQrStyle('funnel','green',this)">Green</button>
+              <button class="qr-style-chip" data-style="navy" onclick="setQrStyle('funnel','navy',this)">Navy</button>
+            </div>
+          </div>
           <div class="qr-actions">
             <button class="btn-qr-action btn-qr-dl" id="funnelBtnDownload">⬇ Download PNG</button>
-            <button class="btn-qr-action btn-qr-print" onclick="printQR('funnelQrImg', 'funnelQrBizName')">🖨️ Print</button>
+            <button class="btn-qr-action btn-qr-print" onclick="printQR('funnelQrImg','funnelQrBizName','★★★★★',document.getElementById('funnelQrIncentive')?.textContent,'Scan the QR code below')">🖨️ Print</button>
             <button class="btn-qr-action btn-qr-order" onclick="scrollToSection('printSection')">📦 Order Physical</button>
           </div>
         </div>
@@ -1102,9 +1160,20 @@
             <div class="qr-card-biz" id="menuQrBizName"></div>
             <div class="qr-card-brand">Powered by HappyClientele.</div>
           </div>
+          <!-- QR Style picker -->
+          <div style="margin-top:10px;">
+            <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin-bottom:6px;">QR Style</div>
+            <div class="qr-style-row" id="menuStyleRow">
+              <button class="qr-style-chip selected" data-style="classic" onclick="setQrStyle('menu','classic',this)">Classic</button>
+              <button class="qr-style-chip" data-style="rounded" onclick="setQrStyle('menu','rounded',this)">Rounded</button>
+              <button class="qr-style-chip" data-style="dark" onclick="setQrStyle('menu','dark',this)">Dark</button>
+              <button class="qr-style-chip" data-style="green" onclick="setQrStyle('menu','green',this)">Green</button>
+              <button class="qr-style-chip" data-style="navy" onclick="setQrStyle('menu','navy',this)">Navy</button>
+            </div>
+          </div>
           <div class="qr-actions">
             <button class="btn-qr-action btn-qr-dl" id="menuBtnDownload">⬇ Download PNG</button>
-            <button class="btn-qr-action btn-qr-print" onclick="printQR('menuQrImg', 'menuQrBizName')">🖨️ Print</button>
+            <button class="btn-qr-action btn-qr-print" onclick="printQR('menuQrImg','menuQrBizName','📋','Tap to view our menu','Scan to access')">🖨️ Print</button>
             <button class="btn-qr-action btn-qr-order" onclick="scrollToSection('printSection')">📦 Order Physical</button>
           </div>
         </div>
@@ -1239,9 +1308,20 @@
             <div class="qr-card-biz" id="wifiQrBizName"></div>
             <div class="qr-card-brand">Powered by HappyClientele.</div>
           </div>
+          <!-- QR Style picker -->
+          <div style="margin-top:10px;">
+            <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin-bottom:6px;">QR Style</div>
+            <div class="qr-style-row" id="wifiStyleRow">
+              <button class="qr-style-chip selected" data-style="classic" onclick="setQrStyle('wifi','classic',this)">Classic</button>
+              <button class="qr-style-chip" data-style="rounded" onclick="setQrStyle('wifi','rounded',this)">Rounded</button>
+              <button class="qr-style-chip" data-style="dark" onclick="setQrStyle('wifi','dark',this)">Dark</button>
+              <button class="qr-style-chip" data-style="green" onclick="setQrStyle('wifi','green',this)">Green</button>
+              <button class="qr-style-chip" data-style="navy" onclick="setQrStyle('wifi','navy',this)">Navy</button>
+            </div>
+          </div>
           <div class="qr-actions">
             <button class="btn-qr-action btn-qr-dl" id="wifiBtnDownload">⬇ Download PNG</button>
-            <button class="btn-qr-action btn-qr-print" onclick="printQR('wifiQrImg', 'wifiQrBizName')">🖨️ Print</button>
+            <button class="btn-qr-action btn-qr-print" onclick="printQR('wifiQrImg','wifiQrBizName','📶','Get the Wi-Fi password','Scan to access')">🖨️ Print</button>
             <button class="btn-qr-action btn-qr-order" onclick="scrollToSection('printSection')">📦 Order Physical</button>
           </div>
         </div>
@@ -1727,9 +1807,48 @@ function renderDashboard() {
 }
 
 /* ── QR generation ──────────────────────────────────────── */
+/* ── QR Style switcher ─────────────────────────────────── */
+const _qrStyles = {
+  classic: { color: '000000', bgcolor: 'ffffff', qzone: 1 },
+  rounded: { color: '000000', bgcolor: 'ffffff', qzone: 1, eye_outer: 'eye_out_curved', eye_inner: 'eye_in_curved', module_shape: 'module_rounded_all' },
+  dark:    { color: 'ffffff', bgcolor: '1a1a1a', qzone: 1 },
+  green:   { color: '065f46', bgcolor: 'f0fdf4', qzone: 1 },
+  navy:    { color: '1e3a5f', bgcolor: 'eff6ff', qzone: 1 },
+};
+const _qrActiveStyle = { funnel: 'classic', menu: 'classic', wifi: 'classic' };
+
+function setQrStyle(feature, style, btn) {
+  // Update chip selection
+  const row = document.getElementById(feature + 'StyleRow');
+  if (row) row.querySelectorAll('.qr-style-chip').forEach(c => c.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+  _qrActiveStyle[feature] = style;
+
+  // Re-generate QR with new colours
+  const imgId = { funnel: 'funnelQrImg', menu: 'menuQrImg', wifi: 'wifiQrImg' }[feature];
+  const img = document.getElementById(imgId);
+  if (!img?.dataset.url) return;
+  const s = _qrStyles[style] || _qrStyles.classic;
+  let url = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&ecc=H`
+    + `&data=${encodeURIComponent(img.dataset.url)}`
+    + `&color=${s.color}&bgcolor=${s.bgcolor}&qzone=${s.qzone}`;
+  if (s.eye_outer) url += `&eye_outer=${s.eye_outer}&eye_inner=${s.eye_inner}`;
+  if (s.module_shape) url += `&module_shape=${s.module_shape}`;
+  img.src = url;
+
+  // Update download button too
+  const dlId = { funnel: 'funnelBtnDownload', menu: 'menuBtnDownload', wifi: 'wifiBtnDownload' }[feature];
+  const dlBtn = document.getElementById(dlId);
+  if (dlBtn) dlBtn.onclick = () => downloadQR(url, feature);
+}
+
 function generateQR(feature, url) {
-  const encoded = encodeURIComponent(url);
-  const src = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encoded}&ecc=H`;
+  const s = _qrStyles[_qrActiveStyle[feature] || 'classic'];
+  let src = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&ecc=H`
+    + `&data=${encodeURIComponent(url)}`
+    + `&color=${s.color}&bgcolor=${s.bgcolor}&qzone=${s.qzone}`;
+  if (s.eye_outer) src += `&eye_outer=${s.eye_outer}&eye_inner=${s.eye_inner}`;
+  if (s.module_shape) src += `&module_shape=${s.module_shape}`;
   const imgId = { funnel: 'funnelQrImg', menu: 'menuQrImg', wifi: 'wifiQrImg' }[feature];
   const img = document.getElementById(imgId);
   if (img) { img.src = src; img.dataset.url = url; }
@@ -1745,55 +1864,24 @@ function downloadQR(src, feature) {
   a.href = src; a.download = `${feature}-qr-${_biz?.slug || 'hc'}.png`; a.click();
 }
 
-function printQR(imgId, bizNameId) {
+/* ── Print QR — in-page print frame, no popup ──────────── */
+function printQR(imgId, bizNameId, stars, incentive, sub) {
   const img     = document.getElementById(imgId);
   const bizEl   = document.getElementById(bizNameId);
-  const imgSrc  = img?.src || '';
-  const bizName = bizEl?.textContent || (_biz?.biz_name || 'HappyClientele');
+  if (!img?.src) { alert('QR code not loaded yet. Please wait a moment and try again.'); return; }
 
-  // Build a minimal print-only popup with just the QR card
-  const win = window.open('', '_blank', 'width=400,height=500');
-  win.document.write(`<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Print QR Code</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; background: #fff;
-    }
-    .card {
-      text-align: center;
-      border: 1.5px solid #e8e8e8;
-      border-radius: 16px;
-      padding: 28px 32px 24px;
-      width: 260px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.07);
-    }
-    .card img { width: 160px; height: 160px; margin: 12px 0; }
-    .biz { font-size: .9rem; font-weight: 700; color: #1a1a1a; margin-top: 4px; }
-    .brand { font-size: .7rem; color: #9ca3af; margin-top: 8px; letter-spacing: .03em; }
-    @media print {
-      body { min-height: unset; }
-      .card { box-shadow: none; border-color: #ddd; }
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <img src="${imgSrc}" alt="QR Code" />
-    <div class="biz">${bizName}</div>
-    <div class="brand">Powered by HappyClientele.</div>
-  </div>
-  <scr\`+\`ipt>
-    window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };
-  <\/script>
-</body>
-</html>`);
-  win.document.close();
+  // Populate the hidden print frame
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || ''; };
+  const setAttr = (id, attr, val) => { const el = document.getElementById(id); if (el) el[attr] = val; };
+
+  set('pfStars',    stars    || '★★★★★');
+  set('pfIncentive', incentive || '');
+  set('pfSub',      sub      || '');
+  set('pfBiz',      bizEl?.textContent || _biz?.biz_name || '');
+  setAttr('pfImg', 'src', img.src);
+
+  // Trigger browser print dialog
+  window.print();
 }
 
 /* ── Feature flags ──────────────────────────────────────── */
@@ -2511,5 +2599,18 @@ document.addEventListener('DOMContentLoaded', () => {
   bootDashboard();
 });
 </script>
+
+<!-- Hidden print frame — only visible during @media print -->
+<div id="printFrame">
+  <div class="pf-card">
+    <div class="pf-stars" id="pfStars"></div>
+    <div class="pf-incentive" id="pfIncentive"></div>
+    <div class="pf-sub" id="pfSub"></div>
+    <img id="pfImg" src="" alt="QR Code" />
+    <div class="pf-biz" id="pfBiz"></div>
+    <div class="pf-brand">Powered by HappyClientele.</div>
+  </div>
+</div>
+
 </body>
 </html>
