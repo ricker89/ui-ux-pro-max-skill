@@ -110,39 +110,38 @@
       text-transform: uppercase;
       letter-spacing: .06em;
       color: var(--sub);
-      margin-bottom: 2px;
+      margin-bottom: 10px;
     }
 
+    /* Full-width single-column list */
     .loc-summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
     .loc-summary-card {
       background: #fff;
       border: 1.5px solid var(--border);
       border-radius: 14px;
-      padding: 16px 18px;
+      padding: 18px 22px;
       text-decoration: none;
       color: var(--black);
       transition: border-color .15s, box-shadow .15s;
       display: flex;
-      flex-direction: column;
-      gap: 6px;
+      align-items: center;
+      gap: 20px;
     }
     .loc-summary-card:hover { border-color: #c0c0c0; box-shadow: 0 4px 16px rgba(0,0,0,.07); }
-    .loc-summary-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-    .loc-summary-name { font-size: .92rem; font-weight: 700; }
-    .loc-summary-addr { font-size: .75rem; color: var(--sub); }
+    .loc-summary-card-info { flex: 1; min-width: 0; }
+    .loc-summary-name { font-size: .95rem; font-weight: 700; }
+    .loc-summary-addr { font-size: .76rem; color: var(--sub); margin-top: 2px; }
     .loc-summary-stats {
       display: flex;
-      gap: 16px;
-      margin-top: 6px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
+      gap: 28px;
+      flex-shrink: 0;
     }
-    .loc-summary-stat { text-align: center; flex: 1; }
-    .loc-summary-stat-num { font-size: 1.25rem; font-weight: 800; }
+    .loc-summary-stat { text-align: center; }
+    .loc-summary-stat-num { font-size: 1.35rem; font-weight: 800; }
     .loc-summary-stat-label { font-size: .7rem; color: var(--sub); margin-top: 2px; }
     .ls-badge {
       font-size: .68rem;
@@ -361,9 +360,9 @@
       <div class="stat-card-label">Review link taps</div>
     </div>
     <div class="stat-card">
-      <div class="stat-card-icon">📅</div>
+      <div class="stat-card-icon">📈</div>
       <div class="stat-card-num" id="statThisMonth">—</div>
-      <div class="stat-card-label">This month</div>
+      <div class="stat-card-label">New this month</div>
     </div>
   </div>
 
@@ -372,6 +371,36 @@
     <div class="section-title">Your Locations</div>
     <div class="loc-summary-grid" id="locSummaryGrid">
       <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- Webhook modal -->
+  <div id="webhookModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#fff;border-radius:18px;padding:32px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.18);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <div style="font-size:1rem;font-weight:700;">⚡ Lead Webhook</div>
+          <div style="font-size:.78rem;color:var(--sub);margin-top:3px;">Instantly push every new lead to your CRM, Zapier, Make.com, or any URL.</div>
+        </div>
+        <button onclick="closeWebhookModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--sub);padding:4px;line-height:1;">✕</button>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin-bottom:7px;">Webhook URL</div>
+        <input type="url" id="webhookUrlInput" placeholder="https://hooks.zapier.com/hooks/catch/..."
+          style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-family:inherit;font-size:.88rem;outline:none;transition:border-color .15s;"
+          onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--border)'" />
+      </div>
+      <div style="background:var(--off);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:.77rem;color:var(--sub);line-height:1.65;">
+        <strong style="color:var(--black);">Payload sent on each lead:</strong><br>
+        <code style="font-family:monospace;font-size:.74rem;">event, email, source, stars, biz_name, biz_slug, location, review_tapped, timestamp</code><br><br>
+        Works with <strong>Zapier</strong>, <strong>Make.com</strong>, <strong>n8n</strong>, <strong>Go High Level</strong>, or any webhook receiver.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button onclick="saveWebhookUrl()" style="background:var(--black);color:#fff;border:none;border-radius:9px;padding:10px 20px;font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer;">Save URL</button>
+        <button onclick="testWebhook()" style="background:var(--off);color:var(--black);border:1.5px solid var(--border);border-radius:9px;padding:10px 20px;font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer;">Send Test</button>
+        <button onclick="clearWebhookUrl()" style="background:none;border:none;color:var(--sub);font-size:.8rem;cursor:pointer;padding:8px;">✕ Remove</button>
+        <span id="webhookSaveStatus" style="font-size:.78rem;font-weight:600;"></span>
+      </div>
     </div>
   </div>
 
@@ -384,6 +413,7 @@
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn-csv" id="btnDownloadCSV" onclick="downloadLeadsCSV()" disabled>↓ CSV</button>
+        <button class="btn-csv" id="btnWebhook" onclick="openWebhookModal()">⚡ Webhook</button>
       </div>
     </div>
 
@@ -402,6 +432,7 @@
       </div>
     </div>
 
+    <!-- Filters always visible once data loads -->
     <div class="leads-toolbar" id="leadsToolbar" style="display:none;">
       <select class="leads-filter-select" id="leadsDateFilter" onchange="applyLeadsFilter()">
         <option value="all">All time</option>
@@ -415,6 +446,7 @@
       </select>
       <select class="leads-loc-filter" id="leadsLocFilter" onchange="applyLeadsFilter()">
         <option value="all">All locations</option>
+        <!-- populated after locations load -->
       </select>
       <span class="leads-showing-label" id="leadsShowingLabel"></span>
     </div>
@@ -619,12 +651,12 @@ function renderLocSummaryCards() {
 
     return `
       <a class="loc-summary-card" href="location.html?loc=${escH(loc.id)}">
-        <div class="loc-summary-card-top">
-          <div>
+        <div class="loc-summary-card-info">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <div class="loc-summary-name">${escH(loc.biz_name || 'Unnamed')}</div>
-            ${loc.address ? `<div class="loc-summary-addr">${escH(loc.address)}</div>` : ''}
+            <span class="ls-badge ${bCls}">${escH(bLbl)}</span>
           </div>
-          <span class="ls-badge ${bCls}">${escH(bLbl)}</span>
+          ${loc.address ? `<div class="loc-summary-addr">${escH(loc.address)}</div>` : ''}
         </div>
         <div class="loc-summary-stats">
           <div class="loc-summary-stat">
@@ -640,6 +672,7 @@ function renderLocSummaryCards() {
             <div class="loc-summary-stat-label">This month</div>
           </div>
         </div>
+        <span style="font-size:1.1rem;color:#9ca3af;flex-shrink:0;">›</span>
       </a>
     `;
   }).join('');
@@ -766,6 +799,82 @@ function renderLeads() {
   }).join('');
 }
 
+/* ── Webhook modal ────────────────────────────────────────────── */
+let _webhookUrl = '';
+
+function openWebhookModal() {
+  const m = document.getElementById('webhookModal');
+  if (m) m.style.display = 'flex';
+  // Pre-fill from businesses table (shared webhook_url)
+  if (_userId && _token) {
+    fetch(`${SUPA_URL}/rest/v1/businesses?select=webhook_url&user_id=eq.${_userId}&limit=1`,
+      { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, Accept: 'application/json' } })
+      .then(r => r.ok ? r.json() : [])
+      .then(rows => {
+        if (rows?.[0]?.webhook_url) {
+          _webhookUrl = rows[0].webhook_url;
+          const inp = document.getElementById('webhookUrlInput');
+          if (inp) inp.value = _webhookUrl;
+        }
+      }).catch(() => {});
+  }
+}
+
+function closeWebhookModal() {
+  const m = document.getElementById('webhookModal');
+  if (m) m.style.display = 'none';
+}
+
+async function saveWebhookUrl() {
+  const url = document.getElementById('webhookUrlInput').value.trim();
+  const statusEl = document.getElementById('webhookSaveStatus');
+  if (url && !url.startsWith('http')) {
+    statusEl.textContent = '✗ Must be a valid https:// URL'; statusEl.style.color = 'var(--red)'; return;
+  }
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/businesses?user_id=eq.${_userId}&limit=1`, {
+      method: 'PATCH',
+      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${_tokSync()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ webhook_url: url || null })
+    });
+    _webhookUrl = url;
+    statusEl.textContent = url ? '✓ Saved' : '✓ Cleared';
+    statusEl.style.color = 'var(--green)';
+    setTimeout(() => { statusEl.textContent = ''; closeWebhookModal(); }, 1500);
+  } catch(e) {
+    statusEl.textContent = '✗ Error saving'; statusEl.style.color = 'var(--red)';
+  }
+}
+
+function clearWebhookUrl() {
+  const inp = document.getElementById('webhookUrlInput');
+  if (inp) inp.value = '';
+  saveWebhookUrl();
+}
+
+async function testWebhook() {
+  const url = document.getElementById('webhookUrlInput').value.trim();
+  if (!url) { alert('Enter a webhook URL first.'); return; }
+  const statusEl = document.getElementById('webhookSaveStatus');
+  statusEl.textContent = 'Sending test…'; statusEl.style.color = 'var(--sub)';
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: 'lead.test', source: 'dashboard_test',
+        email: 'test@example.com', biz_name: '', biz_slug: '',
+        stars: null, review_tapped: false, timestamp: new Date().toISOString()
+      }),
+      mode: 'no-cors'
+    });
+    statusEl.textContent = '✓ Test sent — check your endpoint';
+    statusEl.style.color = 'var(--green)';
+  } catch(e) {
+    statusEl.textContent = '✗ Could not reach URL'; statusEl.style.color = 'var(--red)';
+  }
+}
+
 /* ── CSV Download ─────────────────────────────────────────────── */
 function downloadLeadsCSV() {
   if (!_allLeads.length) return;
@@ -807,6 +916,11 @@ function downloadLeadsCSV() {
 
 /* ── Start ────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+  // Close webhook modal on backdrop click
+  document.getElementById('webhookModal')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('webhookModal')) closeWebhookModal();
+  });
+
   // Topbar sets up auth; wait for it, then boot
   const tryBoot = () => {
     if (window._supabaseClient) { bootDashboard(); return; }

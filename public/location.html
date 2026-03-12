@@ -1561,9 +1561,6 @@ function renderLocSelector() {
     history.replaceState(null, '', url.toString());
   });
 
-  // Keep topbar button label in sync with active location
-  const lbl = document.getElementById('tbUsername');
-  if (lbl && _biz?.biz_name) lbl.textContent = _biz.biz_name;
 }
 
 function toggleLocDropdown() {}

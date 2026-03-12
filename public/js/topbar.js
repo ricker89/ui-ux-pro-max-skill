@@ -197,13 +197,9 @@
     const email = user.email || '';
     const page  = location.pathname.split('/').pop() || 'dashboard.html';
 
-    const getBizLabel = () => {
-      const b = window._biz;
-      if (!b) return email.split('@')[0];
-      return b.bizName || b.biz_name || email.split('@')[0];
-    };
+    const getBizLabel = () => email; // always show full email
 
-    const initial = () => (getBizLabel()[0] || '?').toUpperCase();
+    const initial = () => (email[0] || '?').toUpperCase();
 
     target.innerHTML = `
       <div class="tb-user-wrap" id="tbUserWrap">
@@ -232,19 +228,6 @@
         </div>
       </div>
     `;
-
-    // Poll for biz name — updates avatar + label once _biz loads
-    let polls = 0;
-    const poll = setInterval(() => {
-      polls++;
-      const label    = getBizLabel();
-      const labelEl  = document.getElementById('tbUsername');
-      const avatarEl = document.getElementById('tbAvatar');
-      if (labelEl)  labelEl.textContent  = label;
-      if (avatarEl) avatarEl.textContent = (label[0] || '?').toUpperCase();
-      const bizLoaded = window._biz && (window._biz.bizName || window._biz.biz_name);
-      if (bizLoaded || polls > 20) clearInterval(poll);
-    }, 250);
 
     // Toggle dropdown
     document.getElementById('tbUserBtn').addEventListener('click', e => {
