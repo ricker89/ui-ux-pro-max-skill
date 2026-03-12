@@ -656,6 +656,71 @@
     }
     .print-pdf-btn:hover { opacity: .85; }
 
+    /* ─── Empty / pending state ─────────────────────────── */
+    .no-loc-hero {
+      background: #fffbeb;
+      border: 1.5px solid #f59e0b;
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .no-loc-hero .no-loc-icon { font-size: 2.8rem; line-height: 1; }
+    .no-loc-hero h2 { font-size: 1.25rem; font-weight: 800; color: #1a1a1a; margin: 0; }
+    .no-loc-hero p  { font-size: .9rem; color: #6b7280; margin: 0; max-width: 380px; }
+    .no-loc-hero .no-loc-actions { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+    .no-loc-btn-primary {
+      background: #16a34a; color: #fff; border: 1.5px solid #15803d;
+      border-radius: 8px; padding: 9px 20px; font-size: .88rem; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: background .15s;
+    }
+    .no-loc-btn-primary:hover { background: #15803d; }
+    .no-loc-btn-secondary {
+      background: #fff; color: #1a1a1a; border: 1.5px solid #e5e7eb;
+      border-radius: 8px; padding: 9px 20px; font-size: .88rem; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: background .15s;
+    }
+    .no-loc-btn-secondary:hover { background: #f5f5f7; }
+    .no-loc-loc-list { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .no-loc-loc-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #fff; border: 1.5px solid #e5e7eb; border-radius: 10px;
+      padding: 10px 14px; gap: 12px;
+    }
+    .no-loc-loc-name { font-size: .88rem; font-weight: 700; color: #1a1a1a; }
+    .no-loc-loc-addr { font-size: .76rem; color: #6b7280; }
+    .no-loc-activate-btn {
+      background: #16a34a; color: #fff; border: 1.5px solid #15803d;
+      border-radius: 7px; padding: 5px 13px; font-size: .78rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap; transition: background .15s; flex-shrink: 0;
+    }
+    .no-loc-activate-btn:hover { background: #15803d; }
+
+    /* ─── Paid / welcome banner ──────────────────────────── */
+    #paidBanner {
+      display: none;
+      background: #f0fdf4;
+      border: 1.5px solid #34a853;
+      border-radius: 14px;
+      padding: 18px 22px;
+      display: none;
+      align-items: center;
+      gap: 14px;
+    }
+    #paidBanner.show { display: flex; }
+    #paidBanner .paid-icon { font-size: 2rem; flex-shrink: 0; }
+    #paidBanner .paid-body { flex: 1; }
+    #paidBanner .paid-title { font-size: 1rem; font-weight: 800; color: #065f46; }
+    #paidBanner .paid-sub   { font-size: .84rem; color: #047857; margin-top: 2px; }
+    #paidBanner .paid-close {
+      background: none; border: none; font-size: 1.1rem; color: #6b7280;
+      cursor: pointer; padding: 4px; line-height: 1; flex-shrink: 0;
+    }
+    #paidBanner .paid-close:hover { color: #1a1a1a; }
+
     /* badge colours (used by loc items inside topbar dropdown) */
     .badge-active   { background: #d1fae5; color: #065f46; }
     .badge-pending  { background: #fef3c7; color: #92400e; }
@@ -788,6 +853,16 @@
      PAGE
 ═══════════════════════════════════════════ -->
 <div class="page">
+
+  <!-- ── Paid / activation welcome banner (shown when ?paid=1) ── -->
+  <div id="paidBanner">
+    <div class="paid-icon">🎉</div>
+    <div class="paid-body">
+      <div class="paid-title">Location activated — you're live!</div>
+      <div class="paid-sub" id="paidBannerSub">Your QR codes and review funnel are ready to share.</div>
+    </div>
+    <button class="paid-close" onclick="dismissPaidBanner()" title="Dismiss">✕</button>
+  </div>
 
   <!-- ① BUSINESS HERO ─────────────────────── -->
   <div class="biz-hero" id="bizHero">
@@ -1420,15 +1495,30 @@ async function bootDashboard() {
     }
 
     if (!picked) {
-      dbg('no biz row');
-      showBootError('No location found. Go to <a href="account.html" style="color:#991b1b;text-decoration:underline;">Account Settings</a> to add a location.');
-      renderLocSelector();
+      dbg('no biz row — showing empty state');
+      // Has locations but none active yet — show friendly pending state
+      if (_allLocations.length > 0) {
+        showPendingLocState(_allLocations);
+        renderLocSelector();
+      } else {
+        // Truly no locations at all
+        showNoLocState();
+      }
       return;
     }
 
     _activeLocId = picked.id;
     activateLocation(picked);
     renderLocSelector();
+
+    // ── Item 4: ?paid=1 — show welcome banner ──────────────
+    if (new URLSearchParams(location.search).get('paid') === '1') {
+      showPaidBanner(picked);
+      // Clean the URL so refreshing doesn't re-show the banner
+      const cleanUrl = new URL(location.href);
+      cleanUrl.searchParams.delete('paid');
+      history.replaceState(null, '', cleanUrl.toString());
+    }
 
   } catch(e) {
     dbg('boot exception: ' + e);
@@ -1484,15 +1574,104 @@ function escH(str) {
 }
 
 function showBootError(msg) {
-  document.body.classList.add('auth-ready'); // always show page
-  const el = document.getElementById('heroBizName');
-  if (el) el.closest('section,div')?.insertAdjacentHTML('afterbegin',
-    `<div style="background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:16px 20px;
-      border-radius:12px;margin:24px;font-size:.95rem;font-weight:500;">
-      ⚠️ ${msg}<br><br>
-      <a href="login.html" style="color:#991b1b;text-decoration:underline;">Sign out and log in again</a>
+  document.body.classList.add('auth-ready');
+  const hero = document.getElementById('bizHero');
+  if (hero) hero.insertAdjacentHTML('beforebegin',
+    `<div style="background:#fee2e2;border:1.5px solid #fca5a5;color:#991b1b;padding:16px 20px;
+      border-radius:14px;font-size:.92rem;font-weight:500;">
+      ⚠️ ${msg}
     </div>`
   );
+}
+
+/* ── Item 3: Pending-locations empty state ───────────────── */
+function showPendingLocState(locations) {
+  document.body.classList.add('auth-ready');
+  const hero = document.getElementById('bizHero');
+  if (!hero) return;
+
+  const rows = locations.map(loc => `
+    <div class="no-loc-loc-row">
+      <div>
+        <div class="no-loc-loc-name">${escH(loc.biz_name || 'Unnamed Location')}</div>
+        ${loc.address ? `<div class="no-loc-loc-addr">${escH(loc.address)}</div>` : ''}
+      </div>
+      <button class="no-loc-activate-btn" onclick="resumeActivate('${escH(loc.id)}')">Activate</button>
+    </div>
+  `).join('');
+
+  hero.outerHTML = `
+    <div class="no-loc-hero" id="bizHero">
+      <div class="no-loc-icon">📍</div>
+      <h2>Complete setup to go live</h2>
+      <p>You have location${locations.length > 1 ? 's' : ''} saved but ${locations.length > 1 ? 'none are' : 'it\'s not'} active yet.
+         Click <strong>Activate</strong> to complete payment and go live.</p>
+      <div class="no-loc-loc-list">${rows}</div>
+      <div class="no-loc-actions">
+        <a href="account.html" class="no-loc-btn-secondary">+ Add Location</a>
+      </div>
+    </div>
+  `;
+}
+
+function showNoLocState() {
+  document.body.classList.add('auth-ready');
+  const hero = document.getElementById('bizHero');
+  if (!hero) return;
+  hero.outerHTML = `
+    <div class="no-loc-hero" id="bizHero">
+      <div class="no-loc-icon">🏪</div>
+      <h2>No locations yet</h2>
+      <p>Add your first Google Business location to get started with QR codes, review funnels, and more.</p>
+      <div class="no-loc-actions">
+        <a href="account.html" class="no-loc-btn-primary">+ Add Your First Location</a>
+      </div>
+    </div>
+  `;
+}
+
+async function resumeActivate(locationId) {
+  const loc = _allLocations.find(l => l.id === locationId);
+  if (!loc) return;
+  const btn = document.querySelector(`button[onclick="resumeActivate('${locationId}')"]`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+  try {
+    const session = await _getClient().auth.getSession();
+    const token   = session?.data?.session?.access_token;
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({
+        location_id: loc.id,
+        email:       session?.data?.session?.user?.email,
+        success_url: `${location.origin}/dashboard?loc=${loc.id}&paid=1`,
+        cancel_url:  `${location.origin}/dashboard`,
+      })
+    });
+    if (res.ok) {
+      const { url } = await res.json();
+      if (url) { window.open(url, '_blank'); return; }
+    }
+  } catch(e) { console.warn('[resumeActivate]', e); }
+  if (btn) { btn.disabled = false; btn.textContent = 'Activate'; }
+}
+
+/* ── Item 4: Paid / welcome banner ──────────────────────── */
+function showPaidBanner(loc) {
+  const banner = document.getElementById('paidBanner');
+  const sub    = document.getElementById('paidBannerSub');
+  if (!banner) return;
+  if (sub && loc?.biz_name) {
+    sub.textContent = `${loc.biz_name} is live. Your QR codes and review funnel are ready to share.`;
+  }
+  banner.classList.add('show');
+  // Auto-dismiss after 12 seconds
+  setTimeout(dismissPaidBanner, 12000);
+}
+
+function dismissPaidBanner() {
+  const banner = document.getElementById('paidBanner');
+  if (banner) banner.classList.remove('show');
 }
 
 /* ── Render everything ──────────────────────────────────── */
