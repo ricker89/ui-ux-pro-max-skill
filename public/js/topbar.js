@@ -214,6 +214,11 @@
         </button>
         <div class="tb-dropdown" id="tbDropdown" role="menu">
           <div class="tb-menu-email" id="tbMenuEmail">${escTb(email)}</div>
+          <!-- Dashboard overview link -->
+          <a href="dashboard.html" class="tb-menu-item ${page === 'dashboard.html' ? 'tb-active' : ''}" role="menuitem">
+            📊 Dashboard
+          </a>
+          <div class="tb-menu-divider"></div>
           <!-- Locations injected here — populated by loadAndRenderLocations() -->
           <div id="tbLocationsSlot"></div>
           <!-- Nav items below locations -->
