@@ -376,6 +376,9 @@ The skill provides stack-specific guidelines for:
 | **Android** | Jetpack Compose |
 | **Cross-Platform** | React Native, Flutter |
 
+For the CLI, use these exact `--stack` values:
+`astro`, `flutter`, `html-tailwind`, `jetpack-compose`, `nextjs`, `nuxt-ui`, `nuxtjs`, `react`, `react-native`, `shadcn`, `svelte`, `swiftui`, `vue`
+
 Just mention your preferred stack in the prompt, or let it default to HTML + Tailwind.
 
 ## Design System Command (Advanced)

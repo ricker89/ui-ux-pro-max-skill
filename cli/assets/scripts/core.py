@@ -12,6 +12,7 @@ from collections import defaultdict
 
 # ============ CONFIGURATION ============
 DATA_DIR = Path(__file__).parent.parent / "data"
+STACKS_DIR = DATA_DIR / "stacks"
 MAX_RESULTS = 3
 
 CSV_CONFIG = {
@@ -67,9 +68,15 @@ CSV_CONFIG = {
     }
 }
 
-STACK_CONFIG = {
-    "react-native": {"file": "stacks/react-native.csv"},
-}
+def _discover_stack_config():
+    """Build stack config from available CSV files."""
+    return {
+        filepath.stem: {"file": f"stacks/{filepath.name}"}
+        for filepath in sorted(STACKS_DIR.glob("*.csv"))
+    }
+
+
+STACK_CONFIG = _discover_stack_config()
 
 # Common columns for all stacks
 _STACK_COLS = {
