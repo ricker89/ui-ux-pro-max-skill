@@ -2,7 +2,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import ora from 'ora';
-import prompts from 'prompts';
+import * as p from '@clack/prompts';
 import type { AIType } from '../types/index.js';
 import { AI_TYPES } from '../types/index.js';
 import { copyFolders, installFromZip, createTempDir, cleanup } from '../utils/extract.js';
@@ -111,96 +111,106 @@ async function templateInstall(
 }
 
 export async function initCommand(options: InitOptions): Promise<void> {
-  logger.title('UI/UX Pro Max Installer');
+  console.log();
+  p.intro(chalk.bgCyan.black(' UI/UX Pro Max Installer '));
 
-  let aiType = options.ai;
+  let selectedTypes: AIType[] = [];
 
-  // Auto-detect or prompt for AI type
-  if (!aiType) {
-    const { detected, suggested } = detectAIType();
+  // If --ai flag is provided, use that single type
+  if (options.ai) {
+    selectedTypes = [options.ai];
+    p.log.info(`Installing for: ${chalk.cyan(getAITypeDescription(options.ai))}`);
+  } else {
+    // Auto-detect installed AI assistants
+    const { detected } = detectAIType();
 
     if (detected.length > 0) {
-      logger.info(`Detected: ${detected.map(t => chalk.cyan(t)).join(', ')}`);
+      p.log.info(`Detected: ${detected.map(t => chalk.cyan(getAITypeDescription(t))).join(', ')}`);
     }
 
-    const response = await prompts({
-      type: 'select',
-      name: 'aiType',
-      message: 'Select AI assistant to install for:',
-      choices: AI_TYPES.map(type => ({
-        title: getAITypeDescription(type),
+    // Filter out 'all' from AI_TYPES for multi-select
+    const selectableTypes = AI_TYPES.filter(t => t !== 'all');
+
+    // Multi-select prompt
+    const selected = await p.multiselect({
+      message: 'Select AI assistants to install for:',
+      options: selectableTypes.map(type => ({
         value: type,
+        label: getAITypeDescription(type),
+        hint: detected.includes(type) ? 'detected' : undefined,
       })),
-      initial: suggested ? AI_TYPES.indexOf(suggested) : 0,
+      initialValues: detected.length > 0 ? detected : ['claude'],
+      required: true,
     });
 
-    if (!response.aiType) {
-      logger.warn('Installation cancelled');
-      return;
+    if (p.isCancel(selected)) {
+      p.cancel('Installation cancelled');
+      process.exit(0);
     }
 
-    aiType = response.aiType as AIType;
+    selectedTypes = selected as AIType[];
   }
 
-  logger.info(`Installing for: ${chalk.cyan(getAITypeDescription(aiType))}`);
+  if (selectedTypes.length === 0) {
+    p.log.error('No AI assistants selected');
+    process.exit(1);
+  }
 
-  const spinner = ora('Installing files...').start();
+  const spinner = p.spinner();
+  spinner.start('Installing skill files...');
+
   const cwd = process.cwd();
-  let copiedFolders: string[] = [];
-  let installMethod = 'template';
+  const allCopiedFolders: string[] = [];
 
   try {
-    // Use legacy ZIP-based install if --legacy flag is set
-    if (options.legacy) {
-      // Try GitHub download first (unless offline mode)
-      if (!options.offline) {
-        const githubResult = await tryGitHubInstall(cwd, aiType, spinner);
-        if (githubResult) {
-          copiedFolders = githubResult;
-          installMethod = 'github';
+    for (const aiType of selectedTypes) {
+      // Use legacy ZIP-based install if --legacy flag is set
+      if (options.legacy) {
+        const oraSpinner = ora().start();
+        // Try GitHub download first (unless offline mode)
+        if (!options.offline) {
+          const githubResult = await tryGitHubInstall(cwd, aiType, oraSpinner);
+          if (githubResult) {
+            allCopiedFolders.push(...githubResult);
+            oraSpinner.stop();
+            continue;
+          }
         }
+        // Fall back to bundled assets if GitHub failed or offline mode
+        const folders = await copyFolders(ASSETS_DIR, cwd, aiType);
+        allCopiedFolders.push(...folders);
+        oraSpinner.stop();
+      } else {
+        // Use new template-based generation (default)
+        const folders = await generatePlatformFiles(cwd, aiType);
+        allCopiedFolders.push(...folders);
       }
-
-      // Fall back to bundled assets if GitHub failed or offline mode
-      if (installMethod !== 'github') {
-        spinner.text = 'Installing from bundled assets...';
-        copiedFolders = await copyFolders(ASSETS_DIR, cwd, aiType);
-        installMethod = 'bundled';
-      }
-    } else {
-      // Use new template-based generation (default)
-      copiedFolders = await templateInstall(cwd, aiType, spinner);
-      installMethod = 'template';
     }
 
-    const methodMessage = {
-      github: 'Installed from GitHub release!',
-      bundled: 'Installed from bundled assets!',
-      template: 'Generated from templates!',
-    }[installMethod];
+    spinner.stop('Installation complete');
 
-    spinner.succeed(methodMessage);
-
-    // Summary
-    console.log();
-    logger.info('Installed folders:');
-    copiedFolders.forEach(folder => {
-      console.log(`  ${chalk.green('+')} ${folder}`);
-    });
+    // Summary - deduplicate folders
+    const uniqueFolders = [...new Set(allCopiedFolders)];
 
     console.log();
-    logger.success('UI/UX Pro Max installed successfully!');
+    p.log.success(`Installed for ${chalk.cyan(selectedTypes.length)} AI assistant(s):`);
+    for (const aiType of selectedTypes) {
+      p.log.message(`  ${chalk.green('✓')} ${getAITypeDescription(aiType)}`);
+    }
 
-    // Next steps
     console.log();
-    console.log(chalk.bold('Next steps:'));
-    console.log(chalk.dim('  1. Restart your AI coding assistant'));
-    console.log(chalk.dim('  2. Try: "Build a landing page for a SaaS product"'));
+    p.log.step('Created folders:');
+    for (const folder of uniqueFolders) {
+      p.log.message(`  ${chalk.dim(folder)}`);
+    }
+
     console.log();
+    p.outro(chalk.green('Done! Restart your AI coding assistant to use the skill.'));
+
   } catch (error) {
-    spinner.fail('Installation failed');
+    spinner.stop('Installation failed');
     if (error instanceof Error) {
-      logger.error(error.message);
+      p.log.error(error.message);
     }
     process.exit(1);
   }
