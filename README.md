@@ -160,6 +160,8 @@ Each rule includes:
 
 ### Available Styles (67)
 
+> **See them in action:** Browse all styles with live demos, color palettes, and implementation tips at [uistyleguide.com](https://www.uistyleguide.com)
+
 <details>
 <summary><b>General Styles (49)</b></summary>
 
