@@ -3,8 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HappyClientele – Your Business, on Autopilot. More Reviews. More Customers.</title>
-  <meta name="description" content="HappyClientele turns the moments your customers already experience — the QR code, the Wi-Fi login, the menu scan — into a 5-star review machine and email list builder. Zero tech. Zero install. Works in minutes." />
+  <title>HappyClientele — More Google Reviews. Higher Rankings. Zero Tech.</title>
+  <meta name="description" content="Turn the atmosphere your customers already experience — your Wi-Fi, your menu, your QR code — into a 5-star review engine and email list. No app. No install. Ready in 5 minutes." />
+
+  <!-- Path Router -->
+  <script>
+  (function(){
+    var p = window.location.pathname.replace(/\/+$/, '');
+    var routes = {
+      '/login':     'login.html',
+      '/signup':    'signup.html',
+      '/welcome':   'welcome.html',
+      '/dashboard': 'welcome.html',
+      '/account':   'account.html',
+      '/funnel':    'funnel.html',
+      '/feedback':  'feedback.html',
+      '/thankyou':  'thankyou.html',
+      '/debug':     'debug.html'
+    };
+    var rMatch = p.match(/^\/r\/(.+)$/);
+    if (rMatch) {
+      window.location.replace('funnel.html?biz=' + encodeURIComponent(rMatch[1]) + window.location.search.replace('?','&'));
+      return;
+    }
+    if (routes[p]) { window.location.replace(routes[p] + window.location.search); }
+  })();
+  </script>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="images/favicon.png" />
@@ -13,8 +37,8 @@
   <!-- Open Graph -->
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://happyclientele.com/" />
-  <meta property="og:title"       content="HappyClientele — Turn Your Atmosphere Into a Review Machine" />
-  <meta property="og:description" content="No install. No tech skills. Just print a QR code and watch Google reviews, email leads, and new customers roll in automatically." />
+  <meta property="og:title"       content="HappyClientele — More Google Reviews. Zero Tech." />
+  <meta property="og:description" content="No install. No tech skills. Print a QR code and watch reviews, leads, and customers roll in automatically." />
   <meta property="og:image"       content="https://happyclientele.com/images/og-preview.png" />
   <meta property="og:image:width"  content="1365" />
   <meta property="og:image:height" content="768" />
@@ -26,1388 +50,2061 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
 
   <style>
 /* ============================================================
-   HAPPYCLIENTELE — v3 Homepage
-   Palette: Black #1a1a1a · Yellow #FDB813 · White #fff
+   HappyClientele — v4 Homepage
+   Design: Editorial · Minimal · High-contrast · Bold numbers
+   Palette: Off-white #F8F6F1 · Black #111 · Yellow #FDB813
+            Accent green #1a7a4a · Soft gray #e8e4dc
 ============================================================ */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --black:#1a1a1a;--yellow:#FDB813;--yellow-pale:#fffbea;--white:#fff;
-  --gray-50:#fafafa;--gray-100:#f4f4f4;--gray-200:#e8e8e8;--gray-400:#aaa;--gray-600:#666;--gray-700:#444;
-  --g-blue:#4285F4;--g-red:#EA4335;--g-yellow:#FBBC04;--g-green:#34A853;
-  --r-sm:8px;--r-md:16px;--r-lg:24px;--r-xl:32px;--r-full:9999px;
-  --sh-sm:0 2px 8px rgba(0,0,0,.08);--sh-md:0 8px 32px rgba(0,0,0,.12);--sh-lg:0 20px 60px rgba(0,0,0,.18);
-  --sh-y:0 8px 32px rgba(253,184,19,.35);
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:    #111111;
+  --off-white:#F8F6F1;
+  --yellow:   #FDB813;
+  --yellow-d: #e5a500;
+  --green:    #1a7a4a;
+  --white:    #ffffff;
+  --gray-soft:#e8e4dc;
+  --gray-mid: #c8c4bc;
+  --gray-text:#666258;
+  --gray-dark:#3a3730;
+  --g-blue:   #4285F4;
+  --g-red:    #EA4335;
+  --g-yellow: #FBBC04;
+  --g-green:  #34A853;
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --r-xl: 32px;
+  --r-full: 9999px;
 }
-html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;color:var(--black);background:var(--white);line-height:1.65;overflow-x:hidden}
-h1,h2,h3,h4{font-family:'Poppins',sans-serif;font-weight:800;line-height:1.15}
-a{text-decoration:none;color:inherit}
-img{max-width:100%;display:block}
-ul{list-style:none}
-button{cursor:pointer;border:none;background:none;font-family:inherit}
-.container{max-width:1120px;margin:0 auto;padding:0 24px}
-.highlight{color:var(--yellow)}
-.g-blue{color:#4285F4;font-weight:800}.g-red{color:#EA4335;font-weight:800}
-.g-yellow{color:#FBBC04;font-weight:800}.g-green{color:#34A853;font-weight:800}.g-red2{color:#EA4335;font-weight:800}.g-blue2{color:#4285F4;font-weight:800}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:8px;font-family:'Poppins',sans-serif;font-weight:700;border-radius:var(--r-full);transition:all .2s ease;white-space:nowrap;cursor:pointer}
-.btn-yellow{background:var(--yellow);color:var(--black);border:2px solid var(--yellow);box-shadow:var(--sh-y)}
-.btn-yellow:hover{background:#e8a800;border-color:#e8a800;transform:translateY(-2px);box-shadow:0 12px 40px rgba(253,184,19,.55)}
-.btn-ghost{background:transparent;color:var(--white);border:2px solid rgba(255,255,255,.5)}
-.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:var(--white);transform:translateY(-2px)}
-.btn-dark{background:var(--black);color:var(--white);border:2px solid var(--black)}
-.btn-dark:hover{background:#333;transform:translateY(-2px)}
-.btn-sm{padding:9px 22px;font-size:.85rem}
-.btn-md{padding:13px 30px;font-size:.95rem}
-.btn-lg{padding:16px 38px;font-size:1rem}
-.btn-xl{padding:20px 52px;font-size:1.1rem}
-.pulse{animation:pulse-y 2.5s ease-in-out infinite}
-@keyframes pulse-y{0%,100%{box-shadow:var(--sh-y)}50%{box-shadow:0 12px 48px rgba(253,184,19,.7)}}
+html { scroll-behavior: smooth; }
 
-/* NAVBAR */
-.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;padding:14px 0;transition:all .3s}
-.navbar.scrolled{background:rgba(26,26,26,.97);backdrop-filter:blur(12px);padding:10px 0;box-shadow:0 2px 24px rgba(0,0,0,.4)}
-.nav-wrap{display:flex;align-items:center;justify-content:space-between}
-.logo{font-family:'Poppins',sans-serif;font-size:1.45rem;font-weight:900;color:var(--white)}
-.logo-dot{color:var(--yellow)}
-.nav-links{display:flex;align-items:center;gap:28px}
-.nav-links a{font-size:.9rem;font-weight:500;color:rgba(255,255,255,.8);transition:color .2s}
-.nav-links a:hover{color:var(--yellow)}
-.hamburger{display:none;flex-direction:column;gap:5px;padding:4px;z-index:1001}
-.hamburger span{display:block;width:24px;height:2px;background:var(--white);border-radius:2px;transition:all .3s}
-
-/* ── HERO ── */
-.hero{position:relative;min-height:100vh;background:var(--black);display:flex;align-items:stretch;overflow:hidden}
-.hero-video-bg{position:absolute;inset:0;z-index:0}
-.hero-video-bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.65) 60%,rgba(0,0,0,.82) 100%);z-index:1}
-.hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 420px;min-height:100vh;width:100%;max-width:1120px;margin:0 auto;padding:0 24px}
-.hero-left{display:flex;flex-direction:column;justify-content:center;gap:24px;padding:120px 56px 80px 0}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(253,184,19,.15);border:1px solid rgba(253,184,19,.35);color:var(--yellow);font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 16px;border-radius:var(--r-full);width:fit-content}
-.hero-h1{font-size:clamp(2.4rem,4.5vw,3.8rem);font-weight:900;color:var(--white);line-height:1.08}
-.hero-sub{font-size:1.05rem;color:rgba(255,255,255,.72);max-width:540px;line-height:1.75}
-.hero-pills{display:flex;gap:10px;flex-wrap:wrap}
-.pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.85);font-size:.82rem;font-weight:500;padding:8px 16px;border-radius:var(--r-full);backdrop-filter:blur(4px)}
-.pill i{color:var(--yellow);font-size:.85rem}
-.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-
-/* hero right panel — live review feed */
-.hero-right{border-left:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;justify-content:center;padding:100px 12px 80px 28px;overflow:hidden;position:relative}
-.feed-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:16px}
-.review-feed{display:flex;flex-direction:column;gap:12px}
-.rf-card{background:rgba(255,255,255,.95);border-radius:14px;padding:16px 18px;box-shadow:0 4px 20px rgba(0,0,0,.3);opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s;display:none}
-.rf-card.rf-in{display:block;opacity:1;transform:translateY(0)}
-.rf-card.rf-out{opacity:0;transform:translateY(-14px);display:block}
-.rf-stars{font-size:.9rem;margin-bottom:6px}
-.rf-text{font-size:.83rem;color:var(--gray-700);line-height:1.5;margin-bottom:6px}
-.rf-author{font-size:.75rem;font-weight:600;color:var(--black)}
-.rf-badge{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:600;color:#4285F4;margin-top:6px}
-
-/* ── PROOF STRIP ── */
-.proof-strip{background:var(--yellow);padding:18px 0}
-.proof-strip-inner{display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap}
-.ps-item{display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:700;color:var(--black)}
-.ps-item i{font-size:1rem}
-.ps-div{width:1px;height:24px;background:rgba(0,0,0,.2)}
-
-/* ── ATMOSPHERE SECTION ── */
-.atmo{padding:100px 0;background:var(--white)}
-.atmo-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
-.atmo-left .eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gray-600);margin-bottom:16px}
-.atmo-left h2{font-size:clamp(1.9rem,3.5vw,2.8rem);margin-bottom:20px;line-height:1.15}
-.atmo-left p{font-size:1rem;color:var(--gray-700);line-height:1.75;margin-bottom:28px}
-.atmo-list{display:flex;flex-direction:column;gap:14px}
-.atmo-item{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border-radius:var(--r-md);border:1px solid var(--gray-200);transition:all .25s}
-.atmo-item:hover{border-color:var(--yellow);box-shadow:var(--sh-sm);transform:translateX(4px)}
-.atmo-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
-.atmo-item-text h4{font-size:.93rem;font-weight:700;margin-bottom:3px}
-.atmo-item-text p{font-size:.83rem;color:var(--gray-600);line-height:1.5}
-
-/* right side — touchpoint visual */
-.atmo-right{position:relative}
-.touchpoint-stack{display:flex;flex-direction:column;gap:14px}
-.tp-card{background:var(--white);border-radius:var(--r-lg);padding:20px 22px;border:1.5px solid var(--gray-200);box-shadow:var(--sh-sm);display:flex;align-items:center;gap:16px;transition:all .3s}
-.tp-card:hover{border-color:var(--yellow);box-shadow:0 8px 28px rgba(253,184,19,.2);transform:translateY(-3px)}
-.tp-icon{width:48px;height:48px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
-.tp-body h4{font-size:.93rem;font-weight:700;margin-bottom:2px}
-.tp-body p{font-size:.8rem;color:var(--gray-600)}
-.tp-badge{margin-left:auto;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:var(--r-full);white-space:nowrap;flex-shrink:0}
-.badge-green{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
-.badge-blue{background:#e8f0fe;color:#1a73e8;border:1px solid #aecbfa}
-.badge-yellow{background:rgba(253,184,19,.15);color:#8a5800;border:1px solid rgba(253,184,19,.4)}
-
-/* ── HOW SIMPLE ── */
-.how-simple{padding:100px 0;background:var(--black)}
-.how-simple .section-tag{display:block;width:fit-content;margin:0 auto 14px;background:rgba(253,184,19,.15);color:var(--yellow);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:var(--r-full)}
-.how-simple h2{text-align:center;font-size:clamp(1.9rem,3.5vw,2.8rem);color:var(--white);margin-bottom:12px}
-.how-simple .sub{text-align:center;color:rgba(255,255,255,.55);font-size:1rem;max-width:600px;margin:0 auto 64px;line-height:1.7}
-.steps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative}
-.steps-row::before{content:'';position:absolute;top:48px;left:calc(16.67% + 24px);right:calc(16.67% + 24px);height:2px;background:linear-gradient(90deg,var(--yellow),rgba(253,184,19,.3));z-index:0}
-.step-card{display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 28px;position:relative;z-index:1}
-.step-num{width:56px;height:56px;border-radius:50%;background:var(--yellow);color:var(--black);font-family:'Poppins',sans-serif;font-size:1.2rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 4px 16px rgba(253,184,19,.4)}
-.step-card h3{font-size:1.1rem;color:var(--white);margin-bottom:10px}
-.step-card p{font-size:.88rem;color:rgba(255,255,255,.55);line-height:1.65}
-.step-card .step-note{margin-top:14px;font-size:.8rem;font-weight:700;color:var(--yellow);background:rgba(253,184,19,.12);padding:6px 14px;border-radius:var(--r-full);display:inline-block}
-
-/* ── FOUR PILLARS ── */
-.pillars{padding:100px 0;background:var(--gray-50)}
-.pillars .s-tag{display:block;width:fit-content;margin:0 auto 14px;background:var(--gray-200);color:var(--gray-700);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:var(--r-full)}
-.pillars h2{text-align:center;font-size:clamp(1.9rem,3.5vw,2.8rem);margin-bottom:12px}
-.pillars .sub{text-align:center;color:var(--gray-600);font-size:1rem;max-width:620px;margin:0 auto 60px;line-height:1.7}
-.pillars-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
-.pillar-card{background:var(--white);border-radius:var(--r-xl);padding:36px 32px;border:1.5px solid var(--gray-200);transition:all .3s;position:relative;overflow:hidden}
-.pillar-card::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:4px 4px 0 0;transform:scaleX(0);transition:transform .3s}
-.pillar-card:hover{transform:translateY(-6px);box-shadow:var(--sh-md);border-color:transparent}
-.pillar-card:hover::after{transform:scaleX(1)}
-.pc-1::after{background:var(--yellow)}
-.pc-2::after{background:#4285F4}
-.pc-3::after{background:#34A853}
-.pc-4::after{background:#EA4335}
-.pillar-icon{width:60px;height:60px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:20px}
-.pillar-card h3{font-size:1.2rem;margin-bottom:10px}
-.pillar-card p{font-size:.92rem;color:var(--gray-700);line-height:1.7;margin-bottom:16px}
-.pillar-list{display:flex;flex-direction:column;gap:8px}
-.pillar-list li{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--gray-700)}
-.pillar-list li::before{content:'✓';font-weight:800;color:inherit;flex-shrink:0;font-size:.9rem}
-
-/* ── FUNNEL VISUAL ── */
-.funnel-section{padding:100px 0;background:var(--white)}
-.funnel-section .s-tag{display:block;width:fit-content;margin:0 auto 14px;background:var(--gray-100);color:var(--gray-700);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:var(--r-full)}
-.funnel-section h2{text-align:center;font-size:clamp(1.9rem,3.5vw,2.8rem);margin-bottom:12px}
-.funnel-section .sub{text-align:center;color:var(--gray-600);font-size:1rem;max-width:620px;margin:0 auto 60px;line-height:1.7}
-.funnel-diagram{max-width:860px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:0}
-.f-node{background:var(--white);border-radius:var(--r-md);padding:18px 28px;box-shadow:0 4px 20px rgba(0,0,0,.1);text-align:center;min-width:260px;max-width:340px;border:2px solid var(--gray-200);transition:all .3s}
-.f-node:hover{border-color:var(--yellow)}
-.f-icon{font-size:1.5rem;margin-bottom:8px}
-.f-label{font-size:.92rem;font-weight:700}
-.f-sub{font-size:.78rem;color:var(--gray-600);margin-top:4px}
-.f-arrow{color:var(--gray-400);font-size:1rem;padding:5px 0}
-.f-node.entry{border-top:4px solid var(--gray-400)}
-.f-node.check{border-top:4px solid var(--yellow);background:var(--yellow-pale)}
-.f-node.google{border-top:4px solid #4285F4;background:#f0f5ff}
-.f-node.private{border-top:4px solid var(--gray-400);background:var(--gray-50)}
-.f-node.result-good{border-top:4px solid #34A853;background:#f0faf0}
-.f-node.result-private{border-top:4px solid var(--gray-400);background:var(--gray-50)}
-.f-split{width:100%;margin:4px 0;display:flex;flex-direction:column;align-items:center;gap:8px}
-.f-split-line{width:55%;display:flex;justify-content:space-between;position:relative}
-.f-split-line::before{content:'';position:absolute;top:50%;left:0;right:0;height:2px;background:var(--gray-200)}
-.f-split-bar{width:2px;height:36px;background:var(--gray-200)}
-.f-split-labels{display:flex;gap:110px}
-.happy-tag{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;font-size:.78rem;font-weight:700;padding:5px 14px;border-radius:var(--r-full);display:flex;align-items:center;gap:5px}
-.sad-tag{background:var(--gray-100);color:var(--gray-700);border:1px solid var(--gray-200);font-size:.78rem;font-weight:700;padding:5px 14px;border-radius:var(--r-full);display:flex;align-items:center;gap:5px}
-.f-paths{display:grid;grid-template-columns:1fr 1fr;gap:32px;width:100%;padding:0 40px}
-.f-path{display:flex;flex-direction:column;align-items:center;gap:0}
-.f-insight{display:flex;align-items:center;gap:16px;background:var(--black);color:var(--white);padding:20px 28px;border-radius:var(--r-md);margin-top:32px;max-width:560px}
-.f-insight-icon{font-size:1.7rem;flex-shrink:0}
-.f-insight p{font-size:.9rem;line-height:1.5;color:rgba(255,255,255,.85)}
-.f-insight strong{color:var(--yellow)}
-
-/* ── STATS ── */
-.stats{padding:100px 0;background:var(--black);position:relative;overflow:hidden;text-align:center}
-.stats-bg{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(253,184,19,.06) 1px,transparent 1px);background-size:36px 36px}
-.stats .s-tag{display:block;width:fit-content;margin:0 auto 14px;background:rgba(253,184,19,.15);color:var(--yellow);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:var(--r-full);position:relative;z-index:1}
-.stats h2{color:var(--white);font-size:clamp(1.9rem,3.5vw,2.8rem);margin-bottom:60px;position:relative;z-index:1}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:48px;position:relative;z-index:1}
-.stat-block{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-lg);padding:32px 20px;transition:all .3s}
-.stat-block:hover{background:rgba(253,184,19,.1);border-color:rgba(253,184,19,.3);transform:translateY(-4px)}
-.stat-num{font-family:'Poppins',sans-serif;font-size:clamp(2.8rem,4vw,4.2rem);font-weight:900;color:var(--yellow);line-height:1}
-.stat-suffix{font-family:'Poppins',sans-serif;font-size:clamp(1.6rem,2.5vw,2.5rem);font-weight:800;color:var(--yellow)}
-.stat-label{font-size:.85rem;color:rgba(255,255,255,.55);line-height:1.5;margin-top:10px}
-.stat-quote{position:relative;z-index:1;max-width:680px;margin:0 auto;background:rgba(253,184,19,.08);border:1px solid rgba(253,184,19,.25);border-radius:var(--r-md);padding:28px 36px}
-.stat-quote p{color:rgba(255,255,255,.8);font-size:1rem;font-style:italic;line-height:1.7}
-
-/* ── TESTIMONIALS ── */
-.testimonials{padding:100px 0;background:var(--white)}
-.testimonials .s-tag{display:block;width:fit-content;margin:0 auto 14px;background:var(--gray-100);color:var(--gray-700);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:var(--r-full)}
-.testimonials h2{text-align:center;font-size:clamp(1.9rem,3.5vw,2.8rem);margin-bottom:60px}
-.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:60px}
-.t-card{background:var(--white);border-radius:var(--r-lg);padding:30px 26px;border:1.5px solid var(--gray-200);display:flex;flex-direction:column;gap:14px;transition:all .3s}
-.t-card:hover{transform:translateY(-6px);box-shadow:var(--sh-md);border-color:var(--yellow)}
-.t-stars{font-size:.95rem}
-.t-g-badge{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;color:#4285F4;background:#e8f0fe;padding:4px 10px;border-radius:var(--r-full)}
-.t-card blockquote{font-size:.93rem;color:var(--gray-700);line-height:1.7;flex:1}
-.t-card blockquote::before{content:'"';font-size:2.8rem;color:var(--yellow);font-family:Georgia,serif;line-height:.5;display:block;margin-bottom:10px}
-.t-meta{display:flex;align-items:flex-start;gap:12px;padding-top:14px;border-top:1px solid var(--gray-200)}
-.t-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;color:var(--white);flex-shrink:0}
-.av-1{background:linear-gradient(135deg,#6d4c41,#4e342e)}
-.av-2{background:linear-gradient(135deg,#7b1fa2,#4a148c)}
-.av-3{background:linear-gradient(135deg,#1565c0,#0d47a1)}
-.t-info strong{font-size:.9rem;display:block}
-.t-info span{font-size:.78rem;color:var(--gray-400)}
-.t-result{display:inline-block;margin-top:4px;background:rgba(253,184,19,.15);color:#8a5800;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:4px;border:1px solid rgba(253,184,19,.3)}
-.trust-row{display:flex;align-items:center;justify-content:center;gap:28px;background:var(--black);border-radius:var(--r-lg);padding:28px 36px;flex-wrap:wrap}
-.tr-item{display:flex;align-items:center;gap:10px;color:var(--white);font-size:.9rem}
-.tr-item i{color:var(--yellow)}
-.tr-div{width:1px;height:28px;background:rgba(255,255,255,.12)}
-
-/* ── PERFECT FOR ── */
-.perfect{padding:100px 0;background:var(--black);text-align:center;position:relative;overflow:hidden}
-.perfect-bg{position:absolute;inset:0;background:url('https://sspark.genspark.ai/cfimages?u1=1cJOIobNefrR31ONa9TwVGQIRItAk1QJ%2FgtkvyPt6LHSwwZ4h%2FnYCH66hxw1JsjSH72eM%2BhXsugd0k4WyWaej5fzoclnBlE%2B%2FKtYLD4vlHqB0yicU82hK1oN9oRDGML4pMQtDBC%2B1AqAVY%2F4sPYO2kdk0uUXFQSXsYR69ETKTEsDehWaoeFgmLTl&u2=cNXV%2Fy1nFWJ83uJV&width=2560') center/cover;filter:grayscale(1) contrast(.5) brightness(.3)}
-.perfect-overlay{position:absolute;inset:0;background:rgba(10,10,10,.6)}
-.perfect .container{position:relative;z-index:2}
-.perfect .s-tag{display:block;width:fit-content;margin:0 auto 14px;background:rgba(253,184,19,.15);color:var(--yellow);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:var(--r-full)}
-.perfect h2{color:var(--white);font-size:clamp(1.9rem,3.5vw,2.8rem);margin-bottom:48px}
-.biz-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px}
-.biz-card{background:rgba(255,255,255,.07);border-radius:var(--r-md);padding:24px 16px;border:1.5px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;gap:10px;transition:all .3s}
-.biz-card:hover{border-color:var(--yellow);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.4)}
-.biz-emoji{font-size:2.2rem}
-.biz-name{font-size:.85rem;font-weight:600;color:rgba(255,255,255,.88)}
-
-/* ── PRICING ── */
-.pricing{padding:100px 0;background:var(--gray-50)}
-.pricing .s-tag{display:block;width:fit-content;margin:0 auto 14px;background:var(--gray-200);color:var(--gray-700);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:var(--r-full)}
-.pricing h2{text-align:center;font-size:clamp(1.9rem,3.5vw,2.8rem);margin-bottom:12px}
-.pricing .sub{text-align:center;color:var(--gray-600);font-size:1rem;max-width:560px;margin:0 auto 60px;line-height:1.7}
-.pricing-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:28px;max-width:840px;margin:0 auto 36px;align-items:start}
-.pc{border-radius:var(--r-xl);padding:38px 34px;border:2px solid var(--gray-200);background:var(--white);position:relative}
-.pc.featured{border-color:var(--yellow);box-shadow:0 16px 60px rgba(253,184,19,.2)}
-.pc-pop{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--yellow);color:var(--black);font-size:.75rem;font-weight:800;padding:4px 18px;border-radius:var(--r-full);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
-.pc-tag{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-600);margin-bottom:14px}
-.pc-strike{font-size:.9rem;color:var(--gray-400);text-decoration:line-through;display:block;margin-bottom:2px}
-.pc-price{display:flex;align-items:flex-start;gap:3px;margin-bottom:4px}
-.pc-dollar{font-family:'Poppins',sans-serif;font-size:1.4rem;font-weight:700;padding-top:8px}
-.pc-amount{font-family:'Poppins',sans-serif;font-size:3.5rem;font-weight:900;line-height:1}
-.pc-mo{font-size:.95rem;color:var(--gray-400);padding-top:26px}
-.pc-period{font-size:.78rem;color:var(--gray-400);margin-bottom:24px}
-.pc-features{display:flex;flex-direction:column;gap:11px;margin-bottom:28px}
-.pc-features li{display:flex;align-items:center;gap:9px;font-size:.9rem}
-.pc-features li i{color:#34A853;font-size:.82rem;flex-shrink:0}
-.pc-note{font-size:.8rem;color:var(--gray-400);font-style:italic;padding-top:14px;border-top:1px solid var(--gray-200)}
-.pc-cta{width:100%;justify-content:center;margin-bottom:18px}
-.pc-guarantee{display:flex;align-items:flex-start;gap:9px;background:#e8f5e9;border-radius:var(--r-sm);padding:12px 14px;font-size:.8rem;color:#2e7d32}
-.price-value{display:flex;align-items:flex-start;gap:14px;background:var(--black);border:1px solid rgba(253,184,19,.25);border-radius:var(--r-md);padding:22px 28px;max-width:840px;margin:0 auto}
-.pv-icon{font-size:1.7rem;flex-shrink:0}
-.pv-text{font-size:.93rem;color:rgba(255,255,255,.75);line-height:1.65}
-
-/* ── FAQ ── */
-.faq{padding:100px 0;background:var(--black)}
-.faq .s-tag{display:block;width:fit-content;margin:0 auto 14px;background:rgba(253,184,19,.15);color:var(--yellow);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:var(--r-full)}
-.faq h2{text-align:center;color:var(--white);font-size:clamp(1.9rem,3.5vw,2.8rem);margin-bottom:48px}
-.faq-list{max-width:740px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
-.faq-item{background:var(--white);border-radius:var(--r-md);overflow:hidden;border:1.5px solid var(--gray-200)}
-.faq-item.open{border-color:var(--yellow)}
-.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 26px;text-align:left;font-size:.97rem;font-weight:600;color:var(--black)}
-.faq-q:hover{background:var(--gray-50)}
-.faq-icon{width:26px;height:26px;border-radius:50%;background:rgba(253,184,19,.12);border:1px solid rgba(253,184,19,.25);display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--yellow);transition:transform .3s,background .3s;flex-shrink:0}
-.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--yellow);color:var(--black)}
-.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .4s ease}
-.faq-a.open{max-height:280px;padding:0 26px 22px}
-.faq-a p{font-size:.91rem;color:var(--gray-700);line-height:1.7}
-
-/* ── FINAL CTA ── */
-.final-cta{padding:120px 0;background:var(--black);text-align:center;position:relative;overflow:hidden}
-.fca-video{position:absolute;inset:0;z-index:0}
-.fca-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.fca-overlay{position:absolute;inset:0;background:rgba(0,0,0,.82);z-index:1}
-.final-cta .container{position:relative;z-index:2}
-.fca-urgency{display:inline-flex;align-items:center;gap:8px;background:rgba(234,67,53,.15);border:1px solid rgba(234,67,53,.3);color:#ff7066;font-size:.83rem;font-weight:600;padding:7px 18px;border-radius:var(--r-full);margin-bottom:28px}
-.fca-h2{font-size:clamp(1.9rem,3.5vw,3rem);font-weight:900;color:var(--white);margin-bottom:40px;line-height:1.18}
-.fca-checks{display:grid;grid-template-columns:repeat(2,auto);gap:14px 48px;justify-content:center;max-width:580px;margin:0 auto 44px}
-.fca-check{display:flex;align-items:center;gap:9px;color:rgba(255,255,255,.82);font-size:.92rem}
-.fca-check i{color:#34A853;font-size:1rem}
-.fca-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
-.fca-small{color:rgba(255,255,255,.5);font-size:.83rem}
-.fca-small strong{color:var(--yellow)}
-.fca-guarantee{color:rgba(255,255,255,.4);font-size:.78rem;display:flex;align-items:center;gap:6px}
-.fca-guarantee i{color:#34A853}
-
-/* ── CONTACT FORM ── */
-.contact{padding:100px 0;background:#111;position:relative;overflow:hidden}
-.contact .s-tag{display:block;width:fit-content;margin:0 0 14px;background:rgba(253,184,19,.15);color:var(--yellow);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:var(--r-full)}
-.contact-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;max-width:1080px;margin:0 auto}
-.contact-left h2{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:900;color:var(--white);margin-bottom:16px;line-height:1.2}
-.contact-left p{font-size:.97rem;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:28px}
-.c-benefits{display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
-.c-benefit{display:flex;align-items:center;gap:11px;color:rgba(255,255,255,.82);font-size:.92rem}
-.c-benefit i{color:var(--yellow);flex-shrink:0}
-.c-form{background:var(--white);border-radius:var(--r-xl);padding:40px 38px;box-shadow:0 24px 80px rgba(0,0,0,.4)}
-.c-form h3{font-size:1.35rem;font-weight:800;margin-bottom:5px}
-.c-form .c-sub{font-size:.87rem;color:var(--gray-600);margin-bottom:24px}
-.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.cf-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
-.cf-field label{font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--black)}
-.cf-field input,.cf-field select,.cf-field textarea{width:100%;padding:12px 15px;border:2px solid var(--gray-200);border-radius:var(--r-sm);font-size:.92rem;font-family:inherit;color:var(--black);outline:none;transition:border-color .2s;appearance:none;background:var(--white)}
-.cf-field input:focus,.cf-field select:focus,.cf-field textarea:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(253,184,19,.12)}
-.cf-field textarea{resize:vertical;min-height:90px;line-height:1.55}
-.cf-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23444' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
-.cf-submit{width:100%;padding:15px;background:var(--yellow);color:var(--black);font-family:'Poppins',sans-serif;font-weight:700;font-size:1rem;border-radius:var(--r-full);border:none;cursor:pointer;transition:all .25s;box-shadow:var(--sh-y);margin-top:6px}
-.cf-submit:hover{background:#e8a800;transform:translateY(-2px);box-shadow:0 12px 40px rgba(253,184,19,.5)}
-.cf-privacy{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;font-size:.76rem;color:var(--gray-400)}
-.cf-privacy i{color:#34A853}
-.cf-success{display:none;text-align:center;padding:40px 20px}
-.cf-success-icon{font-size:3.5rem;margin-bottom:14px}
-.cf-success h4{font-size:1.35rem;font-weight:800;margin-bottom:8px}
-.cf-success p{color:var(--gray-700);font-size:.93rem;line-height:1.6}
-
-/* ── FOOTER ── */
-.footer{background:#0d0d0d;color:rgba(255,255,255,.55);padding:68px 0 0}
-.footer-inner{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:44px;padding-bottom:52px;border-bottom:1px solid rgba(255,255,255,.08)}
-.footer-brand .logo{display:inline-block;margin-bottom:14px;font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:900;color:var(--white)}
-.footer-brand p{font-size:.86rem;line-height:1.65;max-width:260px;margin-bottom:20px}
-.footer-social{display:flex;gap:10px}
-.footer-social a{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);transition:all .2s}
-.footer-social a:hover{border-color:var(--yellow);color:var(--yellow);background:rgba(253,184,19,.08)}
-.fl h5{font-size:.8rem;font-weight:700;color:var(--white);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px}
-.fl li{margin-bottom:9px}
-.fl a{font-size:.85rem;color:rgba(255,255,255,.5);transition:color .2s}
-.fl a:hover{color:var(--yellow)}
-.footer-bottom{padding:22px 0;text-align:center}
-.footer-bottom p{font-size:.8rem;color:rgba(255,255,255,.35)}
-
-/* ── POPUP ── */
-.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;backdrop-filter:blur(4px)}
-.popup-overlay.active{opacity:1;pointer-events:all}
-.popup-box{background:var(--white);border-radius:var(--r-xl);padding:44px 40px;max-width:480px;width:92%;position:relative;box-shadow:0 32px 100px rgba(0,0,0,.35);transform:scale(.92) translateY(20px);transition:transform .35s}
-.popup-overlay.active .popup-box{transform:scale(1) translateY(0)}
-.popup-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:var(--gray-100);color:var(--gray-700);display:flex;align-items:center;justify-content:center;font-size:.88rem;transition:all .2s}
-.popup-close:hover{background:var(--black);color:var(--white)}
-.popup-list{display:flex;flex-direction:column;gap:9px;margin-bottom:24px}
-.popup-list li{font-size:.88rem;color:var(--gray-700);background:var(--gray-100);padding:9px 13px;border-radius:var(--r-sm);border-left:3px solid var(--yellow)}
-.popup-form{display:flex;flex-direction:column;gap:10px}
-.popup-form input{width:100%;padding:13px 16px;border:2px solid var(--gray-200);border-radius:var(--r-sm);font-size:.93rem;font-family:inherit;outline:none;transition:border-color .2s}
-.popup-form input:focus{border-color:var(--yellow)}
-.popup-form .btn{width:100%;justify-content:center}
-
-/* ── RESPONSIVE ── */
-@media(max-width:1024px){
-  .hero-inner{grid-template-columns:1fr}
-  .hero-left{padding:120px 0 60px}
-  .hero-right{border-left:none;border-top:1px solid rgba(255,255,255,.08);padding:48px 0 60px}
-  .atmo-grid,.contact-inner{grid-template-columns:1fr}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .pillars-grid{grid-template-columns:1fr}
-  .footer-inner{grid-template-columns:1fr 1fr;gap:32px}
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--off-white);
+  color: var(--black);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
-@media(max-width:768px){
-  .nav-links{position:fixed;top:0;right:-100%;height:100vh;width:260px;background:var(--black);flex-direction:column;justify-content:center;padding:40px;transition:right .3s;z-index:999;gap:20px}
-  .nav-links.open{right:0}
-  .nav-links a{color:var(--white)!important;font-size:1.05rem}
-  .hamburger{display:flex}
-  .proof-strip-inner{gap:20px}
-  .ps-div{display:none}
-  .steps-row{grid-template-columns:1fr}
-  .steps-row::before{display:none}
-  .testi-grid{grid-template-columns:1fr}
-  .pricing-grid{grid-template-columns:1fr;max-width:400px}
-  .biz-grid{grid-template-columns:repeat(2,1fr)}
-  .fca-checks{grid-template-columns:1fr;gap:10px}
-  .trust-row{flex-direction:column;gap:14px;align-items:flex-start;padding:20px}
-  .tr-div{display:none}
-  .f-split-labels{gap:50px}
-  .f-paths{gap:16px;padding:0 8px}
-  .footer-inner{grid-template-columns:1fr}
-  .cf-row{grid-template-columns:1fr}
-  .contact-inner{gap:40px}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -.02em;
 }
-@media(max-width:480px){
-  .hero-ctas{flex-direction:column;align-items:stretch}
-  .hero-ctas .btn{justify-content:center}
-  .stats-grid{grid-template-columns:1fr}
-  .biz-grid{grid-template-columns:repeat(2,1fr)}
-  .popup-box{padding:28px 22px}
+
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; display: block; }
+ul { list-style: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+.container-wide { max-width: 1340px; margin: 0 auto; padding: 0 28px; }
+
+/* ── NAVBAR ─────────────────────────────────────────────── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  padding: 20px 0;
+  transition: background .3s, padding .3s, box-shadow .3s;
+}
+.nav.scrolled {
+  background: rgba(17,17,17,.96);
+  backdrop-filter: blur(16px);
+  padding: 12px 0;
+  box-shadow: 0 1px 0 rgba(255,255,255,.06);
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.3rem; font-weight: 800;
+  color: var(--white); letter-spacing: -.03em;
+}
+.logo span { color: var(--yellow); }
+.nav-links {
+  display: flex; align-items: center; gap: 32px;
+}
+.nav-links a {
+  font-size: .875rem; font-weight: 500;
+  color: rgba(255,255,255,.7);
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--yellow); color: var(--black);
+  font-family: 'Syne', sans-serif; font-size: .875rem; font-weight: 700;
+  padding: 9px 22px; border-radius: var(--r-full);
+  transition: background .2s, transform .2s;
+}
+.nav-cta:hover { background: var(--yellow-d); transform: translateY(-1px); }
+.hamburger { display: none; flex-direction: column; gap: 5px; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: all .3s; }
+
+/* ── HERO ─────────────────────────────────────────────────
+   Full-black, editorial layout. No video. Just type + data.
+────────────────────────────────────────────────────────── */
+.hero {
+  background: var(--black);
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 140px 0 80px;
+  position: relative; overflow: hidden;
+}
+
+/* Subtle yellow glow top-right */
+.hero::before {
+  content: '';
+  position: absolute; top: -180px; right: -120px;
+  width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(253,184,19,.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+/* Left: copy */
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .78rem; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--yellow);
+  margin-bottom: 28px;
+}
+.hero-eyebrow-dot {
+  width: 6px; height: 6px; background: var(--yellow); border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:.3} }
+
+.hero-h1 {
+  font-size: clamp(3rem, 5.5vw, 5rem);
+  color: var(--white);
+  margin-bottom: 28px;
+  max-width: 580px;
+}
+.hero-h1 em {
+  font-style: normal;
+  color: var(--yellow);
+  position: relative;
+  display: inline-block;
+}
+
+/* Underline squiggle on keyword */
+.hero-h1 em::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: -4px; height: 3px;
+  background: var(--yellow); border-radius: 2px; opacity: .5;
+}
+
+.hero-sub {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,.62);
+  max-width: 460px;
+  line-height: 1.75;
+  margin-bottom: 40px;
+}
+
+.hero-actions {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: var(--yellow); color: var(--black);
+  font-family: 'Syne', sans-serif; font-size: .95rem; font-weight: 700;
+  padding: 15px 32px; border-radius: var(--r-full);
+  border: 2px solid var(--yellow);
+  transition: all .2s ease;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  background: var(--yellow-d); border-color: var(--yellow-d);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(253,184,19,.45);
+}
+.btn-primary.pulse {
+  animation: pulse-cta 2.8s ease-in-out infinite;
+}
+@keyframes pulse-cta {
+  0%,100% { box-shadow: 0 0 0 0 rgba(253,184,19,.5); }
+  50%      { box-shadow: 0 0 0 14px rgba(253,184,19,0); }
+}
+
+.btn-ghost-white {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: rgba(255,255,255,.8);
+  font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 600;
+  padding: 14px 28px; border-radius: var(--r-full);
+  border: 1.5px solid rgba(255,255,255,.22);
+  transition: all .2s ease;
+}
+.btn-ghost-white:hover {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.5);
+  color: var(--white);
+}
+
+.hero-proof {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.proof-chip {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .82rem; color: rgba(255,255,255,.55);
+}
+.proof-chip i { color: var(--yellow); font-size: .85rem; }
+.proof-sep { width: 1px; height: 18px; background: rgba(255,255,255,.15); }
+
+/* Right: stat stack */
+.hero-stats {
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.stat-block {
+  display: flex; align-items: stretch;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: rgba(255,255,255,.04);
+  backdrop-filter: blur(6px);
+  transition: border-color .3s;
+}
+.stat-block:hover { border-color: rgba(253,184,19,.35); }
+
+.stat-left {
+  width: 130px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 28px 20px;
+  border-right: 1px solid rgba(255,255,255,.08);
+}
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.4rem; font-weight: 800;
+  color: var(--yellow);
+  line-height: 1;
+}
+.stat-unit {
+  font-size: .75rem; color: rgba(255,255,255,.45);
+  margin-top: 4px; text-align: center;
+}
+.stat-right {
+  flex: 1; padding: 24px 24px;
+  display: flex; flex-direction: column; justify-content: center; gap: 4px;
+}
+.stat-right strong {
+  font-family: 'Syne', sans-serif;
+  font-size: .95rem; font-weight: 700;
+  color: var(--white);
+}
+.stat-right p {
+  font-size: .82rem; color: rgba(255,255,255,.5); line-height: 1.5;
+}
+
+/* Horizontal divider between blocks */
+.stat-connector {
+  height: 4px; margin: 0 auto;
+  width: 2px; background: rgba(253,184,19,.3);
+}
+
+/* ── LOGO BAR ─────────────────────────────────────────────
+   "Trusted by businesses like…" horizontal scroll
+────────────────────────────────────────────────────────── */
+.logo-bar {
+  background: var(--black);
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding: 28px 0;
+  overflow: hidden;
+}
+.logo-bar-inner {
+  display: flex; align-items: center; gap: 0;
+}
+.logo-bar-label {
+  font-size: .75rem; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: rgba(255,255,255,.3);
+  white-space: nowrap; margin-right: 48px; flex-shrink: 0;
+}
+.logo-bar-track {
+  display: flex; align-items: center; gap: 56px;
+  animation: marquee 28s linear infinite;
+  flex-shrink: 0;
+}
+.logo-bar-track:hover { animation-play-state: paused; }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.biz-type {
+  display: flex; align-items: center; gap: 9px;
+  font-size: .82rem; font-weight: 500; color: rgba(255,255,255,.45);
+  white-space: nowrap;
+}
+.biz-type i { font-size: 1rem; color: rgba(255,255,255,.25); }
+
+/* ── SECTION: THE SYSTEM ──────────────────────────────────
+   Four pillars. Clean grid. Each pillar = one card.
+────────────────────────────────────────────────────────── */
+.pillars {
+  padding: 120px 0;
+  background: var(--off-white);
+}
+
+.section-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--gray-text);
+  margin-bottom: 20px;
+}
+.section-label-line {
+  width: 28px; height: 1px; background: var(--gray-mid);
+}
+
+.section-h2 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  color: var(--black);
+  margin-bottom: 16px;
+  max-width: 640px;
+}
+.section-intro {
+  font-size: 1.05rem; color: var(--gray-text);
+  max-width: 560px; line-height: 1.75;
+  margin-bottom: 64px;
+}
+
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--gray-soft);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
+
+.pillar-card {
+  background: var(--white);
+  padding: 44px 32px;
+  display: flex; flex-direction: column;
+  gap: 16px;
+  transition: background .25s;
+  cursor: default;
+}
+.pillar-card:hover {
+  background: var(--black);
+}
+.pillar-card:hover .pillar-num,
+.pillar-card:hover .pillar-title,
+.pillar-card:hover .pillar-desc { color: var(--white); }
+.pillar-card:hover .pillar-icon-wrap { background: rgba(253,184,19,.15); }
+.pillar-card:hover .pillar-icon-wrap i { color: var(--yellow); }
+
+.pillar-num {
+  font-family: 'Syne', sans-serif;
+  font-size: .75rem; font-weight: 700; letter-spacing: .08em;
+  color: var(--gray-mid);
+  transition: color .25s;
+}
+.pillar-icon-wrap {
+  width: 52px; height: 52px;
+  background: var(--off-white);
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .25s;
+}
+.pillar-icon-wrap i { font-size: 1.3rem; color: var(--black); transition: color .25s; }
+
+.pillar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem; font-weight: 800;
+  color: var(--black);
+  transition: color .25s;
+}
+.pillar-desc {
+  font-size: .88rem; color: var(--gray-text);
+  line-height: 1.65;
+  transition: color .25s;
+}
+
+/* ── SECTION: HOW SIMPLE IS IT? ───────────────────────────
+   Large-text "3 steps" with huge step numbers as backdrop
+────────────────────────────────────────────────────────── */
+.simplicity {
+  padding: 120px 0;
+  background: var(--black);
+  overflow: hidden;
+}
+
+.steps-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 64px;
+  background: rgba(255,255,255,.06);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
+
+.step-card {
+  padding: 52px 40px;
+  background: var(--black);
+  position: relative;
+  overflow: hidden;
+}
+.step-card:first-child { border-radius: var(--r-xl) 0 0 var(--r-xl); }
+.step-card:last-child  { border-radius: 0 var(--r-xl) var(--r-xl) 0; }
+
+.step-bg-num {
+  position: absolute;
+  top: -20px; right: -10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 9rem; font-weight: 800;
+  color: rgba(255,255,255,.04);
+  line-height: 1; pointer-events: none;
+  user-select: none;
+}
+
+.step-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  background: var(--yellow);
+  border-radius: 50%;
+  font-family: 'Syne', sans-serif;
+  font-size: .85rem; font-weight: 800;
+  color: var(--black);
+  margin-bottom: 24px;
+}
+.step-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.35rem; font-weight: 800;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+.step-desc {
+  font-size: .9rem; color: rgba(255,255,255,.5);
+  line-height: 1.7;
+}
+.step-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 20px;
+  background: rgba(253,184,19,.1);
+  border: 1px solid rgba(253,184,19,.2);
+  color: var(--yellow);
+  font-size: .75rem; font-weight: 600;
+  padding: 6px 14px; border-radius: var(--r-full);
+}
+
+/* ── SECTION: WHAT GETS BUILT ─────────────────────────────
+   Touchpoint explanation — visual "day in the life"
+────────────────────────────────────────────────────────── */
+.touchpoints {
+  padding: 120px 0;
+  background: var(--off-white);
+}
+
+.tp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+  margin-top: 64px;
+}
+
+.tp-list { display: flex; flex-direction: column; gap: 4px; }
+
+.tp-item {
+  display: flex; align-items: flex-start; gap: 20px;
+  padding: 28px 24px;
+  border-radius: var(--r-lg);
+  border: 1.5px solid transparent;
+  cursor: default;
+  transition: all .25s;
+}
+.tp-item:hover {
+  background: var(--white);
+  border-color: var(--gray-soft);
+  box-shadow: 0 4px 24px rgba(0,0,0,.07);
+}
+.tp-item.active {
+  background: var(--white);
+  border-color: var(--yellow);
+  box-shadow: 0 4px 24px rgba(253,184,19,.15);
+}
+
+.tp-icon {
+  width: 48px; height: 48px; flex-shrink: 0;
+  background: var(--off-white);
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; color: var(--gray-dark);
+  transition: background .25s, color .25s;
+}
+.tp-item:hover .tp-icon,
+.tp-item.active .tp-icon { background: rgba(253,184,19,.15); color: var(--black); }
+
+.tp-copy strong {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  display: block; margin-bottom: 4px;
+}
+.tp-copy p { font-size: .88rem; color: var(--gray-text); line-height: 1.6; }
+
+/* Right: mockup phone frame */
+.tp-visual {
+  position: sticky; top: 120px;
+}
+.phone-shell {
+  width: 280px; margin: 0 auto;
+  background: var(--black);
+  border-radius: 40px;
+  padding: 16px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.25), 0 0 0 1px rgba(255,255,255,.1);
+  position: relative;
+}
+.phone-notch {
+  width: 90px; height: 26px;
+  background: var(--black);
+  border-radius: 14px;
+  margin: 0 auto 12px;
+  border: 2px solid #222;
+}
+.phone-screen {
+  background: var(--white);
+  border-radius: 28px;
+  overflow: hidden;
+  min-height: 480px;
+  padding: 0;
+}
+
+.mock-bar {
+  background: #f5f5f5;
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: .65rem; color: #888;
+  border-bottom: 1px solid #eee;
+}
+.mock-bar-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+.mock-card {
+  padding: 18px 16px;
+}
+.mock-biz-name {
+  font-family: 'Syne', sans-serif;
+  font-size: .9rem; font-weight: 800; color: var(--black);
+  margin-bottom: 4px;
+}
+.mock-stars { font-size: .95rem; color: #FBBC04; margin-bottom: 10px; }
+.mock-prompt {
+  font-size: .78rem; color: #444;
+  line-height: 1.5;
+  background: #fffbea;
+  border: 1px solid #f0da7a;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+.mock-btn {
+  display: block; width: 100%; text-align: center;
+  background: var(--black); color: var(--white);
+  font-size: .8rem; font-weight: 700;
+  padding: 11px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.mock-btn.ghost {
+  background: var(--white); color: #888;
+  border: 1px solid #ddd;
+}
+.mock-wifi-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: .7rem; color: #666; margin-top: 12px;
+  padding: 8px 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+.mock-wifi-badge i { color: #4285F4; }
+
+/* ── SECTION: PROOF / NUMBERS ─────────────────────────────
+   Big, editorial stat line across the full width
+────────────────────────────────────────────────────────── */
+.proof-band {
+  background: var(--yellow);
+  padding: 60px 0;
+  overflow: hidden;
+}
+.proof-band-inner {
+  display: flex; align-items: stretch;
+  gap: 0;
+}
+.proof-stat {
+  flex: 1;
+  text-align: center;
+  padding: 8px 24px;
+  border-right: 1px solid rgba(0,0,0,.12);
+}
+.proof-stat:last-child { border-right: none; }
+.proof-stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 4vw, 3.8rem);
+  font-weight: 800; color: var(--black);
+  line-height: 1;
+}
+.proof-stat-label {
+  font-size: .85rem; font-weight: 500;
+  color: rgba(0,0,0,.6);
+  margin-top: 6px;
+}
+
+/* ── SECTION: PAIN → SOLVE ────────────────────────────────
+   Side-by-side before/after table feel
+────────────────────────────────────────────────────────── */
+.before-after {
+  padding: 120px 0;
+  background: var(--white);
+}
+
+.ba-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 64px;
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
+
+.ba-col { padding: 52px 44px; }
+.ba-col.before {
+  background: #faf9f7;
+  border: 2px solid var(--gray-soft);
+  border-radius: var(--r-xl) 0 0 var(--r-xl);
+}
+.ba-col.after {
+  background: var(--black);
+  border-radius: 0 var(--r-xl) var(--r-xl) 0;
+}
+
+.ba-col-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 36px;
+}
+.ba-col-tag {
+  font-family: 'Syne', sans-serif;
+  font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 5px 14px; border-radius: var(--r-full);
+}
+.before .ba-col-tag { background: #f0ede7; color: var(--gray-text); }
+.after  .ba-col-tag { background: rgba(253,184,19,.15); color: var(--yellow); }
+
+.ba-list { display: flex; flex-direction: column; gap: 18px; }
+.ba-row {
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.ba-icon-wrap {
+  width: 28px; height: 28px; flex-shrink: 0;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem;
+}
+.before .ba-icon-wrap { background: #ede9e2; color: #a09a90; }
+.after  .ba-icon-wrap { background: rgba(253,184,19,.15); color: var(--yellow); }
+.ba-text { font-size: .92rem; line-height: 1.55; }
+.before .ba-text { color: var(--gray-text); }
+.after  .ba-text  { color: rgba(255,255,255,.75); }
+.after .ba-text strong { color: var(--white); }
+
+/* ── SECTION: FEATURES DEEP DIVE ─────────────────────────
+   Alternating rows: visual left/right, copy other side
+────────────────────────────────────────────────────────── */
+.features {
+  padding: 120px 0;
+  background: var(--off-white);
+}
+
+.feature-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  margin-bottom: 100px;
+}
+.feature-row:last-child { margin-bottom: 0; }
+.feature-row.flip { direction: rtl; }
+.feature-row.flip > * { direction: ltr; }
+
+.feature-visual {
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  background: var(--white);
+  box-shadow: 0 12px 48px rgba(0,0,0,.1);
+  border: 1px solid var(--gray-soft);
+}
+
+.fv-inner {
+  padding: 36px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* Mini Google card mock */
+.google-mini {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: #f8f9fa; border-radius: 10px; padding: 14px;
+  border: 1px solid #e0e0e0;
+}
+.gm-icon {
+  width: 38px; height: 38px; border-radius: 8px;
+  background: var(--black);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .95rem; color: var(--yellow); flex-shrink: 0;
+}
+.gm-name { font-size: .85rem; font-weight: 700; color: #1a1a1a; }
+.gm-stars { font-size: .85rem; color: #FBBC04; margin-top: 2px; }
+.gm-count { font-size: .72rem; color: #888; }
+
+/* Star rating progress bars */
+.star-bars { display: flex; flex-direction: column; gap: 8px; }
+.star-bar-row {
+  display: flex; align-items: center; gap: 10px;
+  font-size: .78rem; color: var(--gray-text);
+}
+.star-bar-track {
+  flex: 1; height: 6px; background: #ede9e2; border-radius: 3px; overflow: hidden;
+}
+.star-bar-fill {
+  height: 100%; border-radius: 3px; background: #FBBC04;
+  transition: width 1s ease;
+}
+
+/* Email chip mock */
+.email-chips { display: flex; flex-direction: column; gap: 8px; }
+.email-chip {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--off-white); border-radius: 8px; padding: 10px 14px;
+  border: 1px solid var(--gray-soft);
+  font-size: .8rem;
+}
+.email-chip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.email-chip-name { font-weight: 600; color: var(--black); }
+.email-chip-meta { color: var(--gray-text); margin-left: auto; }
+
+/* SEO rank chip mock */
+.seo-mock { display: flex; flex-direction: column; gap: 10px; }
+.seo-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--off-white); border-radius: 10px;
+  border: 1px solid var(--gray-soft);
+}
+.seo-rank {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem; font-weight: 800; min-width: 28px;
+  color: var(--black);
+}
+.seo-rank.top { color: var(--green); }
+.seo-info { flex: 1; }
+.seo-name { font-size: .82rem; font-weight: 600; color: var(--black); }
+.seo-rating { font-size: .72rem; color: var(--gray-text); }
+.seo-arrow { font-size: .85rem; }
+.seo-arrow.up { color: var(--green); }
+.seo-arrow.down { color: #c0392b; }
+
+/* Feature copy */
+.feature-kicker {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--gray-text);
+  margin-bottom: 16px;
+}
+.feature-h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.6rem, 2.5vw, 2.1rem);
+  font-weight: 800; color: var(--black);
+  margin-bottom: 16px;
+}
+.feature-desc {
+  font-size: .97rem; color: var(--gray-text);
+  line-height: 1.75;
+  margin-bottom: 24px;
+}
+.feature-bullets { display: flex; flex-direction: column; gap: 10px; }
+.feature-bullet {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: .88rem; color: var(--gray-dark);
+}
+.bullet-check {
+  width: 20px; height: 20px; flex-shrink: 0;
+  background: rgba(26,122,74,.12);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--green); font-size: .65rem; margin-top: 1px;
+}
+
+/* ── SECTION: TESTIMONIALS ────────────────────────────────
+   3-column cards, slightly offset
+────────────────────────────────────────────────────────── */
+.testimonials {
+  padding: 120px 0;
+  background: var(--black);
+}
+
+.testi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 64px;
+}
+.testi-grid .tcard:nth-child(2) { margin-top: 32px; }
+
+.tcard {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--r-xl);
+  padding: 36px;
+  display: flex; flex-direction: column; gap: 20px;
+  transition: border-color .3s;
+}
+.tcard:hover { border-color: rgba(253,184,19,.35); }
+
+.tcard-stars { color: #FBBC04; font-size: .9rem; letter-spacing: 2px; }
+.tcard-quote {
+  font-size: .95rem; color: rgba(255,255,255,.75);
+  line-height: 1.75; flex: 1;
+  font-style: italic;
+}
+.tcard-quote strong { color: var(--white); font-style: normal; }
+.tcard-author { display: flex; align-items: center; gap: 12px; }
+.tcard-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(253,184,19,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: .9rem; font-weight: 800; color: var(--yellow);
+}
+.tcard-name {
+  font-family: 'Syne', sans-serif;
+  font-size: .88rem; font-weight: 700; color: var(--white);
+}
+.tcard-biz { font-size: .78rem; color: rgba(255,255,255,.4); }
+
+/* ── SECTION: PRICING ─────────────────────────────────────
+   Clean 2-plan layout, no noise
+────────────────────────────────────────────────────────── */
+.pricing {
+  padding: 120px 0;
+  background: var(--off-white);
+}
+
+.pricing-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 840px;
+  margin: 64px auto 0;
+}
+
+.pc {
+  background: var(--white);
+  border: 2px solid var(--gray-soft);
+  border-radius: var(--r-xl);
+  padding: 48px 40px;
+  display: flex; flex-direction: column; gap: 0;
+  transition: border-color .25s;
+}
+.pc:hover { border-color: var(--gray-mid); }
+
+.pc.popular {
+  background: var(--black);
+  border-color: var(--yellow);
+  position: relative;
+}
+.pc-popular-tag {
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+  background: var(--yellow);
+  font-family: 'Syne', sans-serif;
+  font-size: .7rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--black);
+  padding: 5px 18px; border-radius: var(--r-full);
+  white-space: nowrap;
+}
+
+.pc-name {
+  font-family: 'Syne', sans-serif;
+  font-size: .8rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--gray-text);
+  margin-bottom: 16px;
+}
+.popular .pc-name { color: rgba(255,255,255,.5); }
+
+.pc-price {
+  font-family: 'Syne', sans-serif;
+  font-size: 3.2rem; font-weight: 800;
+  color: var(--black); line-height: 1;
+  margin-bottom: 4px;
+}
+.popular .pc-price { color: var(--white); }
+
+.pc-period {
+  font-size: .85rem; color: var(--gray-text);
+  margin-bottom: 32px;
+}
+.popular .pc-period { color: rgba(255,255,255,.45); }
+
+.pc-divider {
+  height: 1px; background: var(--gray-soft);
+  margin-bottom: 28px;
+}
+.popular .pc-divider { background: rgba(255,255,255,.1); }
+
+.pc-features { display: flex; flex-direction: column; gap: 14px; margin-bottom: 40px; }
+.pc-feature {
+  display: flex; align-items: flex-start; gap: 11px;
+  font-size: .9rem; color: var(--gray-dark);
+}
+.popular .pc-feature { color: rgba(255,255,255,.72); }
+.pc-feature i { color: var(--green); font-size: .85rem; margin-top: 2px; }
+.popular .pc-feature i { color: var(--yellow); }
+
+.pc-cta {
+  display: flex; justify-content: center;
+  text-align: center;
+  background: var(--off-white);
+  color: var(--black);
+  font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700;
+  padding: 14px;
+  border-radius: var(--r-lg);
+  border: 2px solid var(--gray-soft);
+  transition: all .2s;
+}
+.pc-cta:hover { background: var(--gray-soft); border-color: var(--gray-mid); }
+
+.popular .pc-cta {
+  background: var(--yellow); color: var(--black);
+  border-color: var(--yellow);
+}
+.popular .pc-cta:hover {
+  background: var(--yellow-d); border-color: var(--yellow-d);
+  transform: translateY(-2px);
+}
+
+.pricing-note {
+  text-align: center;
+  margin-top: 28px;
+  font-size: .83rem; color: var(--gray-text);
+}
+.pricing-note i { color: var(--green); }
+
+/* ── FINAL CTA BAND ───────────────────────────────────────
+   Full-width black band, large text
+────────────────────────────────────────────────────────── */
+.cta-final {
+  background: var(--black);
+  padding: 140px 0;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.cta-final::before {
+  content: '';
+  position: absolute; bottom: -200px; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(253,184,19,.12) 0%, transparent 65%);
+  pointer-events: none;
+}
+.cta-final-eyebrow {
+  font-size: .78rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(255,255,255,.4);
+  margin-bottom: 24px;
+}
+.cta-final-h2 {
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  color: var(--white);
+  max-width: 700px;
+  margin: 0 auto 24px;
+}
+.cta-final-h2 em {
+  font-style: normal;
+  color: var(--yellow);
+}
+.cta-final-sub {
+  font-size: 1.05rem; color: rgba(255,255,255,.5);
+  margin-bottom: 48px;
+}
+.cta-final-actions {
+  display: flex; justify-content: center; align-items: center;
+  gap: 16px; flex-wrap: wrap;
+}
+.cta-fine {
+  font-size: .78rem; color: rgba(255,255,255,.3);
+  margin-top: 20px;
+}
+
+/* ── FOOTER ───────────────────────────────────────────────
+────────────────────────────────────────────────────────── */
+.footer {
+  background: #0c0c0c;
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding: 48px 0 32px;
+}
+.footer-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 40px; flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+.footer-brand .logo { font-size: 1.2rem; }
+.footer-brand p {
+  font-size: .83rem; color: rgba(255,255,255,.35);
+  max-width: 260px; line-height: 1.6; margin-top: 10px;
+}
+.footer-links-group h5 {
+  font-family: 'Syne', sans-serif;
+  font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: rgba(255,255,255,.3);
+  margin-bottom: 14px;
+}
+.footer-links-group a {
+  display: block; font-size: .85rem; color: rgba(255,255,255,.5);
+  margin-bottom: 10px; transition: color .2s;
+}
+.footer-links-group a:hover { color: var(--white); }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,.07);
+  padding-top: 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  font-size: .8rem; color: rgba(255,255,255,.25);
+}
+
+/* ── MOBILE NAV DRAWER ─────────────────────────────────── */
+.mobile-menu {
+  display: none;
+  position: fixed; inset: 0; z-index: 800;
+  background: rgba(17,17,17,.98);
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 32px;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem; font-weight: 700;
+  color: rgba(255,255,255,.8);
+  transition: color .2s;
+}
+.mobile-menu a:hover { color: var(--yellow); }
+.mobile-close {
+  position: absolute; top: 28px; right: 28px;
+  font-size: 1.5rem; color: rgba(255,255,255,.5);
+  cursor: pointer;
+}
+
+/* ── COUNTER ANIMATION ─────────────────────────────────── */
+.count-up { display: inline-block; }
+
+/* ── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .hero-layout { grid-template-columns: 1fr; gap: 60px; }
+  .hero-stats { display: none; }
+
+  .pillars-grid { grid-template-columns: 1fr 1fr; }
+
+  .steps-row { grid-template-columns: 1fr; }
+  .step-card:first-child { border-radius: var(--r-xl) var(--r-xl) 0 0; }
+  .step-card:last-child  { border-radius: 0 0 var(--r-xl) var(--r-xl); }
+
+  .tp-grid { grid-template-columns: 1fr; }
+  .tp-visual { display: none; }
+
+  .ba-grid { grid-template-columns: 1fr; }
+  .ba-col.before { border-radius: var(--r-xl) var(--r-xl) 0 0; }
+  .ba-col.after  { border-radius: 0 0 var(--r-xl) var(--r-xl); }
+
+  .feature-row, .feature-row.flip {
+    grid-template-columns: 1fr; direction: ltr; gap: 40px;
+  }
+
+  .testi-grid { grid-template-columns: 1fr; }
+  .testi-grid .tcard:nth-child(2) { margin-top: 0; }
+
+  .pricing-cards { grid-template-columns: 1fr; max-width: 480px; }
+}
+
+@media (max-width: 768px) {
+  .nav-links, .nav-cta { display: none; }
+  .hamburger { display: flex; }
+
+  .pillars-grid { grid-template-columns: 1fr; }
+
+  .ba-col { padding: 36px 28px; }
+
+  .proof-band-inner { flex-wrap: wrap; }
+  .proof-stat { flex-basis: 50%; padding: 24px; border-right: none; border-bottom: 1px solid rgba(0,0,0,.1); }
+  .proof-stat:nth-child(odd) { border-right: 1px solid rgba(0,0,0,.1); }
+
+  .footer-top { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 120px 0 60px; }
+  .hero-actions { flex-direction: column; align-items: flex-start; }
+  .proof-stat { flex-basis: 100%; border-right: none !important; }
+  .cta-final-actions { flex-direction: column; }
 }
   </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════
-  NAVBAR
-════════════════════════════════════════ -->
-<nav class="navbar" id="navbar">
+<!-- ═══════════════════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════════════════════ -->
+<nav class="nav" id="nav">
   <div class="container">
-    <div class="nav-wrap">
-      <a href="#" class="logo">Happy<span style="font-weight:400">Clientele</span><span class="logo-dot">.</span></a>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="#pillars">Features</a></li>
-        <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#testimonials">Reviews</a></li>
-        <li><a href="#faq">FAQ</a></li>
-        <li><a href="#contact" class="btn btn-yellow btn-sm">Get Started Free</a></li>
-        <li><a href="login.html" style="color:rgba(255,255,255,.7);font-weight:500;font-size:.9rem">Log In</a></li>
-      </ul>
-      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="nav-inner">
+      <a href="/" class="logo">Happy<span>Clientele</span></a>
+      <div class="nav-links">
+        <a href="#how-it-works">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="login.html">Log in</a>
+      </div>
+      <a href="signup.html" class="nav-cta">
+        <i class="fas fa-arrow-right"></i> Get started free
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </nav>
 
-<!-- ════════════════════════════════════════
-  HERO
-════════════════════════════════════════ -->
-<section class="hero" id="hero">
-  <div class="hero-video-bg">
-    <video autoplay muted loop playsinline preload="auto">
-      <source src="https://www.dropbox.com/scl/fi/v7hp8xspwo1clen7hth6z/720restaurant.mp4?rlkey=nq3ig6ga7nfu3hdxfoe8yxolg&dl=1" type="video/mp4" />
-    </video>
-    <div class="hero-overlay"></div>
-  </div>
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <span class="mobile-close" id="mobileClose"><i class="fas fa-times"></i></span>
+  <a href="#how-it-works" onclick="closeMobile()">How it works</a>
+  <a href="#features" onclick="closeMobile()">Features</a>
+  <a href="#pricing" onclick="closeMobile()">Pricing</a>
+  <a href="login.html">Log in</a>
+  <a href="signup.html" style="color:var(--yellow)">Get started free →</a>
+</div>
 
-  <div class="hero-inner">
-    <!-- LEFT -->
-    <div class="hero-left">
-      <div class="hero-badge" data-aos="fade-down" data-aos-duration="600">
-        ⚡ Zero Install · Works Instantly
+<!-- ═══════════════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-layout">
+
+      <!-- Left copy -->
+      <div class="hero-left">
+        <div class="hero-eyebrow">
+          <span class="hero-eyebrow-dot"></span>
+          No install &nbsp;·&nbsp; No tech skills &nbsp;·&nbsp; Works in 5 minutes
+        </div>
+
+        <h1 class="hero-h1">
+          Your atmosphere is&nbsp;already a&nbsp;<em>growth engine.</em><br>
+          It just isn't plugged&nbsp;in&nbsp;yet.
+        </h1>
+
+        <p class="hero-sub">
+          HappyClientele turns the touchpoints your customers already interact with —
+          your QR code, your Wi-Fi, your menu — into a 24/7 system that builds your
+          Google star rating, improves your SEO ranking, and grows your email list.
+          Automatically.
+        </p>
+
+        <div class="hero-actions">
+          <a href="signup.html" class="btn-primary pulse">
+            Start free — no card needed
+            <i class="fas fa-arrow-right"></i>
+          </a>
+          <a href="#how-it-works" class="btn-ghost-white">
+            See how it works
+          </a>
+        </div>
+
+        <div class="hero-proof">
+          <div class="proof-chip">
+            <i class="fas fa-check-circle"></i>
+            No app download
+          </div>
+          <div class="proof-sep"></div>
+          <div class="proof-chip">
+            <i class="fas fa-check-circle"></i>
+            Instant setup
+          </div>
+          <div class="proof-sep"></div>
+          <div class="proof-chip">
+            <i class="fas fa-check-circle"></i>
+            Print &amp; place
+          </div>
+        </div>
       </div>
 
-      <h1 class="hero-h1" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
-        Your Business Is Already<br/>
-        Collecting Leads.<br/>
-        <span class="highlight">It Just Doesn't Know It Yet.</span>
-      </h1>
+      <!-- Right stats -->
+      <div class="hero-stats">
+        <div class="stat-block">
+          <div class="stat-left">
+            <div class="stat-num count-up" data-target="300">0</div>
+            <div class="stat-unit">% avg. increase</div>
+          </div>
+          <div class="stat-right">
+            <strong>Google reviews grow — fast</strong>
+            <p>Most businesses see a 3× lift in monthly Google reviews within 60 days.</p>
+          </div>
+        </div>
+        <div class="stat-connector"></div>
 
-      <p class="hero-sub" data-aos="fade-up" data-aos-duration="700" data-aos-delay="200">
-        Every QR code scan, every Wi-Fi login, every menu view is a missed opportunity. HappyClientele turns those everyday moments into 5-star Google reviews, an email list, and repeat customers — automatically. No tech. No install. No effort.
-      </p>
+        <div class="stat-block">
+          <div class="stat-left">
+            <div class="stat-num">4.8<span style="font-size:1.4rem">★</span></div>
+            <div class="stat-unit">avg. star rating</div>
+          </div>
+          <div class="stat-right">
+            <strong>Higher stars = higher rankings</strong>
+            <p>Our private feedback filter keeps low ratings off Google and quality high.</p>
+          </div>
+        </div>
+        <div class="stat-connector"></div>
 
-      <div class="hero-pills" data-aos="fade-up" data-aos-duration="700" data-aos-delay="270">
-        <span class="pill"><i class="fas fa-star"></i> More Google Stars</span>
-        <span class="pill"><i class="fas fa-search"></i> Higher SEO Rankings</span>
-        <span class="pill"><i class="fas fa-envelope"></i> Email List Builder</span>
-        <span class="pill"><i class="fas fa-redo"></i> Repeat Customers</span>
+        <div class="stat-block">
+          <div class="stat-left">
+            <div class="stat-num count-up" data-target="5">0</div>
+            <div class="stat-unit">min setup</div>
+          </div>
+          <div class="stat-right">
+            <strong>Zero friction from the start</strong>
+            <p>Sign up, print your QR code, place it on your counter. Done.</p>
+          </div>
+        </div>
+        <div class="stat-connector"></div>
+
+        <div class="stat-block">
+          <div class="stat-left">
+            <div class="stat-num count-up" data-target="500">0</div>
+            <div class="stat-unit">businesses</div>
+          </div>
+          <div class="stat-right">
+            <strong>Growing community of local owners</strong>
+            <p>Restaurants, salons, shops, clinics — all kinds of businesses, one system.</p>
+          </div>
+        </div>
       </div>
 
-      <div class="hero-ctas" data-aos="fade-up" data-aos-duration="700" data-aos-delay="340">
-        <a href="#contact" class="btn btn-yellow btn-lg pulse">
-          <i class="fas fa-bolt"></i> Start Free — No Credit Card
-        </a>
-        <a href="#how-it-works" class="btn btn-ghost btn-lg">
-          <i class="fas fa-play-circle"></i> See How It Works
-        </a>
-      </div>
-    </div>
-
-    <!-- RIGHT — live review feed -->
-    <div class="hero-right">
-      <div class="feed-label">Live Google Reviews Generated</div>
-      <div class="review-feed" id="reviewFeed">
-        <div class="rf-card"><div class="rf-stars">⭐⭐⭐⭐⭐</div><p class="rf-text">"Found them on Google after seeing all the reviews. Now I'm a regular — best coffee in town!"</p><div class="rf-author">— Sarah K.</div><div class="rf-badge"><i class="fab fa-google"></i> Google Review</div></div>
-        <div class="rf-card"><div class="rf-stars">⭐⭐⭐⭐⭐</div><p class="rf-text">"Saw #1 on Maps and had to try it. 100% lived up to the hype. Going back this weekend."</p><div class="rf-author">— Mike T.</div><div class="rf-badge"><i class="fab fa-google"></i> Google Review</div></div>
-        <div class="rf-card"><div class="rf-stars">⭐⭐⭐⭐⭐</div><p class="rf-text">"Amazing service, went above and beyond. Already told 6 friends to check this place out."</p><div class="rf-author">— Priya N.</div><div class="rf-badge"><i class="fab fa-google"></i> Google Review</div></div>
-        <div class="rf-card"><div class="rf-stars">⭐⭐⭐⭐⭐</div><p class="rf-text">"Came for the reviews, stayed for the experience. Warm, welcoming, and genuinely world-class."</p><div class="rf-author">— James P.</div><div class="rf-badge"><i class="fab fa-google"></i> Google Review</div></div>
-        <div class="rf-card"><div class="rf-stars">⭐⭐⭐⭐⭐</div><p class="rf-text">"Setup looked instant — boom, reviews started piling up. My ranking went up in 3 weeks!"</p><div class="rf-author">— Diana C.</div><div class="rf-badge"><i class="fab fa-google"></i> Google Review</div></div>
-        <div class="rf-card"><div class="rf-stars">⭐⭐⭐⭐⭐</div><p class="rf-text">"Couldn't believe it was this simple. Printed the QR, placed it on the counter, done."</p><div class="rf-author">— Marcus W.</div><div class="rf-badge"><i class="fab fa-google"></i> Google Review</div></div>
-        <div class="rf-card"><div class="rf-stars">⭐⭐⭐⭐⭐</div><p class="rf-text">"Quick, professional staff. Found via Google Maps — the reviews told the whole story."</p><div class="rf-author">— Rachel B.</div><div class="rf-badge"><i class="fab fa-google"></i> Google Review</div></div>
-        <div class="rf-card"><div class="rf-stars">⭐⭐⭐⭐⭐</div><p class="rf-text">"Top-rated for a reason. That QR on the table was genius — I left a review on the spot."</p><div class="rf-author">— Omar J.</div><div class="rf-badge"><i class="fab fa-google"></i> Google Review</div></div>
-        <div class="rf-card"><div class="rf-stars">⭐⭐⭐⭐⭐</div><p class="rf-text">"My salon jumped to #2 in local search within 60 days of using HappyClientele. Incredible."</p><div class="rf-author">— Aisha M.</div><div class="rf-badge"><i class="fab fa-google"></i> Google Review</div></div>
-      </div>
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════
-  PROOF STRIP
-════════════════════════════════════════ -->
-<div class="proof-strip">
-  <div class="container">
-    <div class="proof-strip-inner">
-      <div class="ps-item"><i class="fas fa-store"></i> 500+ Local Businesses</div>
-      <div class="ps-div"></div>
-      <div class="ps-item"><i class="fas fa-star"></i> 50,000+ Reviews Generated</div>
-      <div class="ps-div"></div>
-      <div class="ps-item"><i class="fas fa-chart-line"></i> Avg 300% Review Increase</div>
-      <div class="ps-div"></div>
-      <div class="ps-item"><i class="fas fa-bolt"></i> 5-Minute Setup</div>
-      <div class="ps-div"></div>
-      <div class="ps-item"><i class="fas fa-shield-alt"></i> 30-Day Guarantee</div>
+<!-- ═══════════════════════════════════════════════════════
+     LOGO BAR
+══════════════════════════════════════════════════════════ -->
+<div class="logo-bar">
+  <div class="container-wide">
+    <div class="logo-bar-inner">
+      <span class="logo-bar-label">Works for</span>
+      <div style="overflow:hidden;flex:1">
+        <div class="logo-bar-track" id="logoTrack">
+          <!-- duplicated for seamless loop -->
+          <span class="biz-type"><i class="fas fa-utensils"></i> Restaurants</span>
+          <span class="biz-type"><i class="fas fa-scissors"></i> Hair Salons</span>
+          <span class="biz-type"><i class="fas fa-coffee"></i> Cafés</span>
+          <span class="biz-type"><i class="fas fa-spa"></i> Spas &amp; Wellness</span>
+          <span class="biz-type"><i class="fas fa-store"></i> Retail Shops</span>
+          <span class="biz-type"><i class="fas fa-tooth"></i> Dental &amp; Medical</span>
+          <span class="biz-type"><i class="fas fa-dumbbell"></i> Gyms &amp; Fitness</span>
+          <span class="biz-type"><i class="fas fa-paw"></i> Pet Services</span>
+          <span class="biz-type"><i class="fas fa-glass-cheers"></i> Bars &amp; Breweries</span>
+          <span class="biz-type"><i class="fas fa-car"></i> Auto Services</span>
+          <!-- duplicate set for seamless loop -->
+          <span class="biz-type"><i class="fas fa-utensils"></i> Restaurants</span>
+          <span class="biz-type"><i class="fas fa-scissors"></i> Hair Salons</span>
+          <span class="biz-type"><i class="fas fa-coffee"></i> Cafés</span>
+          <span class="biz-type"><i class="fas fa-spa"></i> Spas &amp; Wellness</span>
+          <span class="biz-type"><i class="fas fa-store"></i> Retail Shops</span>
+          <span class="biz-type"><i class="fas fa-tooth"></i> Dental &amp; Medical</span>
+          <span class="biz-type"><i class="fas fa-dumbbell"></i> Gyms &amp; Fitness</span>
+          <span class="biz-type"><i class="fas fa-paw"></i> Pet Services</span>
+          <span class="biz-type"><i class="fas fa-glass-cheers"></i> Bars &amp; Breweries</span>
+          <span class="biz-type"><i class="fas fa-car"></i> Auto Services</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════════════════
-  ATMOSPHERE SECTION — the core insight
-════════════════════════════════════════ -->
-<section class="atmo" id="atmosphere" data-aos="fade-up">
+<!-- ═══════════════════════════════════════════════════════
+     FOUR PILLARS
+══════════════════════════════════════════════════════════ -->
+<section class="pillars" id="how-it-works">
   <div class="container">
-    <div class="atmo-grid">
-      <div class="atmo-left">
-        <div class="eyebrow">The Big Idea</div>
-        <h2>Your Customers Are Already<br/>
-        <span class="highlight">Touching Your System.</span><br/>
-        Make It Work for You.</h2>
-        <p>The Wi-Fi they log in to. The menu they scan. The QR on the table. These moments happen dozens of times a day — and right now they go to waste. HappyClientele turns every one of those touchpoints into a silent, automated marketing machine that builds your Google reputation, grows your email list, and brings customers back.</p>
-        <p>No new devices. No software. No training. You just print a QR code and place it. We handle everything else.</p>
-        <a href="#contact" class="btn btn-yellow btn-md" style="margin-top:8px">
-          <i class="fas fa-bolt"></i> Activate Your Touchpoints
-        </a>
-      </div>
-
-      <div class="atmo-right" data-aos="fade-left" data-aos-delay="200">
-        <div class="touchpoint-stack">
-          <div class="tp-card">
-            <div class="tp-icon" style="background:#fffbea"><span style="font-size:1.4rem">📋</span></div>
-            <div class="tp-body">
-              <h4>The Review Funnel QR</h4>
-              <p>Scan → rate experience → happy path to Google → unhappy path to private form</p>
-            </div>
-            <span class="tp-badge badge-yellow">Flagship</span>
-          </div>
-          <div class="tp-card">
-            <div class="tp-icon" style="background:#e8f0fe"><span style="font-size:1.4rem">📶</span></div>
-            <div class="tp-body">
-              <h4>Super Wi-Fi Funnel</h4>
-              <p>Wi-Fi password reveal captures email → sends a timed review request link</p>
-            </div>
-            <span class="tp-badge badge-blue">Smart</span>
-          </div>
-          <div class="tp-card">
-            <div class="tp-icon" style="background:#e8f5e9"><span style="font-size:1.4rem">🍽️</span></div>
-            <div class="tp-body">
-              <h4>Menu QR Code</h4>
-              <p>Digital menu scan builds your lead list — every view is a potential review</p>
-            </div>
-            <span class="tp-badge badge-green">Always On</span>
-          </div>
-          <div class="tp-card">
-            <div class="tp-icon" style="background:#fce4ec"><span style="font-size:1.4rem">📬</span></div>
-            <div class="tp-body">
-              <h4>Email List & Automation</h4>
-              <p>Every touchpoint builds your list — reachable for promos, events, re-engagement</p>
-            </div>
-            <span class="tp-badge" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1">Powerful</span>
-          </div>
-        </div>
-      </div>
+    <div class="section-label">
+      <span class="section-label-line"></span>
+      The System
     </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  HOW SIMPLE
-════════════════════════════════════════ -->
-<section class="how-simple" id="how-it-works">
-  <div class="container">
-    <div class="section-tag">Simplicity First</div>
-    <h2 data-aos="fade-up">Up and Running in 3 Moves</h2>
-    <p class="sub" data-aos="fade-up" data-aos-delay="100">No developer. No IT department. No onboarding call if you don't want one. This is as simple as it gets.</p>
-
-    <div class="steps-row">
-      <div class="step-card" data-aos="fade-up" data-aos-delay="100">
-        <div class="step-num">1</div>
-        <h3>Sign Up & Connect</h3>
-        <p>Enter your Google Business info. That's it. We pull your listing, generate your QR codes, and your funnel is ready to go — in under 5 minutes.</p>
-        <span class="step-note">⏱ 5 minutes</span>
-      </div>
-      <div class="step-card" data-aos="fade-up" data-aos-delay="200">
-        <div class="step-num">2</div>
-        <h3>Print & Place</h3>
-        <p>Download your QR code as a PNG or order a physical card. Put it on your counter, table, receipt, or front door. Customers scan — the system does the rest.</p>
-        <span class="step-note">🖨️ One print job</span>
-      </div>
-      <div class="step-card" data-aos="fade-up" data-aos-delay="300">
-        <div class="step-num">3</div>
-        <h3>Watch It Work</h3>
-        <p>Happy customers get routed to Google. Unhappy ones go to your private inbox. Emails collect automatically. Your dashboard shows every lead and review in real time.</p>
-        <span class="step-note">📈 Results in 48 hrs</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  FOUR PILLARS
-════════════════════════════════════════ -->
-<section class="pillars" id="pillars">
-  <div class="container">
-    <div class="s-tag" data-aos="fade-up">What You Get</div>
-    <h2 data-aos="fade-up" data-aos-delay="100">Four Results. One Simple System.</h2>
-    <p class="sub" data-aos="fade-up" data-aos-delay="150">Most reputation tools do one thing. HappyClientele does four — and they all compound on each other.</p>
+    <h2 class="section-h2">Four things working for you — around the clock.</h2>
+    <p class="section-intro">
+      Every piece connects. Together they turn foot traffic into reviews,
+      reviews into rankings, and rankings into new customers walking through your door.
+    </p>
 
     <div class="pillars-grid">
-
-      <div class="pillar-card pc-1" data-aos="fade-up" data-aos-delay="100">
-        <div class="pillar-icon" style="background:#fffbea">⭐</div>
-        <h3>Higher Google Star Rating</h3>
-        <p>The review funnel filters satisfaction before asking for a public review. Only genuinely happy customers make it to Google — so your average climbs and stays high.</p>
-        <ul class="pillar-list" style="color:#8a5800">
-          <li>Smart happy/unhappy routing</li>
-          <li>Private feedback for concerns</li>
-          <li>Automatic rating protection</li>
-          <li>Avg client reaches 4.8★ in 90 days</li>
-        </ul>
-      </div>
-
-      <div class="pillar-card pc-2" data-aos="fade-up" data-aos-delay="150">
-        <div class="pillar-icon" style="background:#e8f0fe">🔍</div>
-        <h3>Higher SEO Rankings</h3>
-        <p>Google's local search algorithm ranks businesses with more recent, high-quality reviews. More reviews = higher ranking = more new customers finding you first.</p>
-        <ul class="pillar-list" style="color:#1565c0">
-          <li>Consistent new review velocity</li>
-          <li>Google Maps ranking boost</li>
-          <li>Outrank competitors with fewer reviews</li>
-          <li>Clients average Page 1 in 60 days</li>
-        </ul>
-      </div>
-
-      <div class="pillar-card pc-3" data-aos="fade-up" data-aos-delay="200">
-        <div class="pillar-icon" style="background:#e8f5e9">📧</div>
-        <h3>Email List You Own</h3>
-        <p>Every scan, every login, every interaction captures an email address. Your list grows on autopilot — and you own it. Use it for promotions, events, or re-engagement anytime.</p>
-        <ul class="pillar-list" style="color:#1b5e20">
-          <li>Captured on every funnel interaction</li>
-          <li>Wi-Fi login email capture</li>
-          <li>CSV export, webhook, or direct CRM sync</li>
-          <li>100% yours — not locked to any platform</li>
-        </ul>
-      </div>
-
-      <div class="pillar-card pc-4" data-aos="fade-up" data-aos-delay="250">
-        <div class="pillar-icon" style="background:#fce4ec">🔄</div>
-        <h3>Regular Touchpoints</h3>
-        <p>Your atmosphere becomes the marketing. Every time a customer scans the menu, joins the Wi-Fi, or picks up the table tent — they're in your system. That's ongoing, compounding visibility.</p>
-        <ul class="pillar-list" style="color:#b71c1c">
-          <li>Multiple QR points in your location</li>
-          <li>Wi-Fi funnel runs 24/7</li>
-          <li>Menu QR builds list on every visit</li>
-          <li>Returns customers up to 2× more often</li>
-        </ul>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  HOW THE FUNNEL WORKS
-════════════════════════════════════════ -->
-<section class="funnel-section" id="funnel">
-  <div class="container">
-    <div class="s-tag" data-aos="fade-up">The Smart Filter</div>
-    <h2 data-aos="fade-up" data-aos-delay="100">Protect Your Reputation While Building It</h2>
-    <p class="sub" data-aos="fade-up" data-aos-delay="150">The review funnel asks one simple question — and routes the answer intelligently. You never have to worry about a bad review slipping through again.</p>
-
-    <div class="funnel-diagram" data-aos="zoom-in" data-aos-delay="200">
-      <div class="f-node entry">
-        <div class="f-icon">📱</div>
-        <div class="f-label">Customer Scans QR Code</div>
-        <div class="f-sub">At your counter, table, or door</div>
-      </div>
-      <div class="f-arrow"><i class="fas fa-chevron-down"></i></div>
-      <div class="f-node check">
-        <div class="f-icon" style="animation:pulse-icon 2s ease-in-out infinite">💬</div>
-        <div class="f-label">One Question</div>
-        <div class="f-sub">"How was your experience today?"</div>
-      </div>
-
-      <div class="f-split">
-        <div class="f-split-line">
-          <div class="f-split-bar"></div>
-          <div class="f-split-bar"></div>
+      <div class="pillar-card">
+        <div class="pillar-num">01</div>
+        <div class="pillar-icon-wrap">
+          <i class="fab fa-google"></i>
         </div>
-        <div class="f-split-labels">
-          <span class="happy-tag"><i class="fas fa-smile"></i> Happy</span>
-          <span class="sad-tag"><i class="fas fa-meh"></i> Not Happy</span>
+        <div class="pillar-title">Higher Google Stars</div>
+        <div class="pillar-desc">
+          Happy customers go to Google. Unhappy ones come to you privately. 
+          Your star rating climbs — and stays there.
         </div>
       </div>
 
-      <div class="f-paths">
-        <div class="f-path" data-aos="fade-right" data-aos-delay="400">
-          <div class="f-arrow"><i class="fas fa-chevron-down"></i></div>
-          <div class="f-node google">
-            <div class="f-icon"><span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue2">g</span><span class="g-green">l</span><span class="g-red2">e</span></div>
-            <div class="f-label">Google Review Page</div>
-          </div>
-          <div class="f-arrow"><i class="fas fa-chevron-down"></i></div>
-          <div class="f-node result-good">
-            <div style="font-size:1.2rem;margin-bottom:4px">⭐⭐⭐⭐⭐</div>
-            <div class="f-label">Public 5-Star Review</div>
-          </div>
+      <div class="pillar-card">
+        <div class="pillar-num">02</div>
+        <div class="pillar-icon-wrap">
+          <i class="fas fa-search"></i>
         </div>
-        <div class="f-path" data-aos="fade-left" data-aos-delay="400">
-          <div class="f-arrow"><i class="fas fa-chevron-down"></i></div>
-          <div class="f-node private">
-            <div class="f-icon">🔒</div>
-            <div class="f-label">Private Feedback Form</div>
-          </div>
-          <div class="f-arrow"><i class="fas fa-chevron-down"></i></div>
-          <div class="f-node result-private">
-            <div class="f-icon">💬</div>
-            <div class="f-label">You Handle It Privately</div>
-          </div>
+        <div class="pillar-title">Better SEO Rankings</div>
+        <div class="pillar-desc">
+          Google's algorithm rewards businesses with recent, high-quality reviews.
+          More reviews = higher local search position = more organic traffic.
         </div>
       </div>
 
-      <div class="f-insight" data-aos="fade-up" data-aos-delay="600">
-        <div class="f-insight-icon">💡</div>
-        <p><strong>Your Google profile shows only your best.</strong> Private feedback stays private — and often turns unhappy customers into loyal ones.</p>
+      <div class="pillar-card">
+        <div class="pillar-num">03</div>
+        <div class="pillar-icon-wrap">
+          <i class="fas fa-envelope"></i>
+        </div>
+        <div class="pillar-title">Email List Builder</div>
+        <div class="pillar-desc">
+          Every customer who uses your Wi-Fi, scans your menu, or engages with 
+          your funnel adds their email to your growing list.
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-num">04</div>
+        <div class="pillar-icon-wrap">
+          <i class="fas fa-wifi"></i>
+        </div>
+        <div class="pillar-title">Daily Touchpoints</div>
+        <div class="pillar-desc">
+          Wi-Fi login. Menu scan. Review QR. Your customers interact with these
+          every visit — now each one does something for your business.
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════
-  STATS
-════════════════════════════════════════ -->
-<section class="stats" id="stats">
-  <div class="stats-bg"></div>
+<!-- ═══════════════════════════════════════════════════════
+     3-STEP SIMPLICITY
+══════════════════════════════════════════════════════════ -->
+<section class="simplicity">
   <div class="container">
-    <div class="s-tag" data-aos="fade-up">The Numbers</div>
-    <h2 data-aos="fade-up" data-aos-delay="100">
-      Reviews Are Your #1<br/>
-      <span class="highlight">Free Marketing Asset</span>
+    <div class="section-label" style="color:rgba(255,255,255,.4)">
+      <span class="section-label-line" style="background:rgba(255,255,255,.2)"></span>
+      Setup in 3 steps
+    </div>
+    <h2 class="section-h2" style="color:var(--white)">
+      Seriously. That's&nbsp;all there is to&nbsp;it.
     </h2>
 
-    <div class="stats-grid">
-      <div class="stat-block" data-aos="zoom-in" data-aos-delay="100">
-        <div><span class="stat-num" data-count="93">0</span><span class="stat-suffix">%</span></div>
-        <div class="stat-label">of consumers read online reviews before choosing a local business</div>
+    <div class="steps-row">
+      <div class="step-card">
+        <div class="step-bg-num">1</div>
+        <div class="step-badge">1</div>
+        <div class="step-title">Create your free account.</div>
+        <div class="step-desc">
+          Sign up in under 60 seconds. Enter your business name and Google 
+          profile link — that's the only setup required.
+        </div>
+        <div class="step-tag"><i class="fas fa-clock"></i> Under 60 seconds</div>
       </div>
-      <div class="stat-block" data-aos="zoom-in" data-aos-delay="200">
-        <div><span class="stat-num" data-count="40">0</span><span class="stat-suffix">+</span></div>
-        <div class="stat-label">Google reviews needed to see a meaningful jump in local search rankings</div>
-      </div>
-      <div class="stat-block" data-aos="zoom-in" data-aos-delay="300">
-        <div><span class="stat-num" data-count="85">0</span><span class="stat-suffix">%</span></div>
-        <div class="stat-label">of people trust online reviews as much as a personal recommendation from a friend</div>
-      </div>
-      <div class="stat-block" data-aos="zoom-in" data-aos-delay="400">
-        <div><span class="stat-num" data-count="5">0</span><span class="stat-suffix">%</span></div>
-        <div class="stat-label">of businesses consistently ask for reviews — leaving 95% of their customers silent</div>
-      </div>
-    </div>
 
-    <div class="stat-quote" data-aos="fade-up" data-aos-delay="500">
-      <p>"Every day you're not capturing reviews is a day your competitors are pulling ahead on Google. The gap compounds — and so do the results when you fix it."</p>
+      <div class="step-card">
+        <div class="step-bg-num">2</div>
+        <div class="step-badge">2</div>
+        <div class="step-title">Print your QR code.</div>
+        <div class="step-desc">
+          Download your unique QR code. Print it, stick it on a table tent,
+          a counter card, or anywhere customers look. No app. No tech.
+        </div>
+        <div class="step-tag"><i class="fas fa-print"></i> One print, forever live</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-bg-num">3</div>
+        <div class="step-badge">3</div>
+        <div class="step-title">Watch reviews roll in.</div>
+        <div class="step-desc">
+          Your system runs itself. Customers interact. Reviews post.
+          Emails collect. Your dashboard tracks everything.
+        </div>
+        <div class="step-tag"><i class="fas fa-chart-line"></i> Fully automated</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════
-  TESTIMONIALS
-════════════════════════════════════════ -->
-<section class="testimonials" id="testimonials">
+<!-- ═══════════════════════════════════════════════════════
+     TOUCHPOINTS
+══════════════════════════════════════════════════════════ -->
+<section class="touchpoints">
   <div class="container">
-    <div class="s-tag" data-aos="fade-up">Real Results</div>
-    <h2 data-aos="fade-up" data-aos-delay="100">Real Businesses. <span class="highlight">Real Numbers.</span></h2>
+    <div class="section-label">
+      <span class="section-label-line"></span>
+      Customer touchpoints
+    </div>
+    <h2 class="section-h2">
+      Three moments your customers<br>already experience every visit.
+    </h2>
+
+    <div class="tp-grid">
+      <div class="tp-list">
+
+        <div class="tp-item active">
+          <div class="tp-icon"><i class="fas fa-star"></i></div>
+          <div class="tp-copy">
+            <strong>Review Funnel QR Code</strong>
+            <p>
+              Place it at checkout, on your table, or receipt. Customers who had
+              a great experience get routed to Google. Others leave private feedback
+              that only you can see.
+            </p>
+          </div>
+        </div>
+
+        <div class="tp-item">
+          <div class="tp-icon"><i class="fas fa-wifi"></i></div>
+          <div class="tp-copy">
+            <strong>Wi-Fi Email Capture</strong>
+            <p>
+              Guests log into your Wi-Fi with their email. You get a real,
+              verified email address — every single session, hands-free.
+            </p>
+          </div>
+        </div>
+
+        <div class="tp-item">
+          <div class="tp-icon"><i class="fas fa-qrcode"></i></div>
+          <div class="tp-copy">
+            <strong>Super Menu QR</strong>
+            <p>
+              Customers scan to see your menu. Before they get there, they drop
+              their email. After they've browsed, a timed prompt nudges them
+              toward Google — right in the moment of a great experience.
+            </p>
+          </div>
+        </div>
+
+        <div class="tp-item">
+          <div class="tp-icon"><i class="fas fa-envelope-open-text"></i></div>
+          <div class="tp-copy">
+            <strong>Automated Follow-ups</strong>
+            <p>
+              Your email list gets built automatically with every interaction.
+              Use it to announce specials, send review reminders, 
+              or stay top of mind between visits.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Phone visual -->
+      <div class="tp-visual">
+        <div class="phone-shell">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="mock-bar">
+              <div class="mock-bar-dot" style="background:#ff5f57"></div>
+              <div class="mock-bar-dot" style="background:#febc2e"></div>
+              <div class="mock-bar-dot" style="background:#28c840"></div>
+              <span style="margin-left:8px">happyclientele.com/r/pizzaco</span>
+            </div>
+            <div class="mock-card">
+              <div class="mock-biz-name">🍕 Pizza Co.</div>
+              <div class="mock-stars">★★★★★</div>
+              <div class="mock-prompt">
+                <strong style="font-size:.82rem;color:#333">How was your experience today?</strong><br>
+                Tap the rating that matches your visit.
+              </div>
+              <div style="display:flex;gap:6px;margin-bottom:12px">
+                <div style="flex:1;text-align:center;padding:10px 0;background:#fffbea;border:1px solid #f0da7a;border-radius:8px;font-size:1.2rem;cursor:pointer">😍</div>
+                <div style="flex:1;text-align:center;padding:10px 0;background:#f9f9f9;border:1px solid #eee;border-radius:8px;font-size:1.2rem;cursor:pointer">😊</div>
+                <div style="flex:1;text-align:center;padding:10px 0;background:#f9f9f9;border:1px solid #eee;border-radius:8px;font-size:1.2rem;cursor:pointer">😐</div>
+                <div style="flex:1;text-align:center;padding:10px 0;background:#f9f9f9;border:1px solid #eee;border-radius:8px;font-size:1.2rem;cursor:pointer">😕</div>
+              </div>
+              <div class="mock-btn">Share my review on Google →</div>
+              <div class="mock-btn ghost">Leave private feedback</div>
+              <div class="mock-wifi-badge">
+                <i class="fas fa-lock"></i>
+                Private feedback stays off Google
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     PROOF BAND
+══════════════════════════════════════════════════════════ -->
+<div class="proof-band">
+  <div class="container">
+    <div class="proof-band-inner">
+      <div class="proof-stat">
+        <div class="proof-stat-num">500+</div>
+        <div class="proof-stat-label">Local businesses</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-stat-num">50,000+</div>
+        <div class="proof-stat-label">Reviews collected</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-stat-num">300%</div>
+        <div class="proof-stat-label">Avg. review increase</div>
+      </div>
+      <div class="proof-stat">
+        <div class="proof-stat-num">5 min</div>
+        <div class="proof-stat-label">Average setup time</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     BEFORE / AFTER
+══════════════════════════════════════════════════════════ -->
+<section class="before-after">
+  <div class="container">
+    <div class="section-label">
+      <span class="section-label-line"></span>
+      The difference
+    </div>
+    <h2 class="section-h2">What changes when you plug&nbsp;in.</h2>
+
+    <div class="ba-grid">
+      <div class="ba-col before">
+        <div class="ba-col-header">
+          <div class="ba-col-tag">Before HappyClientele</div>
+        </div>
+        <div class="ba-list">
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-times"></i></div>
+            <div class="ba-text">Customers leave and nothing happens — no review, no email, no follow-up.</div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-times"></i></div>
+            <div class="ba-text">Unhappy customers go straight to Google and tank your star rating.</div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-times"></i></div>
+            <div class="ba-text">You're invisible in local search while competitors rack up reviews.</div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-times"></i></div>
+            <div class="ba-text">No email list. No way to reach your own customers after they walk out.</div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-times"></i></div>
+            <div class="ba-text">Wi-Fi, menu QR, and receipts sit there doing nothing for your business.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ba-col after">
+        <div class="ba-col-header">
+          <div class="ba-col-tag">With HappyClientele</div>
+        </div>
+        <div class="ba-list">
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-check"></i></div>
+            <div class="ba-text"><strong>Every happy customer becomes a Google review</strong> — automatically routed, zero friction.</div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-check"></i></div>
+            <div class="ba-text"><strong>Unhappy customers give private feedback</strong> — stays off Google, goes directly to you.</div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-check"></i></div>
+            <div class="ba-text"><strong>Your Google rankings climb</strong> as fresh reviews signal relevance to the algorithm.</div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-check"></i></div>
+            <div class="ba-text"><strong>Your email list grows with every visit</strong> — Wi-Fi, menu, funnel, all capturing leads.</div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-icon-wrap"><i class="fas fa-check"></i></div>
+            <div class="ba-text"><strong>Every touchpoint works for you</strong> — passive, continuous, no effort required.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     FEATURES DEEP DIVE
+══════════════════════════════════════════════════════════ -->
+<section class="features" id="features">
+  <div class="container">
+
+    <!-- Feature 1: Google Reviews -->
+    <div class="feature-row">
+      <div class="feature-visual">
+        <div class="fv-inner">
+          <div class="google-mini">
+            <div class="gm-icon"><i class="fab fa-google"></i></div>
+            <div>
+              <div class="gm-name">The Corner Café</div>
+              <div class="gm-stars">★★★★★</div>
+              <div class="gm-count">4.9 · <strong style="color:#34A853">↑ 312 reviews</strong> · Google Maps</div>
+            </div>
+          </div>
+          <div class="star-bars">
+            <div class="star-bar-row">
+              <span>5 ★</span>
+              <div class="star-bar-track"><div class="star-bar-fill" style="width:88%"></div></div>
+              <span>88%</span>
+            </div>
+            <div class="star-bar-row">
+              <span>4 ★</span>
+              <div class="star-bar-track"><div class="star-bar-fill" style="width:9%"></div></div>
+              <span>9%</span>
+            </div>
+            <div class="star-bar-row">
+              <span>3 ★</span>
+              <div class="star-bar-track"><div class="star-bar-fill" style="width:2%;background:#c8a000"></div></div>
+              <span>2%</span>
+            </div>
+            <div class="star-bar-row">
+              <span>1–2 ★</span>
+              <div class="star-bar-track"><div class="star-bar-fill" style="width:1%;background:#ccc"></div></div>
+              <span>1%</span>
+            </div>
+          </div>
+          <div style="font-size:.78rem;color:var(--gray-text);text-align:center;padding:8px;background:rgba(52,168,83,.08);border-radius:8px;border:1px solid rgba(52,168,83,.15)">
+            <i class="fas fa-shield-alt" style="color:#34A853;margin-right:6px"></i>
+            Private feedback filter active — unhappy reviews redirected away from Google
+          </div>
+        </div>
+      </div>
+      <div class="feature-copy">
+        <div class="feature-kicker"><i class="fab fa-google"></i> Google Stars</div>
+        <h3 class="feature-h3">A private filter that&nbsp;protects your rating.</h3>
+        <p class="feature-desc">
+          Not every customer experience is perfect — and that's okay. What matters is
+          where their feedback goes. Happy customers get routed directly to your Google
+          review page. Everyone else? They see a private feedback form that comes
+          straight to you. Your star rating climbs. Your reputation stays clean.
+        </p>
+        <div class="feature-bullets">
+          <div class="feature-bullet">
+            <div class="bullet-check"><i class="fas fa-check"></i></div>
+            Positive experiences → Google Reviews page
+          </div>
+          <div class="feature-bullet">
+            <div class="bullet-check"><i class="fas fa-check"></i></div>
+            Negative experiences → Private feedback form (only you see it)
+          </div>
+          <div class="feature-bullet">
+            <div class="bullet-check"><i class="fas fa-check"></i></div>
+            Customers choose their own rating — it feels natural, not pushy
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 2: SEO / Rankings -->
+    <div class="feature-row flip">
+      <div class="feature-visual">
+        <div class="fv-inner">
+          <div style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-text);margin-bottom:12px">
+            Google Maps — "pizza near me"
+          </div>
+          <div class="seo-mock">
+            <div class="seo-row" style="background:rgba(253,184,19,.06);border-color:rgba(253,184,19,.25)">
+              <div class="seo-rank top">#1</div>
+              <div class="seo-info">
+                <div class="seo-name">🍕 Pizza Co. <span style="font-size:.7rem;background:#34A853;color:#fff;padding:2px 7px;border-radius:4px;margin-left:4px">NEW</span></div>
+                <div class="seo-rating">4.9 ★ · 312 reviews · Closes 10pm</div>
+              </div>
+              <div class="seo-arrow up"><i class="fas fa-arrow-up"></i></div>
+            </div>
+            <div class="seo-row">
+              <div class="seo-rank">#2</div>
+              <div class="seo-info">
+                <div class="seo-name">The Slice Shop</div>
+                <div class="seo-rating">4.4 ★ · 89 reviews · Closes 9pm</div>
+              </div>
+              <div class="seo-arrow" style="color:var(--gray-mid)">—</div>
+            </div>
+            <div class="seo-row">
+              <div class="seo-rank">#3</div>
+              <div class="seo-info">
+                <div class="seo-name">Metro Pizza</div>
+                <div class="seo-rating">4.2 ★ · 54 reviews · Closes 8pm</div>
+              </div>
+              <div class="seo-arrow down"><i class="fas fa-arrow-down"></i></div>
+            </div>
+          </div>
+          <div style="font-size:.75rem;color:var(--gray-text);margin-top:12px;padding:10px 12px;background:var(--off-white);border-radius:8px">
+            <i class="fas fa-info-circle" style="color:#4285F4;margin-right:6px"></i>
+            Google rewards businesses with recent, frequent reviews. More reviews = better position.
+          </div>
+        </div>
+      </div>
+      <div class="feature-copy">
+        <div class="feature-kicker"><i class="fas fa-search"></i> SEO Rankings</div>
+        <h3 class="feature-h3">Reviews are the #1 factor in local&nbsp;search.</h3>
+        <p class="feature-desc">
+          Google's local ranking algorithm looks at three things: relevance, distance,
+          and prominence. Reviews are the biggest signal you control. A steady
+          stream of recent, quality reviews is the most effective SEO move a 
+          local business can make — and HappyClientele puts it on autopilot.
+        </p>
+        <div class="feature-bullets">
+          <div class="feature-bullet">
+            <div class="bullet-check"><i class="fas fa-check"></i></div>
+            Fresh reviews signal relevance — Google's algorithm loves recency
+          </div>
+          <div class="feature-bullet">
+            <div class="bullet-check"><i class="fas fa-check"></i></div>
+            Higher star ratings improve click-through rate from search results
+          </div>
+          <div class="feature-bullet">
+            <div class="bullet-check"><i class="fas fa-check"></i></div>
+            No paid SEO, no agency, no monthly retainer — just reviews
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 3: Email list -->
+    <div class="feature-row">
+      <div class="feature-visual">
+        <div class="fv-inner">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <span style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:800">Email Leads</span>
+            <span style="font-size:.75rem;color:var(--green);font-weight:600"><i class="fas fa-arrow-up"></i> 24 this week</span>
+          </div>
+          <div class="email-chips">
+            <div class="email-chip">
+              <div class="email-chip-dot" style="background:#34A853"></div>
+              <span class="email-chip-name">Sarah M.</span>
+              <span style="font-size:.75rem;color:var(--gray-text)">sarah@gmail.com</span>
+              <span class="email-chip-meta">Wi-Fi · just now</span>
+            </div>
+            <div class="email-chip">
+              <div class="email-chip-dot" style="background:#4285F4"></div>
+              <span class="email-chip-name">James R.</span>
+              <span style="font-size:.75rem;color:var(--gray-text)">jr@icloud.com</span>
+              <span class="email-chip-meta">Menu QR · 4m ago</span>
+            </div>
+            <div class="email-chip">
+              <div class="email-chip-dot" style="background:#FBBC04"></div>
+              <span class="email-chip-name">Lisa T.</span>
+              <span style="font-size:.75rem;color:var(--gray-text)">lisa@outlook.com</span>
+              <span class="email-chip-meta">Review funnel · 12m ago</span>
+            </div>
+            <div class="email-chip">
+              <div class="email-chip-dot" style="background:#EA4335"></div>
+              <span class="email-chip-name">Marcus W.</span>
+              <span style="font-size:.75rem;color:var(--gray-text)">marcusw@gmail.com</span>
+              <span class="email-chip-meta">Wi-Fi · 28m ago</span>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:rgba(52,168,83,.08);border-radius:8px;border:1px solid rgba(52,168,83,.15);font-size:.78rem;color:#2a6a3a">
+            <i class="fas fa-download" style="margin-right:6px"></i>
+            Export all leads as CSV anytime
+          </div>
+        </div>
+      </div>
+      <div class="feature-copy">
+        <div class="feature-kicker"><i class="fas fa-envelope"></i> Email List</div>
+        <h3 class="feature-h3">Your busiest moments are&nbsp;your best list-building opportunities.</h3>
+        <p class="feature-desc">
+          When a customer logs into your Wi-Fi, scans your menu, or taps through 
+          your review funnel, their email gets added to your leads list.
+          No awkward "sign up for our newsletter" asks. Just organic capture
+          at the exact moment they're engaged with your business.
+        </p>
+        <div class="feature-bullets">
+          <div class="feature-bullet">
+            <div class="bullet-check"><i class="fas fa-check"></i></div>
+            Captured from Wi-Fi logins, menu scans, and review funnels
+          </div>
+          <div class="feature-bullet">
+            <div class="bullet-check"><i class="fas fa-check"></i></div>
+            All leads stored in your dashboard — export any time as CSV
+          </div>
+          <div class="feature-bullet">
+            <div class="bullet-check"><i class="fas fa-check"></i></div>
+            Connect to Make.com for automatic email sequences
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TESTIMONIALS
+══════════════════════════════════════════════════════════ -->
+<section class="testimonials">
+  <div class="container">
+    <div class="section-label" style="color:rgba(255,255,255,.35)">
+      <span class="section-label-line" style="background:rgba(255,255,255,.15)"></span>
+      Real results
+    </div>
+    <h2 class="section-h2" style="color:var(--white)">
+      Business owners who&nbsp;plugged in.
+    </h2>
 
     <div class="testi-grid">
-      <div class="t-card" data-aos="fade-up" data-aos-delay="100">
-        <div class="t-stars">⭐⭐⭐⭐⭐</div>
-        <div class="t-g-badge"><i class="fab fa-google"></i> Verified Google Business Owner</div>
-        <blockquote>"We went from 12 reviews to 87 in three months. We're now the <strong>top-rated coffee shop in our area</strong> — customers mention our reviews when they walk in. HappyClientele changed everything."</blockquote>
-        <div class="t-meta">
-          <div class="t-avatar av-1">SM</div>
-          <div class="t-info">
-            <strong>Sarah M.</strong>
-            <span>Owner, Brew Haven Coffee</span>
-            <div class="t-result">📈 12 → 87 reviews in 90 days</div>
+      <div class="tcard">
+        <div class="tcard-stars">★★★★★</div>
+        <p class="tcard-quote">
+          "We went from <strong>41 Google reviews to 180 in two months.</strong>
+          I literally just put a little card on the table. That's it.
+          I didn't do anything else."
+        </p>
+        <div class="tcard-author">
+          <div class="tcard-avatar">MR</div>
+          <div>
+            <div class="tcard-name">Maria R.</div>
+            <div class="tcard-biz">La Cocina Mexican Restaurant</div>
           </div>
         </div>
       </div>
 
-      <div class="t-card" data-aos="fade-up" data-aos-delay="200">
-        <div class="t-stars">⭐⭐⭐⭐⭐</div>
-        <div class="t-g-badge"><i class="fab fa-google"></i> Verified Google Business Owner</div>
-        <blockquote>"I was terrified of asking for reviews. <strong>HappyClientele removed that fear completely.</strong> We only get 5-stars publicly now. The private feedback has actually helped us improve behind the scenes."</blockquote>
-        <div class="t-meta">
-          <div class="t-avatar av-2">MT</div>
-          <div class="t-info">
-            <strong>Marcus T.</strong>
-            <span>Owner, Studio 42 Salon</span>
-            <div class="t-result">😌 Zero public negative reviews</div>
+      <div class="tcard">
+        <div class="tcard-stars">★★★★★</div>
+        <p class="tcard-quote">
+          "I'm not a tech person at all. I was skeptical it would actually work.
+          <strong>We hit #1 on Google Maps within six weeks.</strong>
+          My phone has not stopped."
+        </p>
+        <div class="tcard-author">
+          <div class="tcard-avatar">DJ</div>
+          <div>
+            <div class="tcard-name">Derek J.</div>
+            <div class="tcard-biz">Uptown Barbershop</div>
           </div>
         </div>
       </div>
 
-      <div class="t-card" data-aos="fade-up" data-aos-delay="300">
-        <div class="t-stars">⭐⭐⭐⭐⭐</div>
-        <div class="t-g-badge"><i class="fab fa-google"></i> Verified Google Business Owner</div>
-        <blockquote>"Setup was literally 4 minutes. Now it runs itself. We doubled our reviews, <strong>moved to #2 in search</strong>, and we're booking 15 new clients a month directly from better Google rankings."</blockquote>
-        <div class="t-meta">
-          <div class="t-avatar av-3">JL</div>
-          <div class="t-info">
-            <strong>Jennifer L.</strong>
-            <span>Owner, Riverside Bistro</span>
-            <div class="t-result">🚀 #2 in local Google search</div>
+      <div class="tcard">
+        <div class="tcard-stars">★★★★★</div>
+        <p class="tcard-quote">
+          "The Wi-Fi capture alone has built us a list of <strong>over 900 real customer
+          emails</strong> in three months. I've never had anything like that before."
+        </p>
+        <div class="tcard-author">
+          <div class="tcard-avatar">SP</div>
+          <div>
+            <div class="tcard-name">Stephanie P.</div>
+            <div class="tcard-biz">Bloom Day Spa</div>
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="trust-row" data-aos="fade-up" data-aos-delay="400">
-      <div class="tr-item"><i class="fas fa-store"></i> <span><strong>500+</strong> businesses trust us</span></div>
-      <div class="tr-div"></div>
-      <div class="tr-item"><i class="fas fa-star"></i> <span><strong>50,000+</strong> reviews generated</span></div>
-      <div class="tr-div"></div>
-      <div class="tr-item"><i class="fas fa-chart-line"></i> <span><strong>300%</strong> avg review increase</span></div>
-      <div class="tr-div"></div>
-      <div class="tr-item"><i class="fas fa-clock"></i> <span><strong>5 min</strong> avg setup time</span></div>
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════
-  PERFECT FOR
-════════════════════════════════════════ -->
-<section class="perfect" id="perfect-for">
-  <div class="perfect-bg"></div>
-  <div class="perfect-overlay"></div>
-  <div class="container">
-    <div class="s-tag" data-aos="fade-up">Who It's For</div>
-    <h2 data-aos="fade-up" data-aos-delay="100" style="color:var(--white)">
-      If Customers Walk Through Your Door,<br/>
-      <span class="highlight">HappyClientele Works For You.</span>
-    </h2>
-
-    <div class="biz-grid">
-      <div class="biz-card" data-aos="zoom-in" data-aos-delay="50"><span class="biz-emoji">☕</span><span class="biz-name">Coffee Shops</span></div>
-      <div class="biz-card" data-aos="zoom-in" data-aos-delay="100"><span class="biz-emoji">✂️</span><span class="biz-name">Salons &amp; Barbers</span></div>
-      <div class="biz-card" data-aos="zoom-in" data-aos-delay="150"><span class="biz-emoji">🍕</span><span class="biz-name">Restaurants</span></div>
-      <div class="biz-card" data-aos="zoom-in" data-aos-delay="200"><span class="biz-emoji">🏪</span><span class="biz-name">Retail Stores</span></div>
-      <div class="biz-card" data-aos="zoom-in" data-aos-delay="250"><span class="biz-emoji">🔧</span><span class="biz-name">Service Providers</span></div>
-      <div class="biz-card" data-aos="zoom-in" data-aos-delay="300"><span class="biz-emoji">🏋️</span><span class="biz-name">Gyms &amp; Studios</span></div>
-      <div class="biz-card" data-aos="zoom-in" data-aos-delay="350"><span class="biz-emoji">🏥</span><span class="biz-name">Healthcare</span></div>
-      <div class="biz-card" data-aos="zoom-in" data-aos-delay="400"><span class="biz-emoji">🚗</span><span class="biz-name">Auto Services</span></div>
-    </div>
-
-    <div data-aos="fade-up" data-aos-delay="450" style="margin-top:16px">
-      <a href="#contact" class="btn btn-yellow btn-md">Get Started — It's Free to Try →</a>
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  PRICING
-════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════
+     PRICING
+══════════════════════════════════════════════════════════ -->
 <section class="pricing" id="pricing">
-  <div class="container">
-    <div class="s-tag" data-aos="fade-up">Pricing</div>
-    <h2 data-aos="fade-up" data-aos-delay="100">Simple Pricing That <span class="highlight">Pays for Itself</span></h2>
-    <p class="sub" data-aos="fade-up" data-aos-delay="150">Two new customers a month covers the cost. Our average client brings in 8–12.</p>
+  <div class="container" style="text-align:center">
+    <div class="section-label" style="margin:0 auto 20px;display:flex;justify-content:center">
+      <span class="section-label-line"></span>
+      &nbsp;Pricing
+    </div>
+    <h2 class="section-h2" style="margin:0 auto 16px">Simple pricing. No surprises.</h2>
+    <p style="font-size:1rem;color:var(--gray-text);margin-bottom:0">
+      Start free. Upgrade when you're ready.
+    </p>
 
-    <div class="pricing-grid">
-      <div class="pc" data-aos="fade-right" data-aos-delay="150">
-        <div class="pc-tag">One-Time Setup</div>
-        <span class="pc-strike">Regular $1,497</span>
-        <div class="pc-price">
-          <span class="pc-dollar">$</span><span class="pc-amount">497</span>
+    <div class="pricing-cards">
+      <div class="pc">
+        <div class="pc-name">Starter</div>
+        <div class="pc-price">$0</div>
+        <div class="pc-period">Free forever</div>
+        <div class="pc-divider"></div>
+        <div class="pc-features">
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Review funnel QR code</div>
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Up to 50 leads / month</div>
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Dashboard &amp; CSV export</div>
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Private feedback filter</div>
         </div>
-        <div class="pc-period">one-time investment</div>
-        <ul class="pc-features">
-          <li><i class="fas fa-check"></i> Complete funnel installation</li>
-          <li><i class="fas fa-check"></i> Google Business integration</li>
-          <li><i class="fas fa-check"></i> QR codes generated &amp; print-ready</li>
-          <li><i class="fas fa-check"></i> Full testing &amp; QA</li>
-          <li><i class="fas fa-check"></i> Launch support</li>
-        </ul>
-        <div class="pc-note">We handle everything — zero effort on your part</div>
+        <a href="signup.html" class="pc-cta">Get started free</a>
       </div>
 
-      <div class="pc featured" data-aos="zoom-in" data-aos-delay="200">
-        <div class="pc-pop">Most Popular</div>
-        <div class="pc-tag">Monthly Service</div>
-        <span class="pc-strike">Regular $197/mo</span>
-        <div class="pc-price">
-          <span class="pc-dollar">$</span><span class="pc-amount">47</span>
-          <span class="pc-mo">/mo</span>
+      <div class="pc popular">
+        <div class="pc-popular-tag">Most Popular</div>
+        <div class="pc-name">Growth</div>
+        <div class="pc-price">$97</div>
+        <div class="pc-period">per month</div>
+        <div class="pc-divider"></div>
+        <div class="pc-features">
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Everything in Starter</div>
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Wi-Fi email capture</div>
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Super Menu QR with email gate</div>
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Unlimited leads</div>
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Make.com webhook automation</div>
+          <div class="pc-feature"><i class="fas fa-check-circle"></i> Priority support</div>
         </div>
-        <div class="pc-period">No contracts · Cancel anytime · Launch price</div>
-        <ul class="pc-features">
-          <li><i class="fas fa-check"></i> Unlimited review requests</li>
-          <li><i class="fas fa-check"></i> Smart happy/unhappy filtering</li>
-          <li><i class="fas fa-check"></i> Email list collection</li>
-          <li><i class="fas fa-check"></i> Wi-Fi funnel + Menu QR</li>
-          <li><i class="fas fa-check"></i> Dashboard &amp; CSV exports</li>
-          <li><i class="fas fa-check"></i> Webhook + CRM integrations</li>
-          <li><i class="fas fa-check"></i> Priority support</li>
-        </ul>
-        <a href="#contact" class="btn btn-yellow btn-lg pc-cta">Start Free Trial →</a>
-        <div class="pc-guarantee">
-          <i class="fas fa-shield-alt"></i>
-          <span><strong>30-Day Results Guarantee</strong> — See measurable improvement or full refund</span>
-        </div>
+        <a href="signup.html" class="pc-cta">Start your free trial</a>
       </div>
     </div>
 
-    <div class="price-value" data-aos="fade-up" data-aos-delay="300">
-      <div class="pv-icon">💰</div>
-      <div class="pv-text">
-        <strong style="color:var(--yellow)">The math is obvious:</strong> Just 2 extra customers a month from better Google visibility covers the cost — and our average client gains 8–12 new customers monthly from improved rankings.
-      </div>
+    <div class="pricing-note">
+      <i class="fas fa-lock"></i> &nbsp;No credit card required to start &nbsp;·&nbsp;
+      Cancel anytime &nbsp;·&nbsp; 14-day free trial on Growth
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════
-  FINAL CTA
-════════════════════════════════════════ -->
-<section class="final-cta" id="final-cta">
-  <div class="fca-video">
-    <video autoplay muted loop playsinline preload="auto">
-      <source src="https://www.dropbox.com/scl/fi/v7hp8xspwo1clen7hth6z/720restaurant.mp4?rlkey=nq3ig6ga7nfu3hdxfoe8yxolg&dl=1" type="video/mp4" />
-    </video>
-    <div class="fca-overlay"></div>
-  </div>
+<!-- ═══════════════════════════════════════════════════════
+     FINAL CTA
+══════════════════════════════════════════════════════════ -->
+<section class="cta-final">
   <div class="container">
-    <div class="fca-urgency" data-aos="fade-down">
-      <i class="fas fa-exclamation-circle"></i> Every day is another day your competitors get ahead
-    </div>
-    <h2 class="fca-h2" data-aos="fade-up" data-aos-delay="100">
-      Stop Leaving Reviews —<br/>
-      and Revenue — on the Table.<br/>
-      <span class="highlight">Your Atmosphere Is Ready.</span>
+    <div class="cta-final-eyebrow">Ready when you are</div>
+    <h2 class="cta-final-h2">
+      Your next customer is about to walk&nbsp;in.<br>
+      Will they leave a <em>review?</em>
     </h2>
-
-    <div class="fca-checks" data-aos="fade-up" data-aos-delay="200">
-      <div class="fca-check"><i class="fas fa-check-circle"></i> Review funnel live in 5 minutes</div>
-      <div class="fca-check"><i class="fas fa-check-circle"></i> Email list grows automatically</div>
-      <div class="fca-check"><i class="fas fa-check-circle"></i> Bad reviews stay private</div>
-      <div class="fca-check"><i class="fas fa-check-circle"></i> Google rankings climb</div>
-      <div class="fca-check"><i class="fas fa-check-circle"></i> Wi-Fi + Menu funnels included</div>
-      <div class="fca-check"><i class="fas fa-check-circle"></i> 30-day money-back guarantee</div>
-    </div>
-
-    <div class="fca-wrap" data-aos="zoom-in" data-aos-delay="300">
-      <a href="#contact" class="btn btn-yellow btn-xl pulse">
-        <i class="fas fa-bolt"></i> Get HappyClientele. Now
+    <p class="cta-final-sub">
+      Set up in 5 minutes. No tech skills needed. No install.<br>
+      Just print your QR code and let HappyClientele do the rest.
+    </p>
+    <div class="cta-final-actions">
+      <a href="signup.html" class="btn-primary pulse" style="font-size:1.05rem;padding:18px 42px">
+        Start for free — no card needed
+        <i class="fas fa-arrow-right"></i>
       </a>
-      <div class="fca-small">
-        Setup: <strong>$497</strong> one-time &nbsp;|&nbsp; Monthly: <strong>$47</strong>
-      </div>
-      <div class="fca-guarantee">
-        <i class="fas fa-shield-alt"></i> 30-Day Money-Back Guarantee &nbsp;·&nbsp; No Contract &nbsp;·&nbsp; No Tech Skills Required
-      </div>
+    </div>
+    <div class="cta-fine">
+      Takes 5 minutes &nbsp;·&nbsp; No tech skills &nbsp;·&nbsp; Cancel anytime
     </div>
   </div>
 </section>
 
-<!-- ════════════════════════════════════════
-  FAQ
-════════════════════════════════════════ -->
-<section class="faq" id="faq">
-  <div class="container">
-    <div class="s-tag" data-aos="fade-up">Common Questions</div>
-    <h2 data-aos="fade-up" data-aos-delay="100">Everything You Need to Know</h2>
-
-    <div class="faq-list">
-      <div class="faq-item" data-aos="fade-up" data-aos-delay="100">
-        <button class="faq-q"><span>Is this really zero tech and zero install?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></button>
-        <div class="faq-a"><p>Yes, completely. You sign up, connect your Google Business listing, and we generate your QR code. You print it and place it. There's nothing to install, no API keys, no technical setup. If you can print a piece of paper, you can use HappyClientele.</p></div>
-      </div>
-      <div class="faq-item" data-aos="fade-up" data-aos-delay="120">
-        <button class="faq-q"><span>How does the Wi-Fi funnel work?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></button>
-        <div class="faq-a"><p>Customers scan the Wi-Fi QR code on your table or sign. They enter their email to receive the Wi-Fi password. That email is captured in your dashboard. After a set time (you choose), they receive a friendly follow-up asking for a Google review — while their experience is still fresh.</p></div>
-      </div>
-      <div class="faq-item" data-aos="fade-up" data-aos-delay="140">
-        <button class="faq-q"><span>What happens to negative feedback?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></button>
-        <div class="faq-a"><p>Customers who indicate they weren't happy are routed to a private feedback form — not Google. You receive an instant notification so you can respond and resolve it before it ever becomes a public review. Most unhappy customers become loyal ones when they see you care.</p></div>
-      </div>
-      <div class="faq-item" data-aos="fade-up" data-aos-delay="160">
-        <button class="faq-q"><span>How fast will I see results?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></button>
-        <div class="faq-a"><p>Most businesses see their first new Google reviews within 48 hours of placing their QR code. Significant momentum — and visible ranking improvements — typically occur within 2–4 weeks. By 90 days, most clients are well beyond 300% review growth.</p></div>
-      </div>
-      <div class="faq-item" data-aos="fade-up" data-aos-delay="180">
-        <button class="faq-q"><span>Is this compliant with Google's policies?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></button>
-        <div class="faq-a"><p>Absolutely. We help satisfied customers share genuine experiences more easily — we never fabricate, incentivize, or manipulate reviews in ways that violate Google's guidelines. We're fully compliant and designed to build an authentic reputation.</p></div>
-      </div>
-      <div class="faq-item" data-aos="fade-up" data-aos-delay="200">
-        <button class="faq-q"><span>Is there a contract?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></button>
-        <div class="faq-a"><p>No. The monthly plan is month-to-month and you can cancel anytime. We're confident in our results — which is why we also offer a 30-day money-back guarantee. If you don't see measurable improvement in 30 days, we refund your first month.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  CONTACT / GET STARTED
-════════════════════════════════════════ -->
-<section class="contact" id="contact">
-  <div class="container">
-    <div class="contact-inner" data-aos="fade-up">
-
-      <div class="contact-left">
-        <div class="s-tag">Let's Get Started</div>
-        <h2>Ready to Turn Every Customer Into a <span class="highlight">5-Star Review?</span></h2>
-        <p>Fill out the form and our team will reach out within one business day to walk you through setup. Most businesses are live within 48 hours — with zero technical work on your end.</p>
-        <div class="c-benefits">
-          <div class="c-benefit"><i class="fas fa-check-circle"></i> Free consultation with our setup team</div>
-          <div class="c-benefit"><i class="fas fa-check-circle"></i> Custom QR codes generated for your business</div>
-          <div class="c-benefit"><i class="fas fa-check-circle"></i> Live within 48 hours — we handle everything</div>
-          <div class="c-benefit"><i class="fas fa-check-circle"></i> 30-day results guarantee or full refund</div>
-          <div class="c-benefit"><i class="fas fa-star" style="color:var(--yellow)"></i> Join 500+ businesses averaging 300% more reviews</div>
-        </div>
-        <div style="margin-top:32px;padding:22px 26px;background:rgba(253,184,19,.1);border:1px solid rgba(253,184,19,.25);border-radius:var(--r-md)">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <span style="font-size:1.6rem">💬</span>
-            <strong style="color:var(--white);font-size:.97rem">Questions first?</strong>
-          </div>
-          <p style="color:rgba(255,255,255,.6);font-size:.87rem;margin-bottom:0">Email us at <a href="mailto:hello@happyclientele.com" style="color:var(--yellow);text-decoration:underline">hello@happyclientele.com</a> — we respond within 1 business day.</p>
-        </div>
-      </div>
-
-      <div class="c-form" data-aos="fade-left" data-aos-delay="150">
-        <h3>Start Your Free Consultation</h3>
-        <p class="c-sub">2 minutes. No obligation. No tech skills needed.</p>
-
-        <div id="cfFormWrap">
-          <form id="contactForm" novalidate>
-            <input type="hidden" name="access_key" value="1c2925a9-6881-47d9-bb50-496f6bc39c2c" />
-            <input type="hidden" name="subject" value="New HappyClientele Consultation Request" />
-            <input type="hidden" name="from_name" value="HappyClientele Website" />
-            <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
-
-            <div class="cf-row">
-              <div class="cf-field">
-                <label for="cf-fname">First Name *</label>
-                <input type="text" id="cf-fname" name="first_name" placeholder="Sarah" required />
-              </div>
-              <div class="cf-field">
-                <label for="cf-lname">Last Name *</label>
-                <input type="text" id="cf-lname" name="last_name" placeholder="Johnson" required />
-              </div>
-            </div>
-            <div class="cf-field">
-              <label for="cf-email">Email *</label>
-              <input type="email" id="cf-email" name="email" placeholder="sarah@yourbusiness.com" required />
-            </div>
-            <div class="cf-field">
-              <label for="cf-phone">Phone</label>
-              <input type="tel" id="cf-phone" name="phone" placeholder="(555) 000-0000" />
-            </div>
-            <div class="cf-field">
-              <label for="cf-business">Business Name *</label>
-              <input type="text" id="cf-business" name="business_name" placeholder="Brew Haven Coffee" required />
-            </div>
-            <div class="cf-row">
-              <div class="cf-field">
-                <label for="cf-type">Business Type *</label>
-                <select id="cf-type" name="business_type" required>
-                  <option value="" disabled selected>Select industry</option>
-                  <option>Coffee Shop / Café</option>
-                  <option>Restaurant / Bar</option>
-                  <option>Salon / Barbershop</option>
-                  <option>Retail Store</option>
-                  <option>Gym / Fitness Studio</option>
-                  <option>Healthcare / Medical</option>
-                  <option>Auto Services</option>
-                  <option>Service Provider</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div class="cf-field">
-                <label for="cf-reviews">Current Google Reviews</label>
-                <select id="cf-reviews" name="current_reviews">
-                  <option value="" disabled selected>How many do you have?</option>
-                  <option>0 – 10 reviews</option>
-                  <option>11 – 30 reviews</option>
-                  <option>31 – 75 reviews</option>
-                  <option>76 – 150 reviews</option>
-                  <option>150+ reviews</option>
-                </select>
-              </div>
-            </div>
-            <div class="cf-field">
-              <label for="cf-message">Anything else we should know?</label>
-              <textarea id="cf-message" name="message" placeholder="Tell us about your business or any questions you have…"></textarea>
-            </div>
-
-            <button type="submit" class="cf-submit">
-              <i class="fas fa-bolt"></i> &nbsp;Book My Free Consultation →
-            </button>
-            <div class="cf-privacy">
-              <i class="fas fa-lock"></i> Your info is 100% private and never shared.
-            </div>
-          </form>
-        </div>
-
-        <div class="cf-success" id="cfSuccess">
-          <div class="cf-success-icon">🎉</div>
-          <h4>You're All Set!</h4>
-          <p>Our team will reach out within <strong>1 business day</strong> to schedule your onboarding call. Check your inbox — we're sending a quick-start guide now.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════
-  FOOTER
-════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════════ -->
 <footer class="footer">
   <div class="container">
-    <div class="footer-inner">
+    <div class="footer-top">
       <div class="footer-brand">
-        <a href="#" class="logo">HappyClientele<span class="logo-dot">.</span></a>
-        <p>The no-install review funnel for brick-and-mortar businesses. Turn every touchpoint into a 5-star reputation and email list.</p>
-        <div class="footer-social">
-          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-        </div>
+        <div class="logo">Happy<span style="color:var(--yellow)">Clientele</span></div>
+        <p>Turning your existing atmosphere into a lead-generating, review-building machine. Zero tech. Zero friction.</p>
       </div>
-      <div class="footer-links" style="display:contents">
-        <div class="fl">
-          <h5>Product</h5>
-          <ul>
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#pillars">Features</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            <li><a href="login.html">Log In</a></li>
-          </ul>
-        </div>
-        <div class="fl">
-          <h5>Support</h5>
-          <ul>
-            <li><a href="#faq">FAQ</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="#">Documentation</a></li>
-            <li><a href="#">Integrations</a></li>
-          </ul>
-        </div>
-        <div class="fl">
-          <h5>Legal</h5>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Google Compliance</a></li>
-          </ul>
-        </div>
+      <div class="footer-links-group">
+        <h5>Product</h5>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="signup.html">Sign up free</a>
+      </div>
+      <div class="footer-links-group">
+        <h5>Account</h5>
+        <a href="login.html">Log in</a>
+        <a href="signup.html">Create account</a>
       </div>
     </div>
-  </div>
-  <div class="footer-bottom">
-    <div class="container">
-      <p>© 2026 HappyClientele.com · All Rights Reserved · Built for brick-and-mortar businesses</p>
-      <p style="margin-top:4px">HappyClientele is not affiliated with Google. Google is a trademark of Google LLC.</p>
+    <div class="footer-bottom">
+      <span>© 2025 HappyClientele. All rights reserved.</span>
+      <span>Made for local businesses everywhere.</span>
     </div>
   </div>
 </footer>
 
-<!-- EXIT-INTENT POPUP -->
-<div class="popup-overlay" id="popupOverlay">
-  <div class="popup-box">
-    <button class="popup-close" id="popupClose"><i class="fas fa-times"></i></button>
-    <div style="font-size:2.8rem;margin-bottom:10px">📖</div>
-    <h3 style="font-size:1.5rem;font-weight:800;margin-bottom:6px">Grab Your Free Guide</h3>
-    <p style="font-size:.92rem;color:#666;margin-bottom:16px">The 5-Minute Guide to Multiplying Your Google Reviews</p>
-    <ul class="popup-list">
-      <li>✅ Why happy customers don't leave reviews (and the fix)</li>
-      <li>✅ The exact message that gets 3× more responses</li>
-      <li>✅ How to filter bad reviews before they go public</li>
-    </ul>
-    <form class="popup-form" id="popupForm">
-      <input type="email" placeholder="Enter your email address" required />
-      <button type="submit" class="btn btn-yellow btn-md">Send Me the Guide →</button>
-    </form>
-    <p style="margin-top:10px;font-size:.75rem;color:#aaa;text-align:center">No spam. Unsubscribe anytime.</p>
-  </div>
-</div>
-
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-<style>
-@keyframes pulse-icon{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-</style>
+<!-- ═══════════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════════════ -->
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-
-  /* ── AOS ── */
-  AOS.init({ once: true, offset: 80, duration: 700, easing: 'ease-out-cubic' });
-
-  /* ── Navbar scroll ── */
-  const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
-  }, { passive: true });
-
-  /* ── Hamburger ── */
-  const hamburger = document.getElementById('hamburger');
-  const navLinks  = document.getElementById('navLinks');
-  hamburger.addEventListener('click', () => {
-    navLinks.classList.toggle('open');
-    hamburger.classList.toggle('hb-open');
-  });
-  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-    navLinks.classList.remove('open');
-    hamburger.classList.remove('hb-open');
-  }));
-  const hbStyle = document.createElement('style');
-  hbStyle.textContent = `.hamburger span{transition:all .3s}.hamburger.hb-open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}.hamburger.hb-open span:nth-child(2){opacity:0}.hamburger.hb-open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}`;
-  document.head.appendChild(hbStyle);
-
-  /* ── Smooth scroll ── */
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', e => {
-      const id = anchor.getAttribute('href');
-      if (id === '#') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-      const tgt = document.querySelector(id);
-      if (tgt) { e.preventDefault(); window.scrollTo({ top: tgt.getBoundingClientRect().top + window.scrollY - navbar.offsetHeight - 16, behavior: 'smooth' }); }
-    });
-  });
-
-  /* ── FAQ ── */
-  document.querySelectorAll('.faq-item').forEach(item => {
-    item.querySelector('.faq-q').addEventListener('click', () => {
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(i => {
-        i.classList.remove('open');
-        i.querySelector('.faq-a').classList.remove('open');
-      });
-      if (!isOpen) { item.classList.add('open'); item.querySelector('.faq-a').classList.add('open'); }
-    });
-  });
-
-  /* ── Stat counters ── */
-  function animateCounter(el) {
-    const target = parseInt(el.dataset.count, 10);
-    const start = performance.now();
-    (function step(now) {
-      const p = Math.min((now - start) / 1800, 1);
-      el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
-      if (p < 1) requestAnimationFrame(step);
-    })(start);
-  }
-  let statsTriggered = false;
-  function checkStats() {
-    if (statsTriggered) return;
-    const s = document.querySelector('.stats');
-    if (s && s.getBoundingClientRect().top < window.innerHeight * 0.85) {
-      statsTriggered = true;
-      document.querySelectorAll('.stat-num[data-count]').forEach(animateCounter);
-    }
-  }
-  window.addEventListener('scroll', checkStats, { passive: true });
-  checkStats();
-
-  /* ── Review feed carousel ── */
-  (function() {
-    const feed  = document.getElementById('reviewFeed');
-    if (!feed) return;
-    const cards = Array.from(feed.querySelectorAll('.rf-card'));
-    if (!cards.length) return;
-    const VISIBLE = 3;
-    let cur = 0;
-    function show(idx) {
-      cards.forEach(c => { c.classList.remove('rf-in','rf-out'); c.style.display='none'; });
-      for (let v = 0; v < VISIBLE; v++) {
-        const i = (idx + v) % cards.length;
-        cards[i].style.display = 'block';
-        setTimeout(() => cards[i].classList.add('rf-in'), v * 110);
-      }
-    }
-    show(cur);
-    setInterval(() => {
-      for (let v = 0; v < VISIBLE; v++) {
-        const i = (cur + v) % cards.length;
-        cards[i].classList.remove('rf-in');
-        cards[i].classList.add('rf-out');
-      }
-      setTimeout(() => { cur = (cur + 1) % cards.length; show(cur); }, 500);
-    }, 2800);
-  })();
-
-  /* ── Funnel animation ── */
-  const fdiagram = document.querySelector('.funnel-diagram');
-  let fTriggered = false;
-  function checkFunnel() {
-    if (fTriggered || !fdiagram) return;
-    if (fdiagram.getBoundingClientRect().top < window.innerHeight * 0.85) {
-      fTriggered = true;
-      const check = fdiagram.querySelector('.f-node.check');
-      if (check) { check.style.borderColor='#FDB813'; check.style.boxShadow='0 0 0 4px rgba(253,184,19,.2)'; }
-      setTimeout(() => {
-        const g = fdiagram.querySelector('.f-node.google');
-        if (g) { g.style.borderColor='#4285F4'; g.style.boxShadow='0 0 0 4px rgba(66,133,244,.15)'; }
-      }, 600);
-      setTimeout(() => {
-        const rg = fdiagram.querySelector('.f-node.result-good');
-        if (rg) { rg.style.borderColor='#34A853'; rg.style.boxShadow='0 0 0 4px rgba(52,168,83,.15)'; }
-      }, 1200);
-    }
-  }
-  window.addEventListener('scroll', checkFunnel, { passive: true });
-  checkFunnel();
-
-  /* ── Mobile sticky CTA ── */
-  if (window.innerWidth <= 768) {
-    const bar = document.createElement('div');
-    bar.innerHTML = `<span style="font-size:.85rem;font-weight:500">Turn your atmosphere into leads</span><a href="#contact" class="btn btn-yellow btn-sm">Start Free →</a>`;
-    Object.assign(bar.style, {
-      position:'fixed',bottom:'0',left:'0',right:'0',
-      background:'#1a1a1a',padding:'12px 20px',display:'flex',alignItems:'center',
-      justifyContent:'space-between',zIndex:'7000',transform:'translateY(100%)',
-      transition:'transform .4s',boxShadow:'0 -4px 20px rgba(0,0,0,.3)',color:'#fff'
-    });
-    document.body.appendChild(bar);
-    window.addEventListener('scroll', () => {
-      const hero = document.querySelector('.hero');
-      const fin  = document.querySelector('.final-cta');
-      if (hero && fin) {
-        bar.style.transform = (hero.getBoundingClientRect().bottom < 0 && fin.getBoundingClientRect().top > window.innerHeight) ? 'translateY(0)' : 'translateY(100%)';
-      }
-    }, { passive: true });
-  }
-
-  /* ── Active nav highlight ── */
-  window.addEventListener('scroll', () => {
-    const sp = window.scrollY + navbar.offsetHeight + 80;
-    document.querySelectorAll('section[id]').forEach(s => {
-      const link = document.querySelector(`.nav-links a[href="#${s.id}"]:not(.btn)`);
-      if (link) link.style.color = (sp >= s.offsetTop && sp < s.offsetTop + s.offsetHeight) ? '#FDB813' : '';
-    });
-  }, { passive: true });
-
-  /* ── Exit-intent popup ── */
-  const popupOverlay = document.getElementById('popupOverlay');
-  const popupClose   = document.getElementById('popupClose');
-  const popupForm    = document.getElementById('popupForm');
-  let popupShown = false;
-  const showPopup = () => { if (popupShown) return; popupShown = true; popupOverlay.classList.add('active'); document.body.style.overflow='hidden'; };
-  const hidePopup = () => { popupOverlay.classList.remove('active'); document.body.style.overflow=''; };
-  document.addEventListener('mouseleave', e => { if (e.clientY < 10) showPopup(); });
-  setTimeout(showPopup, 50000);
-  let mobScrolled = false;
-  window.addEventListener('scroll', () => {
-    if (!mobScrolled && window.scrollY > window.innerHeight * 0.65) { mobScrolled = true; setTimeout(showPopup, 9000); }
-  }, { passive: true });
-  popupClose && popupClose.addEventListener('click', hidePopup);
-  popupOverlay && popupOverlay.addEventListener('click', e => { if (e.target === popupOverlay) hidePopup(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') hidePopup(); });
-  if (popupForm) {
-    popupForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const email = popupForm.querySelector('input').value;
-      popupForm.innerHTML = `<div style="text-align:center;padding:16px 0"><div style="font-size:2.8rem;margin-bottom:10px">✅</div><strong>Guide On Its Way!</strong><p style="color:#666;font-size:.88rem;margin-top:6px">Check your inbox at <strong>${email}</strong></p></div>`;
-      setTimeout(hidePopup, 3000);
-    });
-  }
-
-  /* ── Contact form ── */
-  const contactForm = document.getElementById('contactForm');
-  const cfSuccess   = document.getElementById('cfSuccess');
-  const cfFormWrap  = document.getElementById('cfFormWrap');
-  if (contactForm) {
-    contactForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const required = contactForm.querySelectorAll('[required]');
-      let valid = true;
-      required.forEach(f => { f.style.borderColor=''; if (!f.value.trim()) { f.style.borderColor='#EA4335'; valid=false; } });
-      if (!valid) { contactForm.querySelector('[style*="EA4335"]')?.scrollIntoView({ behavior:'smooth', block:'center' }); return; }
-
-      const btn = contactForm.querySelector('.cf-submit');
-      const orig = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
-      btn.disabled = true;
-
-      fetch('https://api.web3forms.com/submit', { method:'POST', body: new FormData(contactForm) })
-        .then(r => r.json())
-        .then(d => {
-          if (d.success) { cfFormWrap.style.display='none'; cfSuccess.style.display='block'; cfSuccess.scrollIntoView({ behavior:'smooth', block:'center' }); }
-          else { btn.innerHTML=orig; btn.disabled=false; alert('Something went wrong. Please email hello@happyclientele.com'); }
-        })
-        .catch(() => { btn.innerHTML=orig; btn.disabled=false; alert('Network error. Please try again.'); });
-    });
-    contactForm.querySelectorAll('input,select,textarea').forEach(el => el.addEventListener('input', () => el.style.borderColor=''));
-  }
-
-  console.log('🌟 HappyClientele v3 loaded');
+// Navbar scroll state
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
 });
+
+// Hamburger / mobile menu
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+const mobileClose = document.getElementById('mobileClose');
+hamburger.addEventListener('click', () => mobileMenu.classList.add('open'));
+mobileClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
+function closeMobile() { mobileMenu.classList.remove('open'); }
+
+// Count-up animation
+function animateCount(el) {
+  const target = +el.dataset.target;
+  const duration = 1800;
+  const start = performance.now();
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(ease * target);
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+const countEls = document.querySelectorAll('.count-up');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCount(e.target);
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: .3 });
+countEls.forEach(el => observer.observe(el));
+
+// Touchpoint interactive hover
+document.querySelectorAll('.tp-item').forEach(item => {
+  item.addEventListener('mouseenter', () => {
+    document.querySelectorAll('.tp-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+console.log('HappyClientele v4 loaded');
 </script>
 </body>
 </html>
