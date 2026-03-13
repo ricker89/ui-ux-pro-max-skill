@@ -1064,7 +1064,8 @@
           <div style="margin-top:10px;">
             <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin-bottom:6px;">QR Style</div>
             <div class="qr-style-row" id="funnelStyleRow">
-              <button class="qr-style-chip selected" data-style="classic" onclick="setQrStyle('funnel','classic',this)">Classic</button>
+              <button class="qr-style-chip selected" data-style="dots" onclick="setQrStyle('funnel','dots',this)">Dots</button>
+              <button class="qr-style-chip" data-style="classic" onclick="setQrStyle('funnel','classic',this)">Classic</button>
               <button class="qr-style-chip" data-style="rounded" onclick="setQrStyle('funnel','rounded',this)">Rounded</button>
               <button class="qr-style-chip" data-style="dark" onclick="setQrStyle('funnel','dark',this)">Dark</button>
               <button class="qr-style-chip" data-style="green" onclick="setQrStyle('funnel','green',this)">Green</button>
@@ -1164,7 +1165,8 @@
           <div style="margin-top:10px;">
             <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin-bottom:6px;">QR Style</div>
             <div class="qr-style-row" id="menuStyleRow">
-              <button class="qr-style-chip selected" data-style="classic" onclick="setQrStyle('menu','classic',this)">Classic</button>
+              <button class="qr-style-chip selected" data-style="dots" onclick="setQrStyle('menu','dots',this)">Dots</button>
+              <button class="qr-style-chip" data-style="classic" onclick="setQrStyle('menu','classic',this)">Classic</button>
               <button class="qr-style-chip" data-style="rounded" onclick="setQrStyle('menu','rounded',this)">Rounded</button>
               <button class="qr-style-chip" data-style="dark" onclick="setQrStyle('menu','dark',this)">Dark</button>
               <button class="qr-style-chip" data-style="green" onclick="setQrStyle('menu','green',this)">Green</button>
@@ -1312,7 +1314,8 @@
           <div style="margin-top:10px;">
             <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin-bottom:6px;">QR Style</div>
             <div class="qr-style-row" id="wifiStyleRow">
-              <button class="qr-style-chip selected" data-style="classic" onclick="setQrStyle('wifi','classic',this)">Classic</button>
+              <button class="qr-style-chip selected" data-style="dots" onclick="setQrStyle('wifi','dots',this)">Dots</button>
+              <button class="qr-style-chip" data-style="classic" onclick="setQrStyle('wifi','classic',this)">Classic</button>
               <button class="qr-style-chip" data-style="rounded" onclick="setQrStyle('wifi','rounded',this)">Rounded</button>
               <button class="qr-style-chip" data-style="dark" onclick="setQrStyle('wifi','dark',this)">Dark</button>
               <button class="qr-style-chip" data-style="green" onclick="setQrStyle('wifi','green',this)">Green</button>
@@ -1809,13 +1812,14 @@ function renderDashboard() {
 /* ── QR generation ──────────────────────────────────────── */
 /* ── QR Style switcher ─────────────────────────────────── */
 const _qrStyles = {
-  classic: { color: '000000', bgcolor: 'ffffff', qzone: 1 },
-  rounded: { color: '000000', bgcolor: 'ffffff', qzone: 1, eye_outer: 'eye_out_curved', eye_inner: 'eye_in_curved', module_shape: 'module_rounded_all' },
-  dark:    { color: 'ffffff', bgcolor: '1a1a1a', qzone: 1 },
-  green:   { color: '065f46', bgcolor: 'f0fdf4', qzone: 1 },
-  navy:    { color: '1e3a5f', bgcolor: 'eff6ff', qzone: 1 },
+  dots:    { color: '000000', bgcolor: 'ffffff', qzone: 1, eye_outer: 'eye_out_round', eye_inner: 'eye_in_round', module_shape: 'module_round_all', size: 200 },
+  classic: { color: '000000', bgcolor: 'ffffff', qzone: 1, size: 240 },
+  rounded: { color: '000000', bgcolor: 'ffffff', qzone: 1, eye_outer: 'eye_out_curved', eye_inner: 'eye_in_curved', module_shape: 'module_rounded_all', size: 240 },
+  dark:    { color: 'ffffff', bgcolor: '1a1a1a', qzone: 1, size: 240 },
+  green:   { color: '065f46', bgcolor: 'f0fdf4', qzone: 1, size: 240 },
+  navy:    { color: '1e3a5f', bgcolor: 'eff6ff', qzone: 1, size: 240 },
 };
-const _qrActiveStyle = { funnel: 'classic', menu: 'classic', wifi: 'classic' };
+const _qrActiveStyle = { funnel: 'dots', menu: 'dots', wifi: 'dots' };
 
 function setQrStyle(feature, style, btn) {
   // Update chip selection
@@ -1828,8 +1832,9 @@ function setQrStyle(feature, style, btn) {
   const imgId = { funnel: 'funnelQrImg', menu: 'menuQrImg', wifi: 'wifiQrImg' }[feature];
   const img = document.getElementById(imgId);
   if (!img?.dataset.url) return;
-  const s = _qrStyles[style] || _qrStyles.classic;
-  let url = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&ecc=H`
+  const s = _qrStyles[style] || _qrStyles.dots;
+  const sz = s.size || 240;
+  let url = `https://api.qrserver.com/v1/create-qr-code/?size=${sz}x${sz}&ecc=M`
     + `&data=${encodeURIComponent(img.dataset.url)}`
     + `&color=${s.color}&bgcolor=${s.bgcolor}&qzone=${s.qzone}`;
   if (s.eye_outer) url += `&eye_outer=${s.eye_outer}&eye_inner=${s.eye_inner}`;
@@ -1843,8 +1848,9 @@ function setQrStyle(feature, style, btn) {
 }
 
 function generateQR(feature, url) {
-  const s = _qrStyles[_qrActiveStyle[feature] || 'classic'];
-  let src = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&ecc=H`
+  const s = _qrStyles[_qrActiveStyle[feature] || 'dots'];
+  const sz = s.size || 240;
+  let src = `https://api.qrserver.com/v1/create-qr-code/?size=${sz}x${sz}&ecc=M`
     + `&data=${encodeURIComponent(url)}`
     + `&color=${s.color}&bgcolor=${s.bgcolor}&qzone=${s.qzone}`;
   if (s.eye_outer) src += `&eye_outer=${s.eye_outer}&eye_inner=${s.eye_inner}`;
