@@ -329,6 +329,41 @@ app.get('/api/health', (c) => c.json({ status: 'ok', version: '6.0' }))
 // ══════════════════════════════════════════════════════════════════
 //  CLEAN URL ROUTING
 // ══════════════════════════════════════════════════════════════════
+// ── 6. Admin: Summary Stats (service-role bypass of RLS) ──────────
+app.get('/api/admin/stats', async (c) => {
+  const adminKey = c.req.header('X-Admin-Key')
+  if (adminKey !== 'hc-admin-2025') {
+    return c.json({ error: 'Unauthorized' }, 401)
+  }
+
+  const supa = c.env.SUPABASE_URL
+  const key  = c.env.SUPABASE_SERVICE_KEY
+
+  const headers = {
+    'apikey':        key,
+    'Authorization': `Bearer ${key}`,
+    'Accept':        'application/json',
+  }
+
+  try {
+    const [bizRes, locRes, leadRes] = await Promise.all([
+      fetch(`${supa}/rest/v1/businesses?select=id,business_name,email,subscription_status,created_at&order=created_at.desc&limit=500`, { headers }),
+      fetch(`${supa}/rest/v1/locations?select=id,business_id,name,city,state,subscription_status,created_at&order=created_at.desc&limit=2000`, { headers }),
+      fetch(`${supa}/rest/v1/leads?select=id,email,name,source,business_id,location_id,business_name,location_name,created_at&order=created_at.desc&limit=5000`, { headers }),
+    ])
+
+    const [businesses, locations, leads] = await Promise.all([
+      bizRes.json(),
+      locRes.json(),
+      leadRes.json(),
+    ])
+
+    return c.json({ businesses, locations, leads })
+  } catch (err) {
+    return c.json({ error: 'Failed to fetch admin stats' }, 500)
+  }
+})
+
 const cleanUrls: Record<string, string> = {
   '/login':          '/login.html',
   '/signup':         '/signup.html',
@@ -342,6 +377,7 @@ const cleanUrls: Record<string, string> = {
   '/thankyou':       '/thankyou.html',
   '/debug':          '/debug.html',
   '/funnel-preview': '/funnel-preview.html',
+  '/admin':          '/admin.html',
 }
 
 app.use('/*', async (c) => {
