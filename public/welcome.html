@@ -60,12 +60,16 @@
     .topbar-logo {
       font-family: 'Poppins', sans-serif;
       font-size: 1.2rem;
-      font-weight: 800;
       color: var(--black);
       text-decoration: none;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0;
+      letter-spacing: -.02em;
     }
-
-    .topbar-logo span { color: var(--yellow); }
+    .topbar-logo .logo-bold { font-weight: 800; }
+    .topbar-logo .logo-thin  { font-weight: 300; }
+    .topbar-logo .logo-dot   { color: var(--yellow); font-weight: 800; }
 
     .topbar-right {
       font-size: .8rem;
@@ -1863,7 +1867,7 @@
 
 <!-- Top bar -->
 <div class="topbar">
-  <a href="index.html" class="topbar-logo">HappyClientele<span>.</span></a>
+  <a href="index.html" class="topbar-logo"><span class="logo-bold">Happy</span><span class="logo-thin">Clientele</span><span class="logo-dot">.</span></a>
   <div id="topbarUserArea"></div>
 </div>
 

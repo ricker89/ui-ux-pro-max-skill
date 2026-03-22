@@ -46,12 +46,16 @@
     }
     .topbar-logo {
       font-size: 1.1rem;
-      font-weight: 800;
       color: var(--black);
       text-decoration: none;
       letter-spacing: -.02em;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0;
     }
-    .topbar-logo span { color: var(--yellow); }
+    .topbar-logo .logo-bold { font-weight: 800; }
+    .topbar-logo .logo-thin  { font-weight: 300; }
+    .topbar-logo .logo-dot   { color: var(--yellow); font-weight: 800; }
 
     /* ── Page ───────────────────────────────────────────────── */
     .page {
@@ -322,7 +326,7 @@
 
 <!-- ══ TOPBAR ══ -->
 <nav class="topbar">
-  <a class="topbar-logo" href="dashboard.html">Happy<span>Clientele.</span></a>
+  <a class="topbar-logo" href="dashboard.html"><span class="logo-bold">Happy</span><span class="logo-thin">Clientele</span><span class="logo-dot">.</span></a>
   <div style="display:flex;align-items:center;gap:12px;">
     <div id="topbarUserArea"></div>
   </div>

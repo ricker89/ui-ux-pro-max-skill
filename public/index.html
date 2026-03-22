@@ -139,10 +139,17 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .logo {
   font-family: 'Poppins', sans-serif;
-  font-size: 1.3rem; font-weight: 800;
-  color: var(--white); letter-spacing: -.03em;
+  font-size: 1.3rem;
+  color: var(--white);
+  letter-spacing: -.02em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
 }
-.logo span { color: var(--yellow); }
+.logo .logo-bold { font-weight: 800; }
+.logo .logo-thin  { font-weight: 300; }
+.logo .logo-dot   { color: var(--yellow); font-weight: 800; }
 .nav-links {
   display: flex; align-items: center; gap: 32px;
 }
@@ -1082,7 +1089,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 <nav class="nav" id="nav">
   <div class="container">
     <div class="nav-inner">
-      <a href="/" class="logo">Happy<span>Clientele</span></a>
+      <a href="/" class="logo"><span class="logo-bold">Happy</span><span class="logo-thin">Clientele</span><span class="logo-dot">.</span></a>
       <div class="nav-links">
         <a href="#how-it-works">How it works</a>
         <a href="#features">Features</a>
@@ -1912,7 +1919,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   <div class="container">
     <div class="footer-top">
       <div class="footer-brand">
-        <div class="logo">Happy<span>Clientele</span></div>
+        <div class="logo"><span class="logo-bold">Happy</span><span class="logo-thin">Clientele</span><span class="logo-dot">.</span></div>
         <p>The no-install review funnel for brick-and-mortar businesses. Turn every touchpoint into a 5-star reputation and email list.</p>
       </div>
       <div class="footer-links-group">

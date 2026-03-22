@@ -59,10 +59,16 @@
     .login-logo {
       font-family: 'Poppins', sans-serif;
       font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--yellow);
+      color: white;
       margin-bottom: 8px;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0;
+      letter-spacing: -.02em;
     }
+    .login-logo .logo-bold { font-weight: 800; }
+    .login-logo .logo-thin  { font-weight: 300; }
+    .login-logo .logo-dot   { color: var(--yellow); font-weight: 800; }
 
     .login-subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 32px; }
 
@@ -116,9 +122,16 @@
     .topbar-logo {
       font-family: 'Poppins', sans-serif;
       font-weight: 800;
-      color: var(--yellow);
+      color: white;
       font-size: 1.1rem;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0;
+      letter-spacing: -.02em;
     }
+    .topbar-logo-bold { font-weight: 800; }
+    .topbar-logo-thin  { font-weight: 300; color: white; }
+    .topbar-logo-dot   { color: var(--yellow); font-weight: 800; }
     .topbar-badge {
       background: var(--yellow);
       color: var(--black);
@@ -619,7 +632,7 @@
 <!-- ═══════════════════════ LOGIN GATE ═══════════════════════════ -->
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo">HappyClientele</div>
+    <div class="login-logo"><span class="logo-bold">Happy</span><span class="logo-thin">Clientele</span><span class="logo-dot">.</span></div>
     <div class="login-subtitle">Super Admin Portal — Restricted Access</div>
     <input type="password" id="admin-password" placeholder="Admin password" autocomplete="current-password" />
     <button class="login-btn" onclick="adminLogin()">
@@ -634,7 +647,7 @@
   <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-left">
-      <div class="topbar-logo">HC</div>
+      <div class="topbar-logo"><span class="topbar-logo-bold">Happy</span><span class="topbar-logo-thin">Clientele</span><span class="topbar-logo-dot">.</span></div>
       <div class="topbar-badge">Super Admin</div>
     </div>
     <div class="topbar-right">
