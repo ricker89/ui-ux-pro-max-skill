@@ -2505,25 +2505,9 @@ function downloadPrintPDF(e) {
 }
 
 function openPrintStudio() {
-  // Build URL with location pre-filled
-  const bizName = document.getElementById('funnelQrBizName')?.textContent || '';
+  // Pass the active location ID so Print Studio can auto-select it from the dropdown
   const params = new URLSearchParams();
-  if (bizName) params.set('biz', bizName);
-
-  // Try to get location name and address from page state
-  if (window._locName) params.set('loc', window._locName);
-  if (window._locAddress) params.set('addr', window._locAddress);
-  if (window._locCity) params.set('city', window._locCity);
-
-  // Get the QR URL from the current funnel QR
-  const qrCanvas = document.getElementById('funnelQrCanvas');
-  const funnelUrl = qrCanvas?.dataset?.url || window.location.origin + '/r/' + (window._bizSlug || '');
-  if (funnelUrl) params.set('qr', funnelUrl);
-
-  // Pass user email
-  const emailEl = document.getElementById('userEmailEl') || document.querySelector('.user-email');
-  if (emailEl?.textContent) params.set('email', emailEl.textContent.trim());
-
+  if (window._activeLocId) params.set('loc_id', window._activeLocId);
   window.location.href = '/print-studio?' + params.toString();
 }
 

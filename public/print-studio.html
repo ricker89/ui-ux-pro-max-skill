@@ -564,34 +564,38 @@
               <div class="card-icon">📍</div>
               <div>
                 <h2>Location Details</h2>
-                <div style="font-size:.8rem;color:var(--sub);">These are auto-filled from your location — used for QR code & text</div>
+                <div style="font-size:.8rem;color:var(--sub);">Select a location — details auto-fill from your account</div>
               </div>
             </div>
             <div class="card-body">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Business Name</label>
-                  <input class="form-input" id="bizName" placeholder="e.g. Rick's Pizza" />
-                </div>
-                <div class="form-group">
-                  <label>Location Name</label>
-                  <input class="form-input" id="locName" placeholder="e.g. Downtown" />
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Address Line 1</label>
-                  <input class="form-input" id="addr1" placeholder="123 Main St" />
-                </div>
-                <div class="form-group">
-                  <label>City, State</label>
-                  <input class="form-input" id="addrCity" placeholder="San Diego, CA" />
+              <!-- Location dropdown -->
+              <div class="form-group" style="margin-bottom:16px;">
+                <label>Select Location</label>
+                <div style="position:relative;">
+                  <select class="form-input" id="locationSelect" onchange="onLocationSelect(this.value)"
+                    style="appearance:none;-webkit-appearance:none;padding-right:36px;cursor:pointer;background:#fff;">
+                    <option value="">⏳ Loading your locations…</option>
+                  </select>
+                  <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--sub);">▾</span>
                 </div>
               </div>
-              <div class="form-group">
-                <label>QR Code Destination URL</label>
-                <input class="form-input" id="qrUrl" placeholder="https://happyclientele.com/r/your-biz" />
+
+              <!-- Read-only info pills — filled by onLocationSelect() -->
+              <div id="locInfoRow" style="display:none;background:var(--off);border-radius:12px;padding:14px 16px;border:1px solid var(--border);">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;font-size:.82rem;">
+                  <div><span style="color:var(--sub);">Business</span><br><strong id="locBizDisplay">—</strong></div>
+                  <div><span style="color:var(--sub);">Location</span><br><strong id="locNameDisplay">—</strong></div>
+                  <div><span style="color:var(--sub);">Address</span><br><strong id="locAddrDisplay">—</strong></div>
+                  <div><span style="color:var(--sub);">QR URL</span><br><strong id="locQrDisplay" style="word-break:break-all;font-size:.75rem;">—</strong></div>
+                </div>
               </div>
+
+              <!-- Hidden inputs used by the rest of the form logic -->
+              <input type="hidden" id="bizName" />
+              <input type="hidden" id="locName" />
+              <input type="hidden" id="addr1" />
+              <input type="hidden" id="addrCity" />
+              <input type="hidden" id="qrUrl" />
             </div>
           </div>
 
@@ -929,28 +933,26 @@ const styleLibrary = {
 // ─────────────────────────────────────────────────────────────
 //  AUTH & INIT
 // ─────────────────────────────────────────────────────────────
+// Global token cache — set once on load, reused for all API calls
+let _authToken = null
+
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    // Use the SDK directly for a reliable async session check
+    // Always use SDK directly for reliable async session check
     const { data: sessionData } = await _getClient().auth.getSession()
     if (!sessionData?.session) {
-      // Preserve query params so Print Studio re-opens with pre-filled fields after login
       const returnUrl = '/print-studio' + (location.search || '')
       window.location.href = '/login?next=' + encodeURIComponent(returnUrl)
       return
     }
+    // Cache the token globally so all fetch calls can use it
+    _authToken = sessionData.session.access_token
     const user = sessionData.session.user
     document.getElementById('userEmailEl').textContent = user.email
     document.getElementById('avatarEl').textContent = user.email[0].toUpperCase()
 
-    // Prefill from URL params (coming from location dashboard)
-    const p = new URLSearchParams(location.search)
-    if (p.get('biz'))    document.getElementById('bizName').value  = decodeURIComponent(p.get('biz'))
-    if (p.get('loc'))    document.getElementById('locName').value  = decodeURIComponent(p.get('loc'))
-    if (p.get('addr'))   document.getElementById('addr1').value    = decodeURIComponent(p.get('addr'))
-    if (p.get('city'))   document.getElementById('addrCity').value = decodeURIComponent(p.get('city'))
-    if (p.get('qr'))     document.getElementById('qrUrl').value    = decodeURIComponent(p.get('qr'))
-    if (p.get('email'))  document.getElementById('shipEmail').value = decodeURIComponent(p.get('email'))
+    // Load user's locations from Supabase, then pre-select from URL param if present
+    await loadUserLocations()
 
     // Render initial styles
     renderStyleSwatches()
@@ -959,9 +961,86 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadOrderHistory()
 
   } catch (e) {
-    console.error(e)
+    console.error('[print-studio] init error:', e)
   }
 })
+
+// ─────────────────────────────────────────────────────────────
+//  LOCATION DROPDOWN
+// ─────────────────────────────────────────────────────────────
+let _allLocations = []
+
+async function loadUserLocations() {
+  try {
+    const locations = await loadLocations()  // from supabase.js
+    _allLocations = locations || []
+    const sel = document.getElementById('locationSelect')
+
+    if (_allLocations.length === 0) {
+      sel.innerHTML = '<option value="">No locations found — add one in your dashboard</option>'
+      return
+    }
+
+    sel.innerHTML = '<option value="">— Select a location —</option>' +
+      _allLocations.map(loc => {
+        const label = loc.location_name
+          ? `${loc.biz_name || 'My Business'} — ${loc.location_name}`
+          : (loc.biz_name || 'My Business')
+        return `<option value="${loc.id}">${label}</option>`
+      }).join('')
+
+    // Pre-select from URL param ?loc= or auto-select if only one
+    const urlParam = new URLSearchParams(location.search).get('loc_id')
+    if (urlParam && _allLocations.find(l => l.id === urlParam)) {
+      sel.value = urlParam
+      onLocationSelect(urlParam)
+    } else if (_allLocations.length === 1) {
+      sel.value = _allLocations[0].id
+      onLocationSelect(_allLocations[0].id)
+    } else {
+      // Try to match by biz name from URL param
+      const bizParam = new URLSearchParams(location.search).get('biz')
+      if (bizParam) {
+        const match = _allLocations.find(l =>
+          (l.biz_name || '').toLowerCase() === decodeURIComponent(bizParam).toLowerCase()
+        )
+        if (match) { sel.value = match.id; onLocationSelect(match.id) }
+      }
+    }
+  } catch(e) {
+    console.error('[loadUserLocations]', e)
+    document.getElementById('locationSelect').innerHTML =
+      '<option value="">Could not load locations</option>'
+  }
+}
+
+function onLocationSelect(locId) {
+  const loc = _allLocations.find(l => l.id === locId)
+  const infoRow = document.getElementById('locInfoRow')
+  if (!loc) { infoRow.style.display = 'none'; return }
+
+  // Build QR URL from slug (matches how location.html builds funnel URLs)
+  const qrUrl = loc.slug
+    ? `https://happyclientele.com/r/${loc.slug}`
+    : ''
+
+  // Fill hidden inputs used by generation & order logic
+  document.getElementById('bizName').value  = loc.biz_name || ''
+  document.getElementById('locName').value  = loc.biz_name || ''   // loc name = biz name for single-location
+  document.getElementById('addr1').value    = loc.address || ''
+  document.getElementById('addrCity').value = loc.address || ''    // address is stored as full string
+  document.getElementById('qrUrl').value    = qrUrl
+
+  // Pre-fill shipping email if available
+  if (loc.email) document.getElementById('shipEmail').value = loc.email
+
+  // Show read-only display
+  document.getElementById('locBizDisplay').textContent  = loc.biz_name || '—'
+  document.getElementById('locNameDisplay').textContent = loc.location_name || loc.biz_name || '(main)'
+  document.getElementById('locAddrDisplay').textContent = loc.address || '—'
+  document.getElementById('locQrDisplay').textContent   = qrUrl || '—'
+  infoRow.style.display = 'block'
+}
 
 // ─────────────────────────────────────────────────────────────
 //  STEPPER
@@ -1079,8 +1158,7 @@ async function generateDesigns() {
   `).join('')
 
   try {
-    const session = await sb.auth.getSession()
-    const token = session?.data?.session?.access_token
+    const token = _authToken || (await _getClient().auth.getSession()).data?.session?.access_token
 
     const res = await fetch('/api/generate-design', {
       method: 'POST',
@@ -1207,8 +1285,7 @@ async function placeOrder() {
   document.getElementById('placeOrderBtn').disabled = true
 
   try {
-    const session = await sb.auth.getSession()
-    const token = session?.data?.session?.access_token
+    const token = _authToken || (await _getClient().auth.getSession()).data?.session?.access_token
 
     const res = await fetch('/api/create-print-order', {
       method: 'POST',
@@ -1273,8 +1350,7 @@ async function placeOrder() {
 // ─────────────────────────────────────────────────────────────
 async function loadOrderHistory() {
   try {
-    const session = await sb.auth.getSession()
-    const token = session?.data?.session?.access_token
+    const token = _authToken || (await _getClient().auth.getSession()).data?.session?.access_token
     const res = await fetch('/api/print-orders', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
