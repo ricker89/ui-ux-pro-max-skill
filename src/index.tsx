@@ -13,9 +13,14 @@ type Bindings = {
   STRIPE_PORTAL_FALLBACK: string
   SUPABASE_URL: string
   SUPABASE_SERVICE_KEY: string
+  PRODIGI_API_KEY: string
+  FAL_API_KEY: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
+
+// Prodigi live API base URL
+const PRODIGI_API = 'https://api.prodigi.com/v4.0'
 
 // ── CORS for all API routes ────────────────────────────────────────
 app.use('/api/*', cors({
@@ -364,6 +369,190 @@ app.get('/api/admin/stats', async (c) => {
   }
 })
 
+// ══════════════════════════════════════════════════════════════════
+//  PRINT STUDIO — fal.ai + Prodigi
+// ══════════════════════════════════════════════════════════════════
+
+// ── 6. Generate AI Designs via fal.ai ────────────────────────
+app.post('/api/generate-design', async (c) => {
+  const userId = await getUserId(c)
+  if (!userId) return c.json({ error: 'Unauthorized' }, 401)
+
+  const { prompt, count = 4 } = await c.req.json<{ prompt: string; count?: number }>()
+  if (!prompt) return c.json({ error: 'prompt is required' }, 400)
+
+  const falKey = c.env.FAL_API_KEY || '5b2e2e48-a9fb-4a98-b213-fbf32cb48740:cf580383fe02519d6c4ecec2441c79d0'
+
+  // Generate all variants in parallel via fal.ai FLUX model
+  const numImages = Math.min(count || 4, 4)
+
+  try {
+    // Use fal.ai REST API directly — fal-ai/flux/schnell is fast and cheap
+    const falRes = await fetch('https://fal.run/fal-ai/flux/schnell', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${falKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        num_images: numImages,
+        image_size: 'square_hd',  // 1024×1024 — good for stickers
+        num_inference_steps: 4,
+        enable_safety_checker: false,
+      })
+    })
+
+    if (!falRes.ok) {
+      const errText = await falRes.text()
+      console.error('[generate-design] fal.ai error:', errText)
+      return c.json({ error: 'Image generation failed', detail: errText }, 500)
+    }
+
+    const falData = await falRes.json() as { images?: { url: string }[] }
+    const images = (falData.images || []).map((img: { url: string }) => img.url)
+
+    return c.json({ images })
+  } catch (err) {
+    console.error('[generate-design] error:', err)
+    return c.json({ error: 'Generation service error' }, 500)
+  }
+})
+
+// ── 7. Create Prodigi Print Order ─────────────────────────────
+app.post('/api/create-print-order', async (c) => {
+  const userId = await getUserId(c)
+  if (!userId) return c.json({ error: 'Unauthorized' }, 401)
+
+  const body = await c.req.json<{
+    sku: string
+    copies: number
+    shippingMethod: string
+    imageUrl: string
+    businessName?: string
+    locationName?: string
+    qrUrl?: string
+    recipient: {
+      name: string
+      email: string
+      address: {
+        line1: string
+        line2?: string
+        postalOrZipCode: string
+        countryCode: string
+        townOrCity: string
+        stateOrCounty?: string
+      }
+    }
+  }>()
+
+  if (!body.sku || !body.imageUrl || !body.recipient) {
+    return c.json({ error: 'sku, imageUrl, and recipient are required' }, 400)
+  }
+
+  const prodigiKey = c.env.PRODIGI_API_KEY || '3a10599e-8d15-4d07-8006-a9ba60ee003f'
+  const merchantRef = `hc-${userId.slice(0,8)}-${Date.now()}`
+
+  const orderPayload = {
+    merchantReference: merchantRef,
+    shippingMethod: body.shippingMethod || 'Budget',
+    recipient: {
+      name: body.recipient.name,
+      email: body.recipient.email,
+      address: body.recipient.address
+    },
+    items: [
+      {
+        merchantReference: `${body.businessName || 'HappyClientele'}-${body.locationName || 'Location'}`,
+        sku: body.sku,
+        copies: body.copies || 1,
+        sizing: 'fillPrintArea',
+        assets: [
+          {
+            printArea: 'default',
+            url: body.imageUrl
+          }
+        ]
+      }
+    ],
+    metadata: {
+      userId,
+      businessName: body.businessName || '',
+      locationName: body.locationName || '',
+      qrUrl: body.qrUrl || '',
+      source: 'happyclientele-print-studio'
+    }
+  }
+
+  try {
+    const res = await fetch(`${PRODIGI_API}/orders`, {
+      method: 'POST',
+      headers: {
+        'X-API-Key': prodigiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderPayload)
+    })
+
+    const data = await res.json() as { outcome?: string; order?: { id: string }; debugDetails?: unknown }
+
+    if (!res.ok || (data.outcome && !['Created', 'OnHold', 'CreatedWithIssues'].includes(data.outcome))) {
+      console.error('[create-print-order] Prodigi error:', data)
+      return c.json({ error: 'Prodigi order failed', detail: data }, 500)
+    }
+
+    const orderId = data.order?.id || 'unknown'
+    console.log(`[create-print-order] Order created: ${orderId} for user ${userId}`)
+
+    return c.json({ orderId, outcome: data.outcome, merchantReference: merchantRef })
+  } catch (err) {
+    console.error('[create-print-order] error:', err)
+    return c.json({ error: 'Print order service error' }, 500)
+  }
+})
+
+// ── 8. List Prodigi Print Orders ──────────────────────────────
+app.get('/api/print-orders', async (c) => {
+  const userId = await getUserId(c)
+  if (!userId) return c.json({ error: 'Unauthorized' }, 401)
+
+  const prodigiKey = c.env.PRODIGI_API_KEY || '3a10599e-8d15-4d07-8006-a9ba60ee003f'
+
+  try {
+    const res = await fetch(`${PRODIGI_API}/orders?top=50`, {
+      headers: { 'X-API-Key': prodigiKey }
+    })
+    const data = await res.json() as { outcome?: string; orders?: unknown[] }
+
+    if (!res.ok) {
+      return c.json({ orders: [] })
+    }
+
+    // Filter to orders matching this user's merchant references
+    const allOrders = (data.orders || []) as Array<{ merchantReference?: string }>
+    const userOrders = allOrders.filter((o) =>
+      o.merchantReference?.startsWith(`hc-${userId.slice(0,8)}-`)
+    )
+
+    return c.json({ orders: userOrders })
+  } catch (err) {
+    console.error('[print-orders] error:', err)
+    return c.json({ orders: [] })
+  }
+})
+
+// ── 9. Prodigi Product Details ────────────────────────────────
+app.get('/api/print-product/:sku', async (c) => {
+  const sku = c.req.param('sku')
+  const prodigiKey = c.env.PRODIGI_API_KEY || '3a10599e-8d15-4d07-8006-a9ba60ee003f'
+
+  const res = await fetch(`${PRODIGI_API}/products/${sku}`, {
+    headers: { 'X-API-Key': prodigiKey }
+  })
+  const data = await res.json()
+  return c.json(data)
+})
+
 const cleanUrls: Record<string, string> = {
   '/login':          '/login.html',
   '/signup':         '/signup.html',
@@ -378,6 +567,7 @@ const cleanUrls: Record<string, string> = {
   '/debug':          '/debug.html',
   '/funnel-preview': '/funnel-preview.html',
   '/admin':          '/admin.html',
+  '/print-studio':   '/print-studio.html',
 }
 
 app.use('/*', async (c) => {
