@@ -1411,13 +1411,30 @@
     </div>
     <div class="feature-body" id="printBody">
       <div class="print-coming-soon">
-        <div style="font-size:2.5rem;margin-bottom:12px;">📦</div>
-        <h3>Download your print-ready PDF now</h3>
-        <p>Your QR code and incentive are embedded and ready to print at any local shop — or use as a proof before physical fulfillment ships.</p>
-        <a href="#" class="print-pdf-btn" onclick="downloadPrintPDF(event)">⬇ Download Print-Ready PDF</a>
-        <div style="margin-top:24px;padding:16px;background:var(--off);border-radius:12px;border:1px solid var(--border);">
-          <div style="font-size:.82rem;font-weight:700;color:var(--black);margin-bottom:4px;">🚀 Physical sticker packs — coming soon</div>
-          <div style="font-size:.78rem;color:var(--sub);line-height:1.6;">We're partnering with Prodigi to ship 10 custom table stickers per order directly to your business. White-label, print-on-demand, globally routed. Launching soon.</div>
+        <div style="font-size:2.5rem;margin-bottom:12px;">🎨</div>
+        <h3>AI-Powered Print Studio — Now Live!</h3>
+        <p>Generate custom designs with AI, preview 4 variants, and order professional stickers &amp; tent cards shipped directly to your business.</p>
+
+        <!-- Quick links with location pre-filled -->
+        <button class="print-pdf-btn" onclick="openPrintStudio()" style="background:#FDB813;color:#000;border:none;cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:700;">
+          🖨️ Open Print Studio
+        </button>
+
+        <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="padding:14px;background:var(--off);border-radius:10px;border:1px solid var(--border);text-align:center;">
+            <div style="font-size:1.3rem;margin-bottom:4px;">🏷️</div>
+            <div style="font-size:.78rem;font-weight:700;">Menu Sticker</div>
+            <div style="font-size:.7rem;color:var(--sub);">3×4" vinyl · ~$6.95</div>
+          </div>
+          <div style="padding:14px;background:var(--off);border-radius:10px;border:1px solid var(--border);text-align:center;">
+            <div style="font-size:1.3rem;margin-bottom:4px;">🏕️</div>
+            <div style="font-size:.78rem;font-weight:700;">Table Tent Card</div>
+            <div style="font-size:.7rem;color:var(--sub);">4×6" matte · ~$4.95</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <a href="#" class="print-pdf-btn" onclick="downloadPrintPDF(event)" style="background:var(--off);color:var(--black);border:1px solid var(--border);">⬇ Download Print-Ready PDF (DIY)</a>
         </div>
       </div>
     </div>
@@ -2485,6 +2502,29 @@ function escHtml(str) {
 function downloadPrintPDF(e) {
   e.preventDefault();
   alert('Print-ready PDF download coming soon. Your QR code and incentive are already generated — this button will trigger a download in the next update.');
+}
+
+function openPrintStudio() {
+  // Build URL with location pre-filled
+  const bizName = document.getElementById('funnelQrBizName')?.textContent || '';
+  const params = new URLSearchParams();
+  if (bizName) params.set('biz', bizName);
+
+  // Try to get location name and address from page state
+  if (window._locName) params.set('loc', window._locName);
+  if (window._locAddress) params.set('addr', window._locAddress);
+  if (window._locCity) params.set('city', window._locCity);
+
+  // Get the QR URL from the current funnel QR
+  const qrCanvas = document.getElementById('funnelQrCanvas');
+  const funnelUrl = qrCanvas?.dataset?.url || window.location.origin + '/r/' + (window._bizSlug || '');
+  if (funnelUrl) params.set('qr', funnelUrl);
+
+  // Pass user email
+  const emailEl = document.getElementById('userEmailEl') || document.querySelector('.user-email');
+  if (emailEl?.textContent) params.set('email', emailEl.textContent.trim());
+
+  window.location.href = '/print-studio?' + params.toString();
 }
 
 /* ── Webhook modal ───────────────────────────────────────── */
