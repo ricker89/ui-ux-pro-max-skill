@@ -7,6 +7,14 @@ const STRIPE_PRICE_ID = 'price_1T8ZWZBf4cpCOXU3NlmAq5am'
 // Stripe webhook signing secret
 const STRIPE_WEBHOOK_SECRET = 'whsec_lTZPfk65gJkD1PDg0yWGUhu3dReZtEWF'
 
+// Supabase constants — URL and anon key are public (safe to hardcode)
+const SUPA_URL  = 'https://dbbryatmoxlzifsurxrm.supabase.co'
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk'
+
+// Third-party API keys — overridden by env secrets in production
+const FAL_KEY_DEFAULT     = '5b2e2e48-a9fb-4a98-b213-fbf32cb48740:cf580383fe02519d6c4ecec2441c79d0'
+const PRODIGI_KEY_DEFAULT = '3a10599e-8d15-4d07-8006-a9ba60ee003f'
+
 type Bindings = {
   ASSETS: Fetcher
   STRIPE_SECRET_KEY: string
@@ -34,19 +42,29 @@ app.use('/api/*', cors({
 //  HELPERS
 // ══════════════════════════════════════════════════════════════════
 
-/** Verify caller JWT, return their Supabase user id */
+/** Verify caller JWT against Supabase, return their user id.
+ *  Uses hardcoded public URL + anon key so it works even when
+ *  SUPABASE_URL / SUPABASE_SERVICE_KEY env secrets aren't set. */
 async function getUserId(c: any): Promise<string | null> {
   const auth = c.req.header('Authorization')
-  if (!auth) return null
-  const res = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
-    headers: {
-      'apikey':        c.env.SUPABASE_SERVICE_KEY,
-      'Authorization': auth,
-    }
-  })
-  if (!res.ok) return null
-  const user = await res.json() as { id?: string }
-  return user.id || null
+  if (!auth || !auth.startsWith('Bearer ')) return null
+  // Use env secrets when available, fall back to public constants
+  const supaUrl  = c.env.SUPABASE_URL  || SUPA_URL
+  const supaKey  = c.env.SUPABASE_SERVICE_KEY || SUPA_ANON
+  try {
+    const res = await fetch(`${supaUrl}/auth/v1/user`, {
+      headers: {
+        'apikey':        supaKey,
+        'Authorization': auth,
+      }
+    })
+    if (!res.ok) return null
+    const user = await res.json() as { id?: string }
+    return user.id || null
+  } catch(e) {
+    console.error('[getUserId] error:', e)
+    return null
+  }
 }
 
 /** Stripe helper: create or retrieve a customer for an email */
@@ -129,12 +147,12 @@ app.post('/api/create-checkout', async (c) => {
 
   // Save the pending subscription reference to the location row
   await fetch(
-    `${c.env.SUPABASE_URL}/rest/v1/locations?id=eq.${location_id}`,
+    `${c.env.SUPABASE_URL || SUPA_URL}/rest/v1/locations?id=eq.${location_id}`,
     {
       method: 'PATCH',
       headers: {
-        'apikey':       c.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY}`,
+        'apikey':       c.env.SUPABASE_SERVICE_KEY || SUPA_ANON,
+        'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY || SUPA_ANON}`,
         'Content-Type': 'application/json',
         'Prefer':       'return=minimal',
       },
@@ -223,12 +241,12 @@ app.post('/api/webhook-stripe', async (c) => {
       }
 
       await fetch(
-        `${c.env.SUPABASE_URL}/rest/v1/locations?id=eq.${locationId}`,
+        `${c.env.SUPABASE_URL || SUPA_URL}/rest/v1/locations?id=eq.${locationId}`,
         {
           method: 'PATCH',
           headers: {
-            'apikey':        c.env.SUPABASE_SERVICE_KEY,
-            'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY}`,
+            'apikey':        c.env.SUPABASE_SERVICE_KEY || SUPA_ANON,
+            'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY || SUPA_ANON}`,
             'Content-Type':  'application/json',
             'Prefer':        'return=minimal',
           },
@@ -249,12 +267,12 @@ app.post('/api/webhook-stripe', async (c) => {
   const locationId = sub.metadata?.location_id
   if (locationId) {
     await fetch(
-      `${c.env.SUPABASE_URL}/rest/v1/locations?id=eq.${locationId}`,
+      `${c.env.SUPABASE_URL || SUPA_URL}/rest/v1/locations?id=eq.${locationId}`,
       {
         method: 'PATCH',
         headers: {
-          'apikey':        c.env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY}`,
+          'apikey':        c.env.SUPABASE_SERVICE_KEY || SUPA_ANON,
+          'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY || SUPA_ANON}`,
           'Content-Type':  'application/json',
           'Prefer':        'return=minimal',
         },
@@ -277,11 +295,11 @@ app.post('/api/webhook-stripe', async (c) => {
       email = cust.email
     }
     if (email) {
-      await fetch(`${c.env.SUPABASE_URL}/rest/v1/accounts?email=eq.${encodeURIComponent(email)}`, {
+      await fetch(`${c.env.SUPABASE_URL || SUPA_URL}/rest/v1/accounts?email=eq.${encodeURIComponent(email)}`, {
         method: 'PATCH',
         headers: {
-          'apikey':        c.env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY}`,
+          'apikey':        c.env.SUPABASE_SERVICE_KEY || SUPA_ANON,
+          'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY || SUPA_ANON}`,
           'Content-Type':  'application/json',
           'Prefer':        'return=minimal',
         },
@@ -304,9 +322,9 @@ app.post('/api/delete-account', async (c) => {
   const authHeader = c.req.header('Authorization')
   if (!authHeader) return c.json({ error: 'Unauthorized' }, 401)
 
-  const verifyRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/user`, {
+  const verifyRes = await fetch(`${c.env.SUPABASE_URL || SUPA_URL}/auth/v1/user`, {
     headers: {
-      'apikey':        c.env.SUPABASE_SERVICE_KEY,
+      'apikey':        c.env.SUPABASE_SERVICE_KEY || SUPA_ANON,
       'Authorization': authHeader,
     }
   })
@@ -314,11 +332,11 @@ app.post('/api/delete-account', async (c) => {
   const user = await verifyRes.json() as { id?: string }
   if (!user.id) return c.json({ error: 'Could not identify user' }, 401)
 
-  const delRes = await fetch(`${c.env.SUPABASE_URL}/auth/v1/admin/users/${user.id}`, {
+  const delRes = await fetch(`${c.env.SUPABASE_URL || SUPA_URL}/auth/v1/admin/users/${user.id}`, {
     method: 'DELETE',
     headers: {
-      'apikey':        c.env.SUPABASE_SERVICE_KEY,
-      'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY}`,
+      'apikey':        c.env.SUPABASE_SERVICE_KEY || SUPA_ANON,
+      'Authorization': `Bearer ${c.env.SUPABASE_SERVICE_KEY || SUPA_ANON}`,
     }
   })
   if (!delRes.ok) {
@@ -341,8 +359,8 @@ app.get('/api/admin/stats', async (c) => {
     return c.json({ error: 'Unauthorized' }, 401)
   }
 
-  const supa = c.env.SUPABASE_URL
-  const key  = c.env.SUPABASE_SERVICE_KEY
+  const supa = c.env.SUPABASE_URL || SUPA_URL
+  const key  = c.env.SUPABASE_SERVICE_KEY || SUPA_ANON
 
   const headers = {
     'apikey':        key,
@@ -450,7 +468,7 @@ app.post('/api/create-print-order', async (c) => {
     return c.json({ error: 'sku, imageUrl, and recipient are required' }, 400)
   }
 
-  const prodigiKey = c.env.PRODIGI_API_KEY || '3a10599e-8d15-4d07-8006-a9ba60ee003f'
+  const prodigiKey = c.env.PRODIGI_API_KEY || PRODIGI_KEY_DEFAULT
   const merchantRef = `hc-${userId.slice(0,8)}-${Date.now()}`
 
   const orderPayload = {
@@ -516,7 +534,7 @@ app.get('/api/print-orders', async (c) => {
   const userId = await getUserId(c)
   if (!userId) return c.json({ error: 'Unauthorized' }, 401)
 
-  const prodigiKey = c.env.PRODIGI_API_KEY || '3a10599e-8d15-4d07-8006-a9ba60ee003f'
+  const prodigiKey = c.env.PRODIGI_API_KEY || PRODIGI_KEY_DEFAULT
 
   try {
     const res = await fetch(`${PRODIGI_API}/orders?top=50`, {
@@ -544,7 +562,7 @@ app.get('/api/print-orders', async (c) => {
 // ── 9. Prodigi Product Details ────────────────────────────────
 app.get('/api/print-product/:sku', async (c) => {
   const sku = c.req.param('sku')
-  const prodigiKey = c.env.PRODIGI_API_KEY || '3a10599e-8d15-4d07-8006-a9ba60ee003f'
+  const prodigiKey = c.env.PRODIGI_API_KEY || PRODIGI_KEY_DEFAULT
 
   const res = await fetch(`${PRODIGI_API}/products/${sku}`, {
     headers: { 'X-API-Key': prodigiKey }
