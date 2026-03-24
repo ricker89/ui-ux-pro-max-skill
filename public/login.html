@@ -723,7 +723,6 @@ async function handlePasswordSignIn(e) {
 
   const email    = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
-  let valid = true;
 
   // Validate
   setFieldError('field-email', !isValidEmail(email));
@@ -737,9 +736,15 @@ async function handlePasswordSignIn(e) {
   try {
     const data = await sb.auth.signIn(email, password);
 
-    if (data.error || !data.session) {
-      const msg = data.error || 'Invalid email or password.';
-      showAlert('error', msg);
+    // sb.auth.signIn returns { error: string } on failure, { user, session } on success
+    if (data && data.error) {
+      showAlert('error', data.error);
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      return;
+    }
+    if (!data || !data.session) {
+      showAlert('error', 'Invalid email or password.');
       btn.disabled = false;
       btn.classList.remove('loading');
       return;
@@ -748,6 +753,7 @@ async function handlePasswordSignIn(e) {
     redirectAfterLogin();
 
   } catch(err) {
+    console.error('[login] signIn error:', err);
     showAlert('error', 'Network error. Please check your connection and try again.');
     btn.disabled = false;
     btn.classList.remove('loading');
@@ -770,7 +776,12 @@ async function handleMagicLink(e) {
   btn.classList.add('loading');
 
   try {
-    await sb.auth.sendMagicLink(email);
+    // Build redirect URL: preserve ?next= so magic link lands on the right page
+    const nextParam = new URLSearchParams(window.location.search).get('next');
+    const redirectTo = nextParam
+      ? `${location.origin}/login?next=${encodeURIComponent(nextParam)}`
+      : `${location.origin}/dashboard.html`;
+    await sb.auth.sendMagicLink(email, redirectTo);
 
     // Show success screen regardless (don't leak whether email exists)
     document.getElementById('magicLinkForm').style.display = 'none';
@@ -863,7 +874,11 @@ function redirectAfterLogin() {
   const next = params.get('next');
   const ALLOWED_PREFIXES = ['/print-studio', '/dashboard', '/account', '/welcome', '/location', '/wifi', '/menu', '/feedback'];
   if (next && ALLOWED_PREFIXES.some(p => next.startsWith(p))) {
-    window.location.href = next;
+    // Decode the next URL fully (it may be double-encoded)
+    let dest = next;
+    try { dest = decodeURIComponent(next); } catch(e) {}
+    console.log('[login] redirecting to:', dest);
+    window.location.href = dest;
     return;
   }
   window.location.href = 'dashboard.html';

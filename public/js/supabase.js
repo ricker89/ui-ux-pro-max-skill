@@ -62,10 +62,12 @@ const sb = {
       return data;   // { user, session }
     },
 
-    async sendMagicLink(email) {
+    async sendMagicLink(email, redirectTo) {
+      // Carry ?next= through the magic link so the user lands on the right page
+      const dest = redirectTo || `${location.origin}/dashboard.html`;
       const { error } = await _getClient().auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${location.origin}/dashboard.html` }
+        options: { emailRedirectTo: dest }
       });
       return error ? { error: error.message } : {};
     },

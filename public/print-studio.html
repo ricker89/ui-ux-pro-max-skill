@@ -931,14 +931,15 @@ const styleLibrary = {
 // ─────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const session = await sb.auth.getSession()
-    if (!session || !session.data?.session) {
+    // Use the SDK directly for a reliable async session check
+    const { data: sessionData } = await _getClient().auth.getSession()
+    if (!sessionData?.session) {
       // Preserve query params so Print Studio re-opens with pre-filled fields after login
       const returnUrl = '/print-studio' + (location.search || '')
       window.location.href = '/login?next=' + encodeURIComponent(returnUrl)
       return
     }
-    const user = session.data.session.user
+    const user = sessionData.session.user
     document.getElementById('userEmailEl').textContent = user.email
     document.getElementById('avatarEl').textContent = user.email[0].toUpperCase()
 
