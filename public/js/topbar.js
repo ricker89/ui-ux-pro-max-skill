@@ -265,10 +265,10 @@
       if (!token) return;
 
       const res = await fetch(
-        `https://dbbryatmoxlzibfsurxrm.supabase.co/rest/v1/locations` +
+        `https://dbbryatmoxlzifsurxrm.supabase.co/rest/v1/locations` +
         `?user_id=eq.${user.id}&deleted_at=is.null&order=created_at.asc&select=*`,
         { headers: {
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemliZnN1cnhybSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzQ2NDkzNTg4LCJleHAiOjIwNjIwNjk1ODh9.N_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk',
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk',
             'Authorization': `Bearer ${token}`,
           }
         }
