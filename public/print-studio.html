@@ -933,7 +933,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const session = await sb.auth.getSession()
     if (!session || !session.data?.session) {
-      window.location.href = '/login'
+      // Preserve query params so Print Studio re-opens with pre-filled fields after login
+      const returnUrl = '/print-studio' + (location.search || '')
+      window.location.href = '/login?next=' + encodeURIComponent(returnUrl)
       return
     }
     const user = session.data.session.user

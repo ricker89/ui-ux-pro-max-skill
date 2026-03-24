@@ -857,8 +857,15 @@ function togglePw() {
    REDIRECT AFTER LOGIN
 ════════════════════════════════════════════════════════ */
 function redirectAfterLogin() {
-  // Always go straight to dashboard — no ?next= chasing (caused redirect loops)
-  // AUTH GUARD DISABLED — re-enable ?next= handling once redirect loop is resolved
+  // Honor ?next= param for deep-link returns (e.g. /print-studio, /account)
+  // Allowlist prevents open-redirect abuse — only same-origin paths accepted
+  const params = new URLSearchParams(window.location.search);
+  const next = params.get('next');
+  const ALLOWED_PREFIXES = ['/print-studio', '/dashboard', '/account', '/welcome', '/location', '/wifi', '/menu', '/feedback'];
+  if (next && ALLOWED_PREFIXES.some(p => next.startsWith(p))) {
+    window.location.href = next;
+    return;
+  }
   window.location.href = 'dashboard.html';
 }
 
