@@ -309,25 +309,25 @@
         </div>
         <div class="card-body">
           <div class="product-grid">
-            <div class="product-card" onclick="selectProduct(this,'M-STI-3X4','Scan-for-Menu Sticker','Kiss-cut vinyl sticker, ideal for tables & counters','sticker','3×4"',6.95)">
+            <div class="product-card" onclick="selectProduct(this,'M-STI-3X4','Scan-for-Menu Sticker','Kiss-cut vinyl sticker, ideal for tables &amp; counters','sticker','3x4in',6.95)">
               <div class="product-emoji">🏷️</div>
               <div class="product-name">Menu Sticker</div>
               <div class="product-dims">3×4" vinyl kiss-cut</div>
               <div class="product-price">~$6.95 ea</div>
             </div>
-            <div class="product-card" onclick="selectProduct(this,'M-STI-5_5X5_5','Table Sticker (Large)','Larger kiss-cut vinyl sticker','sticker','5.5×5.5"',9.95)">
+            <div class="product-card" onclick="selectProduct(this,'M-STI-5_5X5_5','Table Sticker (Large)','Larger kiss-cut vinyl sticker','sticker','5.5x5.5in',9.95)">
               <div class="product-emoji">🏷️</div>
               <div class="product-name">Table Sticker</div>
               <div class="product-dims">5.5×5.5" vinyl kiss-cut</div>
               <div class="product-price">~$9.95 ea</div>
             </div>
-            <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-4X6','Table Tent Card (4×6)','Fold in half for a 4×3" standing tent card','tent','4×6"',4.95)">
+            <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-4X6','Table Tent Card (4x6)','Fold in half for a 4x3in standing tent card','tent','4x6in',4.95)">
               <div class="product-emoji">🗂️</div>
               <div class="product-name">Tent Card (4×6)</div>
               <div class="product-dims">4×6" matte art print</div>
               <div class="product-price">~$4.95 ea</div>
             </div>
-            <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-5X7','Table Tent Card (5×7)','Fold in half for a 5×3.5" standing tent card','tent','5×7"',5.95)">
+            <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-5X7','Table Tent Card (5x7)','Fold in half for a 5x3.5in standing tent card','tent','5x7in',5.95)">
               <div class="product-emoji">🗂️</div>
               <div class="product-name">Tent Card (5×7)</div>
               <div class="product-dims">5×7" matte art print</div>
@@ -1059,8 +1059,10 @@ function goToStep(n) {
 //  STEP 1 — Product
 // ─────────────────────────────────────────────────────────────
 function selectProduct(el, sku, name, desc, type, dims, unitPrice) {
+  // Walk up to the .product-card in case a child element was clicked
+  const card = el.closest ? el.closest('.product-card') : el
   document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'))
-  el.classList.add('selected')
+  if (card) card.classList.add('selected')
   selectedProduct = { sku, name, desc, type, dims, unitPrice }
   document.getElementById('step1Next').disabled = false
   // Update upload spec box
