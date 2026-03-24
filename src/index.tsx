@@ -469,7 +469,49 @@ app.post('/api/create-print-order', async (c) => {
   }
 
   const prodigiKey = c.env.PRODIGI_API_KEY || PRODIGI_KEY_DEFAULT
+  const falKey     = c.env.FAL_API_KEY     || FAL_KEY_DEFAULT
   const merchantRef = `hc-${userId.slice(0,8)}-${Date.now()}`
+
+  // If imageUrl is a base64 data URL (from canvas template or upload),
+  // upload it to fal.ai storage to get a public HTTPS URL for Prodigi
+  let publicImageUrl = body.imageUrl
+  if (body.imageUrl.startsWith('data:')) {
+    try {
+      // Decode base64 to binary
+      const [header, b64] = body.imageUrl.split(',')
+      const mimeMatch = header.match(/data:([^;]+)/)
+      const mime = mimeMatch ? mimeMatch[1] : 'image/png'
+      const ext  = mime.split('/')[1] || 'png'
+
+      // Convert base64 to Uint8Array
+      const binaryStr = atob(b64)
+      const bytes = new Uint8Array(binaryStr.length)
+      for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i)
+
+      // Upload to fal.ai storage
+      const uploadRes = await fetch('https://rest.alpha.fal.ai/storage/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Key ${falKey}`,
+          'Content-Type': mime,
+          'x-fal-file-name': `print-design-${merchantRef}.${ext}`
+        },
+        body: bytes
+      })
+      if (uploadRes.ok) {
+        const uploadData = await uploadRes.json() as { url?: string; access_url?: string }
+        publicImageUrl = uploadData.url || uploadData.access_url || body.imageUrl
+        console.log('[create-print-order] image uploaded to:', publicImageUrl)
+      } else {
+        const errText = await uploadRes.text()
+        console.error('[create-print-order] fal upload error:', errText)
+        return c.json({ error: 'Could not upload design image', detail: errText }, 500)
+      }
+    } catch(uploadErr) {
+      console.error('[create-print-order] upload exception:', uploadErr)
+      return c.json({ error: 'Image upload failed' }, 500)
+    }
+  }
 
   const orderPayload = {
     merchantReference: merchantRef,
@@ -488,7 +530,7 @@ app.post('/api/create-print-order', async (c) => {
         assets: [
           {
             printArea: 'default',
-            url: body.imageUrl
+            url: publicImageUrl
           }
         ]
       }

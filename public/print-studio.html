@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- print-studio.html v1.0 — AI-powered print marketing studio -->
+<!-- print-studio.html v2.0 — Template-based print marketing studio -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -8,959 +8,982 @@
   <link rel="icon" type="image/png" href="images/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet" />
+  <!-- QR code generator -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/supabase.js?v=5.7"></script>
   <script src="js/topbar.js?v=2.0"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --black:   #1a1a1a;
-      --white:   #ffffff;
-      --off:     #f5f5f7;
-      --border:  #e8e8e8;
-      --sub:     #6b7280;
-      --yellow:  #FDB813;
-      --green:   #34A853;
-      --blue:    #4285F4;
-      --red:     #EA4335;
-      --purple:  #6366f1;
-      --radius:  16px;
-      --shadow:  0 2px 16px rgba(0,0,0,.06);
+      --black:#1a1a1a; --white:#ffffff; --off:#f5f5f7; --border:#e8e8e8;
+      --sub:#6b7280; --yellow:#FDB813; --green:#34A853; --blue:#4285F4;
+      --red:#EA4335; --radius:16px; --shadow:0 2px 16px rgba(0,0,0,.06);
     }
+    html,body { min-height:100%; font-family:'Inter',system-ui,sans-serif; background:var(--off); color:var(--black); -webkit-font-smoothing:antialiased; }
 
-    html, body {
-      min-height: 100%;
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--off);
-      color: var(--black);
-      -webkit-font-smoothing: antialiased;
-    }
+    /* ─── Topbar ─── */
+    .topbar { background:var(--white); border-bottom:1px solid var(--border); padding:0 32px; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .topbar-left { display:flex; align-items:center; gap:20px; }
+    .topbar-logo { font-family:'Poppins',sans-serif; font-size:1.15rem; text-decoration:none; color:var(--black); }
+    .topbar-logo strong { font-weight:800; }
+    .topbar-logo span { font-weight:300; }
+    .topbar-logo em { color:var(--yellow); font-style:normal; font-weight:800; }
+    .topbar-back { display:flex; align-items:center; gap:6px; color:var(--sub); font-size:.85rem; text-decoration:none; padding:6px 12px; border-radius:8px; transition:background .15s; }
+    .topbar-back:hover { background:var(--off); color:var(--black); }
+    .topbar-right { display:flex; align-items:center; gap:12px; }
+    .user-chip { display:flex; align-items:center; gap:8px; background:var(--off); border-radius:99px; padding:5px 14px 5px 8px; font-size:.8rem; }
+    .avatar { width:26px; height:26px; border-radius:50%; background:var(--yellow); color:var(--black); display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; }
 
-    /* ─── Topbar ─────────────────────────────────────── */
-    .topbar {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .topbar-left { display: flex; align-items: center; gap: 20px; }
-    .topbar-logo {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.15rem;
-      text-decoration: none;
-      color: var(--black);
-    }
-    .topbar-logo strong { font-weight: 800; }
-    .topbar-logo span { font-weight: 300; }
-    .topbar-logo em { color: var(--yellow); font-style: normal; font-weight: 800; }
-    .topbar-back {
-      display: flex; align-items: center; gap: 6px;
-      color: var(--sub); font-size: 0.85rem; text-decoration: none;
-      padding: 6px 12px; border-radius: 8px;
-      transition: background .15s;
-    }
-    .topbar-back:hover { background: var(--off); color: var(--black); }
-    .topbar-right { display: flex; align-items: center; gap: 12px; }
-    .user-chip {
-      display: flex; align-items: center; gap: 8px;
-      background: var(--off); border-radius: 99px;
-      padding: 5px 14px 5px 8px; font-size: 0.8rem;
-    }
-    .avatar {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--yellow); color: var(--black);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 700;
-    }
+    /* ─── Layout ─── */
+    .page-wrap { max-width:960px; margin:0 auto; padding:32px 20px 80px; }
+    .page-header { margin-bottom:28px; }
+    .page-header h1 { font-size:1.6rem; font-weight:800; display:flex; align-items:center; gap:10px; }
+    .page-header p { color:var(--sub); margin-top:6px; font-size:.92rem; }
 
-    /* ─── Layout ─────────────────────────────────────── */
-    .page-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+    /* ─── Stepper ─── */
+    .stepper { display:flex; background:var(--white); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:28px; }
+    .step { flex:1; padding:16px 20px; display:flex; align-items:center; gap:12px; cursor:pointer; border-right:1px solid var(--border); transition:background .15s; }
+    .step:last-child { border-right:none; }
+    .step.active { background:var(--yellow); }
+    .step.done { background:#f0fdf4; cursor:pointer; }
+    .step.disabled { opacity:.4; pointer-events:none; }
+    .step-num { width:28px; height:28px; border-radius:50%; background:var(--off); display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700; flex-shrink:0; }
+    .step.active .step-num { background:var(--black); color:var(--yellow); }
+    .step.done .step-num { background:var(--green); color:#fff; }
+    .step-label { font-size:.82rem; font-weight:600; }
+    .step-sublabel { font-size:.7rem; color:var(--sub); }
+    .step.active .step-sublabel { color:rgba(0,0,0,.55); }
 
-    .page-header { margin-bottom: 32px; }
-    .page-header h1 {
-      font-size: 1.75rem; font-weight: 800;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .page-header h1 .badge {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #fff; font-size: 0.6rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .08em;
-      padding: 3px 8px; border-radius: 99px;
-    }
-    .page-header p { color: var(--sub); margin-top: 6px; font-size: 0.95rem; }
+    /* ─── Card ─── */
+    .card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; box-shadow:var(--shadow); }
+    .card-header { padding:18px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:14px; }
+    .card-header h2 { font-size:1rem; font-weight:700; }
+    .card-icon { width:36px; height:36px; background:var(--off); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .card-body { padding:24px; }
 
-    /* ─── Stepper ─────────────────────────────────────── */
-    .stepper {
-      display: flex; gap: 0; margin-bottom: 32px;
-      background: var(--white); border-radius: var(--radius);
-      border: 1px solid var(--border); overflow: hidden;
-    }
-    .step {
-      flex: 1; padding: 16px 20px; display: flex; align-items: center; gap: 10px;
-      cursor: pointer; border-right: 1px solid var(--border);
-      transition: background .15s;
-    }
-    .step:last-child { border-right: none; }
-    .step.active { background: var(--yellow); }
-    .step.done { background: #f0fdf4; }
-    .step.disabled { opacity: .45; cursor: not-allowed; }
-    .step-num {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--border); color: var(--sub);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
-    }
-    .step.active .step-num { background: var(--black); color: var(--yellow); }
-    .step.done .step-num { background: var(--green); color: #fff; }
-    .step-label { font-size: 0.8rem; font-weight: 600; }
-    .step-sublabel { font-size: 0.7rem; color: var(--sub); }
-    .step.active .step-sublabel { color: rgba(0,0,0,.6); }
+    /* ─── Product cards ─── */
+    .product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+    .product-card { border:2px solid var(--border); border-radius:14px; padding:18px 16px; cursor:pointer; transition:all .15s; position:relative; }
+    .product-card:hover { border-color:var(--yellow); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.08); }
+    .product-card.selected { border-color:var(--yellow); background:#fffbeb; }
+    .product-card.selected::after { content:'✓'; position:absolute; top:10px; right:12px; width:22px; height:22px; background:var(--yellow); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:800; }
+    .product-emoji { font-size:2rem; margin-bottom:10px; }
+    .product-name { font-size:.9rem; font-weight:700; margin-bottom:4px; }
+    .product-dims { font-size:.75rem; color:var(--sub); margin-bottom:8px; }
+    .product-price { font-size:1rem; font-weight:800; color:var(--black); }
 
-    /* ─── Cards ─────────────────────────────────────── */
-    .card {
-      background: var(--white); border-radius: var(--radius);
-      border: 1px solid var(--border); box-shadow: var(--shadow);
-    }
-    .card-header {
-      padding: 20px 24px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 10px;
-    }
-    .card-header h2 { font-size: 1rem; font-weight: 700; }
-    .card-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: var(--off); display: flex; align-items: center;
-      justify-content: center; font-size: 1.1rem;
-    }
-    .card-body { padding: 24px; }
+    /* ─── Design mode tabs ─── */
+    .mode-tabs { display:flex; gap:10px; margin-bottom:24px; }
+    .mode-tab { flex:1; padding:14px 16px; border:2px solid var(--border); border-radius:12px; cursor:pointer; text-align:center; transition:all .15s; background:var(--white); }
+    .mode-tab:hover { border-color:var(--yellow); }
+    .mode-tab.active { border-color:var(--yellow); background:#fffbeb; }
+    .mode-tab-icon { font-size:1.6rem; margin-bottom:6px; }
+    .mode-tab-label { font-size:.82rem; font-weight:700; }
+    .mode-tab-sub { font-size:.7rem; color:var(--sub); margin-top:2px; }
 
-    /* ─── Product Grid ─────────────────────────────────── */
-    .product-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-    }
-    .product-card {
-      border: 2px solid var(--border); border-radius: 12px;
-      padding: 20px; cursor: pointer; transition: all .2s;
-      position: relative; background: var(--white);
-    }
-    .product-card:hover { border-color: var(--yellow); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
-    .product-card.selected { border-color: var(--yellow); background: #fffbeb; }
-    .product-card.selected::after {
-      content: '✓'; position: absolute; top: 10px; right: 10px;
-      width: 22px; height: 22px; border-radius: 50%;
-      background: var(--yellow); color: var(--black);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 800;
-    }
-    .product-icon { font-size: 2rem; margin-bottom: 10px; }
-    .product-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
-    .product-desc { font-size: 0.78rem; color: var(--sub); margin-bottom: 10px; }
-    .product-price {
-      font-size: 0.75rem; background: var(--off); color: var(--sub);
-      border-radius: 6px; padding: 3px 8px; display: inline-block;
-    }
-    .product-dims {
-      font-size: 0.7rem; color: var(--purple); font-weight: 600;
-      margin-top: 4px;
-    }
-    .product-use-tag {
-      font-size: 0.65rem; background: #ede9fe; color: #6d28d9;
-      border-radius: 4px; padding: 2px 6px; display: inline-block;
-      margin-top: 6px;
-    }
+    /* ─── Template grid ─── */
+    .template-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; margin-bottom:20px; }
+    .template-card { border:2px solid var(--border); border-radius:12px; overflow:hidden; cursor:pointer; transition:all .15s; position:relative; background:var(--white); }
+    .template-card:hover { border-color:var(--yellow); transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.1); }
+    .template-card.selected { border-color:var(--yellow); box-shadow:0 0 0 3px rgba(253,184,19,.25); }
+    .template-card.selected::after { content:'✓'; position:absolute; top:8px; right:8px; width:22px; height:22px; background:var(--yellow); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:800; z-index:2; }
+    .template-thumb { width:100%; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .template-thumb canvas { width:100%; height:100%; object-fit:contain; }
+    .template-label { padding:8px 10px; font-size:.75rem; font-weight:600; text-align:center; border-top:1px solid var(--border); }
 
-    /* ─── Location Selector ─────────────────────────────── */
-    .location-select-wrap { margin-bottom: 20px; }
-    .location-select-wrap label { font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 6px; }
-    .form-select, .form-input {
-      width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
-      border-radius: 10px; font-size: 0.9rem; font-family: inherit;
-      background: var(--white); color: var(--black);
-      transition: border-color .15s;
+    /* ─── Live preview ─── */
+    .preview-wrap { text-align:center; }
+    .preview-canvas-wrap {
+      display:inline-block; border:2px solid var(--border); border-radius:14px;
+      overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.12); max-width:340px; width:100%;
     }
-    .form-select:focus, .form-input:focus { outline: none; border-color: var(--yellow); }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 0.83rem; font-weight: 600; }
+    #previewCanvas { display:block; width:100%; height:auto; }
+    .preview-actions { display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
 
-    /* ─── AI Design Section ─────────────────────────────── */
-    .design-section { margin-bottom: 24px; }
-    .design-type-tabs {
-      display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+    /* ─── Upload zone ─── */
+    .upload-zone {
+      border:2.5px dashed var(--border); border-radius:14px; padding:48px 24px;
+      text-align:center; cursor:pointer; transition:all .2s; background:var(--white);
     }
-    .design-tab {
-      padding: 8px 16px; border: 1.5px solid var(--border);
-      border-radius: 8px; cursor: pointer; font-size: 0.82rem;
-      font-weight: 600; transition: all .15s; background: var(--white);
-    }
-    .design-tab:hover { border-color: var(--yellow); }
-    .design-tab.active { background: var(--yellow); border-color: var(--yellow); color: var(--black); }
+    .upload-zone:hover, .upload-zone.drag-over { border-color:var(--yellow); background:#fffbeb; }
+    .upload-zone-icon { font-size:2.5rem; margin-bottom:12px; }
+    .upload-zone-text { font-size:1rem; font-weight:700; margin-bottom:6px; }
+    .upload-zone-sub { font-size:.82rem; color:var(--sub); }
+    #uploadInput { display:none; }
 
-    .style-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 10px; margin-bottom: 20px;
-    }
-    .style-card {
-      border: 2px solid var(--border); border-radius: 10px; overflow: hidden;
-      cursor: pointer; transition: all .2s;
-    }
-    .style-card:hover { border-color: var(--yellow); }
-    .style-card.selected { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(253,184,19,.25); }
-    .style-preview {
-      height: 90px; display: flex; align-items: center;
-      justify-content: center; font-size: 2rem;
-    }
-    .style-preview.gradient-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
-    .style-preview.gradient-2 { background: linear-gradient(135deg, #f093fb, #f5576c); }
-    .style-preview.gradient-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-    .style-preview.gradient-4 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-    .style-preview.gradient-5 { background: linear-gradient(135deg, #fa709a, #fee140); }
-    .style-preview.gradient-6 { background: linear-gradient(135deg, #30cfd0, #330867); }
-    .style-preview.minimal-bw { background: #1a1a1a; }
-    .style-preview.minimal-wht { background: #fff; border-bottom: 1px solid var(--border); }
-    .style-label { padding: 6px 10px; font-size: 0.73rem; font-weight: 600; }
+    /* ─── Quality indicator ─── */
+    .quality-bar { height:6px; border-radius:3px; margin-top:6px; transition:all .3s; }
+    .quality-good { background:var(--green); }
+    .quality-marginal { background:var(--yellow); }
+    .quality-poor { background:var(--red); }
+    .quality-label { font-size:.75rem; font-weight:600; margin-top:4px; }
+    .quality-good-text { color:var(--green); }
+    .quality-marginal-text { color:#d97706; }
+    .quality-poor-text { color:var(--red); }
 
-    /* ─── Generate Button ─────────────────────────────── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 24px; border-radius: 10px; font-size: 0.9rem;
-      font-weight: 700; cursor: pointer; border: none; transition: all .2s;
-      font-family: inherit; text-decoration: none;
-    }
-    .btn-primary { background: var(--yellow); color: var(--black); }
-    .btn-primary:hover { background: #e6ab00; transform: translateY(-1px); }
-    .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-    .btn-outline {
-      background: transparent; color: var(--black);
-      border: 1.5px solid var(--border);
-    }
-    .btn-outline:hover { border-color: var(--yellow); background: #fffbeb; }
-    .btn-dark { background: var(--black); color: var(--white); }
-    .btn-dark:hover { background: #333; }
-    .btn-green { background: var(--green); color: var(--white); }
-    .btn-green:hover { background: #2a8a42; }
-    .btn-sm { padding: 8px 16px; font-size: 0.82rem; }
+    /* ─── Acknowledgment checklist ─── */
+    .ack-list { display:flex; flex-direction:column; gap:10px; }
+    .ack-item { display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; transition:border-color .15s; }
+    .ack-item:hover { border-color:var(--yellow); }
+    .ack-item input[type=checkbox] { width:18px; height:18px; flex-shrink:0; accent-color:var(--yellow); margin-top:1px; cursor:pointer; }
+    .ack-item label { font-size:.82rem; line-height:1.4; cursor:pointer; }
 
-    /* ─── Preview Canvas ─────────────────────────────── */
-    .preview-area {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
-      align-items: start;
-    }
-    .canvas-wrap {
-      background: #f0f0f0; border-radius: 12px; overflow: hidden;
-      border: 1px solid var(--border); position: relative;
-    }
-    .canvas-placeholder {
-      padding: 48px 24px; text-align: center;
-    }
-    .canvas-placeholder .big-icon { font-size: 3rem; margin-bottom: 12px; }
-    .canvas-placeholder p { color: var(--sub); font-size: 0.85rem; }
+    /* ─── Upload preview ─── */
+    .upload-preview-img { max-width:280px; width:100%; border-radius:12px; border:2px solid var(--border); display:block; margin:0 auto; }
 
-    .generated-image {
-      width: 100%; display: block;
-    }
-    .canvas-overlay {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,.45);
-    }
-    .canvas-generating {
-      color: #fff; text-align: center;
-    }
-    .canvas-generating .spinner {
-      width: 40px; height: 40px; border: 3px solid rgba(255,255,255,.3);
-      border-top-color: var(--yellow); border-radius: 50%;
-      animation: spin .8s linear infinite; margin: 0 auto 12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* ─── Location info ─── */
+    .loc-info-row { background:var(--off); border-radius:12px; padding:14px 16px; border:1px solid var(--border); }
+    .loc-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 20px; font-size:.82rem; }
+    .loc-info-label { color:var(--sub); margin-bottom:2px; }
+    .loc-info-val { font-weight:700; word-break:break-all; }
 
-    .design-variants {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    }
-    .variant-thumb {
-      border: 2px solid var(--border); border-radius: 10px;
-      overflow: hidden; cursor: pointer; transition: all .15s;
-      aspect-ratio: 1;
-    }
-    .variant-thumb:hover { border-color: var(--yellow); }
-    .variant-thumb.selected { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(253,184,19,.3); }
-    .variant-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .variant-thumb-placeholder {
-      width: 100%; height: 100%; display: flex; align-items: center;
-      justify-content: center; background: var(--off); font-size: 1.5rem;
-    }
+    /* ─── Order summary ─── */
+    .summary-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:.88rem; }
+    .summary-row:last-child { border-bottom:none; font-weight:800; font-size:1rem; }
+    .qty-control { display:flex; align-items:center; gap:12px; }
+    .qty-btn { width:34px; height:34px; border-radius:8px; border:1.5px solid var(--border); background:var(--white); font-size:1.1rem; font-weight:700; cursor:pointer; transition:all .15s; display:flex; align-items:center; justify-content:center; }
+    .qty-btn:hover { border-color:var(--yellow); background:#fffbeb; }
+    .qty-display { font-size:1.1rem; font-weight:700; min-width:32px; text-align:center; }
+    .shipping-option { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; margin-bottom:8px; transition:border-color .15s; }
+    .shipping-option.selected { border-color:var(--yellow); background:#fffbeb; }
+    .shipping-option input { accent-color:var(--yellow); }
+    .shipping-details { flex:1; }
+    .shipping-name { font-size:.88rem; font-weight:600; }
+    .shipping-time { font-size:.75rem; color:var(--sub); }
+    .shipping-price { font-size:.9rem; font-weight:700; }
 
-    /* ─── Order Form ─────────────────────────────────── */
-    .order-summary {
-      background: #fffbeb; border: 1.5px solid #fde68a;
-      border-radius: 12px; padding: 20px; margin-bottom: 20px;
-    }
-    .order-summary h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 12px; }
-    .summary-row {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.85rem; padding: 4px 0;
-    }
-    .summary-row.total {
-      border-top: 1px solid #fde68a; margin-top: 8px; padding-top: 10px;
-      font-weight: 700;
-    }
-    .quantity-row {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
-    }
-    .qty-btn {
-      width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border);
-      background: var(--white); cursor: pointer; font-size: 1.1rem;
-      display: flex; align-items: center; justify-content: center;
-      transition: all .15s;
-    }
-    .qty-btn:hover { border-color: var(--yellow); background: #fffbeb; }
-    .qty-display { font-size: 1rem; font-weight: 700; width: 40px; text-align: center; }
+    /* ─── Form ─── */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-group label { font-size:.8rem; font-weight:600; }
+    .form-input { padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:.88rem; font-family:inherit; width:100%; transition:border-color .15s; }
+    .form-input:focus { outline:none; border-color:var(--yellow); }
+    select.form-input { appearance:none; -webkit-appearance:none; background:var(--white); cursor:pointer; }
 
-    /* ─── Shipping ─────────────────────────────────── */
-    .shipping-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-    .shipping-option {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; border: 1.5px solid var(--border);
-      border-radius: 10px; cursor: pointer; transition: all .15s;
-    }
-    .shipping-option:hover { border-color: var(--yellow); }
-    .shipping-option.selected { border-color: var(--yellow); background: #fffbeb; }
-    .shipping-option input[type="radio"] { width: 16px; height: 16px; accent-color: var(--yellow); }
-    .shipping-name { font-weight: 600; font-size: 0.85rem; }
-    .shipping-est { font-size: 0.75rem; color: var(--sub); }
-    .shipping-price { margin-left: auto; font-weight: 700; font-size: 0.85rem; }
+    /* ─── Buttons ─── */
+    .btn { padding:11px 22px; border-radius:10px; font-family:inherit; font-size:.88rem; font-weight:700; cursor:pointer; border:none; transition:all .15s; display:inline-flex; align-items:center; gap:8px; }
+    .btn-primary { background:var(--yellow); color:var(--black); }
+    .btn-primary:hover { opacity:.88; }
+    .btn-primary:disabled { opacity:.4; cursor:not-allowed; }
+    .btn-outline { background:transparent; color:var(--black); border:1.5px solid var(--border); }
+    .btn-outline:hover { border-color:var(--black); }
+    .btn-ghost { background:transparent; color:var(--sub); border:none; font-size:.82rem; cursor:pointer; padding:8px 12px; border-radius:8px; font-family:inherit; font-weight:600; }
+    .btn-ghost:hover { background:var(--off); color:var(--black); }
+    .step-nav { display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
 
-    /* ─── Toast ─────────────────────────────────────── */
-    .toast-wrap {
-      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .toast {
-      background: var(--black); color: var(--white);
-      padding: 12px 20px; border-radius: 10px; font-size: 0.85rem;
-      font-weight: 500; box-shadow: 0 4px 20px rgba(0,0,0,.2);
-      animation: slideIn .2s ease; max-width: 320px;
-    }
-    .toast.success { background: var(--green); }
-    .toast.error { background: var(--red); }
-    @keyframes slideIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    /* ─── Order history table ─── */
+    .order-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+    .order-table th { text-align:left; padding:10px 14px; background:var(--off); font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--sub); }
+    .order-table td { padding:12px 14px; border-bottom:1px solid var(--border); }
+    .status-badge { padding:3px 9px; border-radius:99px; font-size:.72rem; font-weight:700; }
+    .status-inprogress { background:#dbeafe; color:#1d4ed8; }
+    .status-complete { background:#dcfce7; color:#166534; }
+    .status-cancelled { background:#fee2e2; color:#991b1b; }
+    .status-pending { background:#fef9c3; color:#854d0e; }
 
-    /* ─── Alert boxes ─────────────────────────────────── */
-    .alert {
-      border-radius: 10px; padding: 14px 16px; font-size: 0.85rem;
-      display: flex; align-items: flex-start; gap: 10px;
-    }
-    .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
-    .alert-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
-    .alert-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    /* ─── Tabs ─── */
+    .main-tabs { display:flex; gap:4px; background:var(--white); border:1px solid var(--border); border-radius:12px; padding:4px; margin-bottom:24px; }
+    .tab-btn { flex:1; padding:9px; border-radius:9px; border:none; background:transparent; font-family:inherit; font-size:.85rem; font-weight:600; cursor:pointer; color:var(--sub); transition:all .15s; }
+    .tab-btn.active { background:var(--yellow); color:var(--black); }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
 
-    /* ─── Tabs ─────────────────────────────────────── */
-    .tab-nav {
-      display: flex; gap: 0;
-      border-bottom: 2px solid var(--border); margin-bottom: 24px;
-    }
-    .tab-btn {
-      padding: 10px 18px; border: none; background: transparent;
-      font-size: 0.85rem; font-weight: 600; cursor: pointer;
-      color: var(--sub); border-bottom: 2px solid transparent;
-      margin-bottom: -2px; transition: all .15s; font-family: inherit;
-    }
-    .tab-btn.active { color: var(--black); border-bottom-color: var(--yellow); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    /* ─── Loading overlay ─── */
+    .loading-overlay { display:none; position:fixed; inset:0; background:rgba(255,255,255,.85); z-index:200; align-items:center; justify-content:center; flex-direction:column; gap:14px; }
+    .loading-overlay.active { display:flex; }
+    .spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--yellow); border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* ─── Order History ─────────────────────────────── */
-    .order-table { width: 100%; border-collapse: collapse; }
-    .order-table th {
-      text-align: left; font-size: 0.78rem; text-transform: uppercase;
-      letter-spacing: .05em; color: var(--sub); padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    .order-table td {
-      padding: 12px; font-size: 0.85rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .order-table tr:last-child td { border-bottom: none; }
-    .status-badge {
-      font-size: 0.7rem; font-weight: 700; padding: 3px 9px;
-      border-radius: 99px; text-transform: uppercase;
-    }
-    .status-inprogress { background: #dbeafe; color: #1d4ed8; }
-    .status-complete   { background: #dcfce7; color: #166534; }
-    .status-cancelled  { background: #fee2e2; color: #991b1b; }
-    .status-pending    { background: #fef9c3; color: #854d0e; }
+    /* ─── Toast ─── */
+    #toastWrap { position:fixed; bottom:24px; right:24px; z-index:300; display:flex; flex-direction:column; gap:8px; }
+    .toast { padding:12px 18px; border-radius:12px; background:var(--black); color:var(--white); font-size:.85rem; font-weight:600; box-shadow:0 4px 20px rgba(0,0,0,.2); animation:slideIn .3s ease; max-width:320px; }
+    .toast.success { background:#166534; }
+    .toast.error { background:#991b1b; }
+    @keyframes slideIn { from { transform:translateX(40px); opacity:0; } to { transform:translateX(0); opacity:1; } }
 
-    /* ─── Empty State ─────────────────────────────────── */
-    .empty-state {
-      text-align: center; padding: 60px 20px;
-    }
-    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; }
-    .empty-state h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
-    .empty-state p { color: var(--sub); font-size: 0.85rem; }
-
-    /* ─── Loading ─────────────────────────────────────── */
-    .loading-overlay {
-      position: fixed; inset: 0; background: rgba(255,255,255,.85);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 1000; display: none;
-    }
-    .loading-overlay.active { display: flex; }
-    .loading-box {
-      background: var(--white); border-radius: 16px; padding: 32px;
-      text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,.12);
-    }
-    .loading-spinner {
-      width: 48px; height: 48px; border: 4px solid var(--border);
-      border-top-color: var(--yellow); border-radius: 50%;
-      animation: spin .8s linear infinite; margin: 0 auto 16px;
-    }
-    .loading-msg { font-size: 0.9rem; font-weight: 600; color: var(--sub); }
-
-    /* ─── Responsive ─────────────────────────────────── */
-    @media (max-width: 768px) {
-      .stepper { flex-direction: column; }
-      .step { border-right: none; border-bottom: 1px solid var(--border); }
-      .preview-area { grid-template-columns: 1fr; }
-      .form-row { grid-template-columns: 1fr; }
+    /* ─── Responsive ─── */
+    @media (max-width:640px) {
+      .page-wrap { padding:20px 14px 60px; }
+      .stepper { flex-direction:column; }
+      .step { border-right:none; border-bottom:1px solid var(--border); }
+      .form-grid { grid-template-columns:1fr; }
+      .mode-tabs { flex-direction:column; }
+      .loc-info-grid { grid-template-columns:1fr; }
     }
   </style>
 </head>
 <body>
 
 <!-- Topbar -->
-<div class="topbar">
+<nav class="topbar">
   <div class="topbar-left">
-    <a href="/" class="topbar-logo"><strong>Happy</strong><span>Clientele</span><em>.</em></a>
-    <a href="javascript:history.back()" class="topbar-back">
-      ← Back
+    <a class="topbar-logo" href="/dashboard">
+      <strong>Happy</strong><span>Clientele</span><em>.</em>
     </a>
+    <a class="topbar-back" href="/location">← Back to Dashboard</a>
   </div>
   <div class="topbar-right">
     <div class="user-chip">
       <div class="avatar" id="avatarEl">?</div>
-      <span id="userEmailEl">Loading…</span>
+      <span id="userEmailEl">…</span>
     </div>
   </div>
+</nav>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div id="loadingMsg" style="font-weight:600;color:var(--sub);">Processing…</div>
 </div>
 
-<!-- Page -->
+<!-- Toast container -->
+<div id="toastWrap"></div>
+
 <div class="page-wrap">
 
   <div class="page-header">
-    <h1>🖨️ Print Studio <span class="badge">Beta</span></h1>
-    <p>Generate AI-powered designs and order print marketing materials — delivered to your business in days.</p>
+    <h1>🖨️ Print Studio</h1>
+    <p>Order professional printed materials — shipped directly to your business.</p>
   </div>
 
-  <!-- Stepper -->
-  <div class="stepper" id="stepper">
-    <div class="step active" data-step="1">
-      <div class="step-num">1</div>
-      <div>
-        <div class="step-label">Choose Product</div>
-        <div class="step-sublabel">Sticker, tent card & more</div>
-      </div>
-    </div>
-    <div class="step disabled" data-step="2">
-      <div class="step-num">2</div>
-      <div>
-        <div class="step-label">Design</div>
-        <div class="step-sublabel">AI-generate your artwork</div>
-      </div>
-    </div>
-    <div class="step disabled" data-step="3">
-      <div class="step-num">3</div>
-      <div>
-        <div class="step-label">Review & Order</div>
-        <div class="step-sublabel">Shipping address & checkout</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tab nav for main content vs order history -->
-  <div class="tab-nav">
+  <!-- Main tabs -->
+  <div class="main-tabs">
     <button class="tab-btn active" onclick="switchMainTab('create')">Create Order</button>
     <button class="tab-btn" onclick="switchMainTab('history')">Order History</button>
   </div>
 
-  <!-- CREATE TAB -->
+  <!-- ══ CREATE TAB ══ -->
   <div class="tab-panel active" id="tab-create">
 
-    <!-- STEP 1: Choose Product -->
+    <!-- Stepper -->
+    <div class="stepper" id="stepper">
+      <div class="step active" data-step="1">
+        <div class="step-num">1</div>
+        <div><div class="step-label">Choose Product</div><div class="step-sublabel">Sticker or tent card</div></div>
+      </div>
+      <div class="step disabled" data-step="2">
+        <div class="step-num">2</div>
+        <div><div class="step-label">Design</div><div class="step-sublabel">Template or upload</div></div>
+      </div>
+      <div class="step disabled" data-step="3">
+        <div class="step-num">3</div>
+        <div><div class="step-label">Review & Order</div><div class="step-sublabel">Shipping & checkout</div></div>
+      </div>
+    </div>
+
+    <!-- ── STEP 1: Choose Product ── -->
     <div id="step1-panel">
+
+      <!-- Location selector -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">📍</div>
+          <div><h2>Location</h2><div style="font-size:.78rem;color:var(--sub);">Select which location you're printing for</div></div>
+        </div>
+        <div class="card-body">
+          <div class="form-group" style="margin-bottom:12px;">
+            <div style="position:relative;">
+              <select class="form-input" id="locationSelect" onchange="onLocationSelect(this.value)" style="padding-right:36px;">
+                <option value="">⏳ Loading locations…</option>
+              </select>
+              <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--sub);">▾</span>
+            </div>
+          </div>
+          <div id="locInfoRow" style="display:none;" class="loc-info-row">
+            <div class="loc-info-grid">
+              <div><div class="loc-info-label">Business</div><div class="loc-info-val" id="locBizDisplay">—</div></div>
+              <div><div class="loc-info-label">Address</div><div class="loc-info-val" id="locAddrDisplay">—</div></div>
+              <div style="grid-column:1/-1;"><div class="loc-info-label">QR URL</div><div class="loc-info-val" id="locQrDisplay" style="font-size:.75rem;">—</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product picker -->
       <div class="card">
         <div class="card-header">
           <div class="card-icon">📦</div>
-          <div>
-            <h2>Choose a Product</h2>
-            <div style="font-size:.8rem;color:var(--sub);">Select the marketing material to design & print</div>
-          </div>
+          <div><h2>Choose a Product</h2><div style="font-size:.78rem;color:var(--sub);">All prices are per unit, printed and shipped globally</div></div>
         </div>
         <div class="card-body">
-          <div class="product-grid" id="productGrid">
-
-            <div class="product-card" onclick="selectProduct(this,'M-STI-3X4','Scan-for-Menu Sticker','Small kiss-cut vinyl sticker ideal for menus and counters','sticker','3×4 inch / 7.6×10cm',6.95)">
-              <div class="product-icon">🏷️</div>
-              <div class="product-name">Scan-for-Menu Sticker</div>
-              <div class="product-desc">Small kiss-cut vinyl sticker — perfect for tables, menus, windows & doors.</div>
-              <div class="product-dims">3×4 inch · matte vinyl</div>
-              <div class="product-use-tag">Menu Scanning</div>
-              <div class="product-price">~$6.95 + shipping</div>
+          <div class="product-grid">
+            <div class="product-card" onclick="selectProduct(this,'M-STI-3X4','Scan-for-Menu Sticker','Kiss-cut vinyl sticker, ideal for tables & counters','sticker','3×4"',6.95)">
+              <div class="product-emoji">🏷️</div>
+              <div class="product-name">Menu Sticker</div>
+              <div class="product-dims">3×4" vinyl kiss-cut</div>
+              <div class="product-price">~$6.95 ea</div>
             </div>
-
-            <div class="product-card" onclick="selectProduct(this,'M-STI-5_5X5_5','Premium Table Sticker','Medium kiss-cut vinyl sticker','sticker','5.5×5.5 inch / 14×14cm',9.95)">
-              <div class="product-icon">⭐</div>
-              <div class="product-name">Premium Table Sticker</div>
-              <div class="product-desc">Medium vinyl sticker for tabletops, host stands, or display windows.</div>
-              <div class="product-dims">5.5×5.5 inch · matte vinyl</div>
-              <div class="product-use-tag">Branding</div>
-              <div class="product-price">~$9.95 + shipping</div>
+            <div class="product-card" onclick="selectProduct(this,'M-STI-5_5X5_5','Table Sticker (Large)','Larger kiss-cut vinyl sticker','sticker','5.5×5.5"',9.95)">
+              <div class="product-emoji">🏷️</div>
+              <div class="product-name">Table Sticker</div>
+              <div class="product-dims">5.5×5.5" vinyl kiss-cut</div>
+              <div class="product-price">~$9.95 ea</div>
             </div>
-
-            <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-4X6','Table Tent Card (4×6)','Enhanced matte art paper — fold in half for a 4×3 tent card','tent','4×6 inch / 10×15cm',4.95)">
-              <div class="product-icon">🏕️</div>
-              <div class="product-name">Table Tent Card (4×6)</div>
-              <div class="product-desc">Premium matte art print — fold in half to stand on any table as a 4×3 tent card.</div>
-              <div class="product-dims">4×6 inch · 200gsm matte</div>
-              <div class="product-use-tag">Table Card</div>
-              <div class="product-price">~$4.95 + shipping</div>
+            <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-4X6','Table Tent Card (4×6)','Fold in half for a 4×3" standing tent card','tent','4×6"',4.95)">
+              <div class="product-emoji">🗂️</div>
+              <div class="product-name">Tent Card (4×6)</div>
+              <div class="product-dims">4×6" matte art print</div>
+              <div class="product-price">~$4.95 ea</div>
             </div>
-
-            <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-5X7','Table Tent Card (5×7)','Enhanced matte art paper — fold for a 5×3.5 tent card','tent','5×7 inch / 13×18cm',5.95)">
-              <div class="product-icon">🗂️</div>
-              <div class="product-name">Table Tent Card (5×7)</div>
-              <div class="product-desc">Larger premium print — fold in half for a 5×3.5 tent card, or stand as a menu sign.</div>
-              <div class="product-dims">5×7 inch · 200gsm matte</div>
-              <div class="product-use-tag">Menu Sign</div>
-              <div class="product-price">~$5.95 + shipping</div>
+            <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-5X7','Table Tent Card (5×7)','Fold in half for a 5×3.5" standing tent card','tent','5×7"',5.95)">
+              <div class="product-emoji">🗂️</div>
+              <div class="product-name">Tent Card (5×7)</div>
+              <div class="product-dims">5×7" matte art print</div>
+              <div class="product-price">~$5.95 ea</div>
             </div>
-
-          </div>
-
-          <div style="margin-top:24px;display:flex;gap:12px;">
-            <button class="btn btn-primary" id="nextToStep2Btn" disabled onclick="goToStep(2)">
-              Next: Design →
-            </button>
           </div>
         </div>
       </div>
+
+      <div class="step-nav">
+        <div></div>
+        <button class="btn btn-primary" onclick="goToStep(2)" id="step1Next" disabled>Next: Design →</button>
+      </div>
     </div>
 
-    <!-- STEP 2: Design -->
+    <!-- ── STEP 2: Design ── -->
     <div id="step2-panel" style="display:none;">
-      <div style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;">
 
-        <!-- Left: design controls -->
-        <div>
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header">
-              <div class="card-icon">📍</div>
-              <div>
-                <h2>Location Details</h2>
-                <div style="font-size:.8rem;color:var(--sub);">Select a location — details auto-fill from your account</div>
-              </div>
+      <!-- Mode selector -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🎨</div>
+          <div><h2>Choose Your Design Method</h2></div>
+        </div>
+        <div class="card-body">
+          <div class="mode-tabs">
+            <div class="mode-tab active" id="modeTabTemplate" onclick="setDesignMode('template')">
+              <div class="mode-tab-icon">📐</div>
+              <div class="mode-tab-label">Use a Template</div>
+              <div class="mode-tab-sub">Professional, ready in seconds</div>
             </div>
-            <div class="card-body">
-              <!-- Location dropdown -->
-              <div class="form-group" style="margin-bottom:16px;">
-                <label>Select Location</label>
-                <div style="position:relative;">
-                  <select class="form-input" id="locationSelect" onchange="onLocationSelect(this.value)"
-                    style="appearance:none;-webkit-appearance:none;padding-right:36px;cursor:pointer;background:#fff;">
-                    <option value="">⏳ Loading your locations…</option>
-                  </select>
-                  <span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--sub);">▾</span>
-                </div>
-              </div>
-
-              <!-- Read-only info pills — filled by onLocationSelect() -->
-              <div id="locInfoRow" style="display:none;background:var(--off);border-radius:12px;padding:14px 16px;border:1px solid var(--border);">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;font-size:.82rem;">
-                  <div><span style="color:var(--sub);">Business</span><br><strong id="locBizDisplay">—</strong></div>
-                  <div><span style="color:var(--sub);">Location</span><br><strong id="locNameDisplay">—</strong></div>
-                  <div><span style="color:var(--sub);">Address</span><br><strong id="locAddrDisplay">—</strong></div>
-                  <div><span style="color:var(--sub);">QR URL</span><br><strong id="locQrDisplay" style="word-break:break-all;font-size:.75rem;">—</strong></div>
-                </div>
-              </div>
-
-              <!-- Hidden inputs used by the rest of the form logic -->
-              <input type="hidden" id="bizName" />
-              <input type="hidden" id="locName" />
-              <input type="hidden" id="addr1" />
-              <input type="hidden" id="addrCity" />
-              <input type="hidden" id="qrUrl" />
+            <div class="mode-tab" id="modeTabUpload" onclick="setDesignMode('upload')">
+              <div class="mode-tab-icon">⬆️</div>
+              <div class="mode-tab-label">Upload My Design</div>
+              <div class="mode-tab-sub">PNG, JPG or PDF</div>
             </div>
           </div>
+        </div>
+      </div>
 
+      <!-- TEMPLATE MODE -->
+      <div id="templateMode">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+          <!-- Left: template picker -->
           <div class="card">
             <div class="card-header">
-              <div class="card-icon">🎨</div>
-              <div>
-                <h2>Design Style</h2>
-                <div style="font-size:.8rem;color:var(--sub);">Pick a style, then generate with AI</div>
-              </div>
+              <div class="card-icon">📐</div>
+              <div><h2>Pick a Template</h2><div style="font-size:.78rem;color:var(--sub);">Your business name &amp; QR code are auto-filled</div></div>
             </div>
             <div class="card-body">
-
-              <!-- Design type tabs: sticker vs tent -->
-              <div id="designTypeSection">
-                <div class="design-type-tabs">
-                  <button class="design-tab active" onclick="setDesignType(this,'bw')">⬛ Black &amp; White</button>
-                  <button class="design-tab" onclick="setDesignType(this,'abstract')">🌀 Abstract</button>
-                  <button class="design-tab" onclick="setDesignType(this,'minimal')">✨ Minimal</button>
-                  <button class="design-tab" onclick="setDesignType(this,'vibrant')">🎨 Vibrant</button>
-                  <button class="design-tab" onclick="setDesignType(this,'custom')">✍️ Custom Prompt</button>
-                </div>
-
-                <!-- Style swatches (hidden for 'custom') -->
-                <div id="styleSwatchSection">
-                  <div class="style-grid" id="styleGrid">
-                    <!-- filled by JS based on design type -->
-                  </div>
-                </div>
-
-                <!-- Custom prompt (shown for 'custom') -->
-                <div id="customPromptSection" style="display:none;">
-                  <div class="form-group" style="margin-bottom:12px;">
-                    <label>Describe your design</label>
-                    <textarea class="form-input" id="customPrompt" rows="3"
-                      style="resize:vertical;"
-                      placeholder="e.g. minimalist black and white with bold QR code, geometric border, and restaurant name in large elegant font…"></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <div style="margin-top:20px;">
-                <button class="btn btn-primary" id="generateBtn" onclick="generateDesigns()">
-                  ✨ Generate Designs (×4 variants)
-                </button>
-                <div style="font-size:.75rem;color:var(--sub);margin-top:6px;">
-                  Powered by fal.ai · Takes ~15–30 seconds
-                </div>
+              <div class="template-grid" id="templateGrid">
+                <!-- rendered by JS -->
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Right: preview -->
-        <div>
-          <div class="card" style="margin-bottom:16px;">
+          <!-- Right: live preview -->
+          <div class="card">
             <div class="card-header">
               <div class="card-icon">👁️</div>
-              <h2>Design Preview</h2>
+              <div><h2>Live Preview</h2><div style="font-size:.78rem;color:var(--sub);">Updates as you edit</div></div>
             </div>
-            <div class="card-body" style="padding:16px;">
-              <div id="variantGrid" class="design-variants">
-                <div class="variant-thumb">
-                  <div class="variant-thumb-placeholder">🖼️</div>
+            <div class="card-body">
+              <div class="preview-wrap">
+                <div id="previewPlaceholder" style="padding:40px;text-align:center;color:var(--sub);">
+                  <div style="font-size:2rem;margin-bottom:8px;">👆</div>
+                  <div style="font-size:.85rem;">Select a template to preview</div>
                 </div>
-                <div class="variant-thumb">
-                  <div class="variant-thumb-placeholder">🖼️</div>
+                <div id="previewCanvasWrap" style="display:none;" class="preview-canvas-wrap">
+                  <canvas id="previewCanvas" width="600" height="800"></canvas>
                 </div>
-                <div class="variant-thumb">
-                  <div class="variant-thumb-placeholder">🖼️</div>
-                </div>
-                <div class="variant-thumb">
-                  <div class="variant-thumb-placeholder">🖼️</div>
+                <div class="preview-actions" id="previewActions" style="display:none;">
+                  <button class="btn btn-outline" onclick="downloadProof()">⬇ Download Proof</button>
                 </div>
               </div>
 
-              <div id="selectedPreviewWrap" style="margin-top:16px;">
-                <div id="selectedPreviewLabel" style="font-size:.8rem;color:var(--sub);margin-bottom:8px;display:none;">
-                  Selected design:
+              <!-- Editable overrides -->
+              <div id="templateOverrides" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+                <div style="font-size:.8rem;font-weight:700;margin-bottom:12px;color:var(--sub);">CUSTOMIZE TEXT</div>
+                <div class="form-group" style="margin-bottom:10px;">
+                  <label>Tagline / Call to Action</label>
+                  <input class="form-input" id="tmplTagline" placeholder="e.g. Scan to see our menu" oninput="rerenderTemplate()" />
                 </div>
-                <div class="canvas-wrap" id="mainCanvas">
-                  <div class="canvas-placeholder">
-                    <div class="big-icon">🎨</div>
-                    <p>Your AI-generated design will appear here.<br>Click Generate to create 4 variants.</p>
+                <div class="form-group">
+                  <label>Sub-text (optional)</label>
+                  <input class="form-input" id="tmplSubtext" placeholder="e.g. Leave us a review!" oninput="rerenderTemplate()" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPLOAD MODE -->
+      <div id="uploadMode" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">⬆️</div>
+            <div>
+              <h2>Upload Your Design</h2>
+              <div style="font-size:.78rem;color:var(--sub);">For best results: PNG or PDF, 300dpi+, correct dimensions for your product</div>
+            </div>
+          </div>
+          <div class="card-body">
+
+            <!-- Spec reminder -->
+            <div id="uploadSpecBox" style="background:#fffbeb;border:1.5px solid var(--yellow);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:.82rem;">
+              <strong>📏 Print specs for your product:</strong>
+              <span id="uploadSpecText">Select a product first</span>
+            </div>
+
+            <!-- Drop zone -->
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('uploadInput').click()"
+              ondragover="event.preventDefault();this.classList.add('drag-over')"
+              ondragleave="this.classList.remove('drag-over')"
+              ondrop="handleFileDrop(event)">
+              <div class="upload-zone-icon">📁</div>
+              <div class="upload-zone-text">Drop your file here or click to browse</div>
+              <div class="upload-zone-sub">PNG, JPG, PDF — max 20MB</div>
+            </div>
+            <input type="file" id="uploadInput" accept="image/png,image/jpeg,application/pdf" onchange="handleFileSelect(this.files[0])" />
+
+            <!-- Upload preview + quality -->
+            <div id="uploadPreviewSection" style="display:none;margin-top:20px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
+                <div>
+                  <img id="uploadPreviewImg" class="upload-preview-img" alt="Your design preview" />
+                </div>
+                <div>
+                  <div style="font-size:.85rem;font-weight:700;margin-bottom:10px;">Print Quality Check</div>
+                  <div id="qualityRows"></div>
+
+                  <div style="margin-top:20px;">
+                    <div style="font-size:.85rem;font-weight:700;margin-bottom:10px;">Before you order, confirm:</div>
+                    <div class="ack-list" id="ackList">
+                      <label class="ack-item">
+                        <input type="checkbox" class="ack-check" onchange="checkAcks()" />
+                        <span>My design is the correct size and resolution for printing</span>
+                      </label>
+                      <label class="ack-item">
+                        <input type="checkbox" class="ack-check" onchange="checkAcks()" />
+                        <span>All important text and logos are within the safe zone (not near edges)</span>
+                      </label>
+                      <label class="ack-item">
+                        <input type="checkbox" class="ack-check" onchange="checkAcks()" />
+                        <span>I understand this is my final design — I'm responsible for the print result</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div style="margin-top:14px;font-size:.75rem;color:var(--sub);background:var(--off);border-radius:8px;padding:10px;">
-                💡 <strong>Tip:</strong> QR code + business info are composited at print time using your actual QR URL & location name. Preview shows artwork background.
-              </div>
             </div>
-          </div>
 
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-outline btn-sm" onclick="goToStep(1)">← Back</button>
-            <button class="btn btn-primary" id="nextToStep3Btn" disabled onclick="goToStep(3)">
-              Next: Review →
-            </button>
           </div>
         </div>
+      </div>
 
+      <div class="step-nav">
+        <button class="btn btn-outline" onclick="goToStep(1)">← Back</button>
+        <button class="btn btn-primary" onclick="goToStep(3)" id="step2Next" disabled>Next: Review & Order →</button>
       </div>
     </div>
 
-    <!-- STEP 3: Review & Order -->
+    <!-- ── STEP 3: Review & Order ── -->
     <div id="step3-panel" style="display:none;">
-      <div style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
 
-        <!-- Left: shipping -->
+        <!-- Left: shipping form -->
         <div>
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header">
-              <div class="card-icon">🚚</div>
-              <h2>Shipping Address</h2>
-            </div>
-            <div class="card-body">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Full Name</label>
-                  <input class="form-input" id="shipName" placeholder="John Smith" />
-                </div>
-                <div class="form-group">
-                  <label>Email</label>
-                  <input class="form-input" id="shipEmail" placeholder="john@example.com" type="email" />
-                </div>
-              </div>
-              <div class="form-group" style="margin-bottom:16px;">
-                <label>Address Line 1</label>
-                <input class="form-input" id="shipLine1" placeholder="123 Main St" />
-              </div>
-              <div class="form-group" style="margin-bottom:16px;">
-                <label>Address Line 2 (optional)</label>
-                <input class="form-input" id="shipLine2" placeholder="Suite 4, Unit B…" />
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>City</label>
-                  <input class="form-input" id="shipCity" placeholder="San Diego" />
-                </div>
-                <div class="form-group">
-                  <label>State</label>
-                  <input class="form-input" id="shipState" placeholder="CA" />
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>ZIP Code</label>
-                  <input class="form-input" id="shipZip" placeholder="92101" />
-                </div>
-                <div class="form-group">
-                  <label>Country</label>
-                  <select class="form-select" id="shipCountry">
-                    <option value="US" selected>United States</option>
-                    <option value="CA">Canada</option>
-                    <option value="GB">United Kingdom</option>
-                    <option value="AU">Australia</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div class="card">
             <div class="card-header">
               <div class="card-icon">📬</div>
-              <h2>Shipping Method</h2>
+              <div><h2>Ship To</h2></div>
             </div>
             <div class="card-body">
-              <div class="shipping-options">
-                <label class="shipping-option selected">
-                  <input type="radio" name="shipping" value="Budget" checked onchange="updateShipping(this)">
-                  <div>
-                    <div class="shipping-name">Budget</div>
-                    <div class="shipping-est">7–14 business days</div>
-                  </div>
-                  <div class="shipping-price">~$3.99</div>
-                </label>
-                <label class="shipping-option">
-                  <input type="radio" name="shipping" value="Standard" onchange="updateShipping(this)">
-                  <div>
-                    <div class="shipping-name">Standard</div>
-                    <div class="shipping-est">4–7 business days</div>
-                  </div>
-                  <div class="shipping-price">~$6.99</div>
-                </label>
-                <label class="shipping-option">
-                  <input type="radio" name="shipping" value="Express" onchange="updateShipping(this)">
-                  <div>
-                    <div class="shipping-name">Express</div>
-                    <div class="shipping-est">2–3 business days</div>
-                  </div>
-                  <div class="shipping-price">~$12.99</div>
-                </label>
+              <div class="form-grid" style="margin-bottom:14px;">
+                <div class="form-group">
+                  <label>Full Name *</label>
+                  <input class="form-input" id="shipName" placeholder="Jane Smith" />
+                </div>
+                <div class="form-group">
+                  <label>Email *</label>
+                  <input class="form-input" id="shipEmail" placeholder="jane@example.com" type="email" />
+                </div>
               </div>
+              <div class="form-group" style="margin-bottom:14px;">
+                <label>Address Line 1 *</label>
+                <input class="form-input" id="shipLine1" placeholder="123 Main St" />
+              </div>
+              <div class="form-group" style="margin-bottom:14px;">
+                <label>Address Line 2</label>
+                <input class="form-input" id="shipLine2" placeholder="Suite 200 (optional)" />
+              </div>
+              <div class="form-grid" style="margin-bottom:14px;">
+                <div class="form-group">
+                  <label>City *</label>
+                  <input class="form-input" id="shipCity" placeholder="San Diego" />
+                </div>
+                <div class="form-group">
+                  <label>State / Province *</label>
+                  <input class="form-input" id="shipState" placeholder="CA" />
+                </div>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>ZIP / Postal Code *</label>
+                  <input class="form-input" id="shipZip" placeholder="92101" />
+                </div>
+                <div class="form-group">
+                  <label>Country *</label>
+                  <select class="form-input" id="shipCountry">
+                    <option value="US">United States</option>
+                    <option value="CA">Canada</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="AU">Australia</option>
+                    <option value="NZ">New Zealand</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="ES">Spain</option>
+                    <option value="IT">Italy</option>
+                    <option value="NL">Netherlands</option>
+                    <option value="SE">Sweden</option>
+                    <option value="NO">Norway</option>
+                    <option value="DK">Denmark</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping options -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">🚚</div>
+              <div><h2>Shipping Speed</h2></div>
+            </div>
+            <div class="card-body">
+              <label class="shipping-option selected" onclick="updateShipping(this,'Budget')">
+                <input type="radio" name="shipping" value="Budget" checked />
+                <div class="shipping-details">
+                  <div class="shipping-name">Budget</div>
+                  <div class="shipping-time">7–14 business days</div>
+                </div>
+                <div class="shipping-price">~$3.99</div>
+              </label>
+              <label class="shipping-option" onclick="updateShipping(this,'Standard')">
+                <input type="radio" name="shipping" value="Standard" />
+                <div class="shipping-details">
+                  <div class="shipping-name">Standard</div>
+                  <div class="shipping-time">4–7 business days</div>
+                </div>
+                <div class="shipping-price">~$6.99</div>
+              </label>
+              <label class="shipping-option" onclick="updateShipping(this,'Express')">
+                <input type="radio" name="shipping" value="Express" />
+                <div class="shipping-details">
+                  <div class="shipping-name">Express</div>
+                  <div class="shipping-time">2–3 business days</div>
+                </div>
+                <div class="shipping-price">~$12.99</div>
+              </label>
             </div>
           </div>
         </div>
 
-        <!-- Right: summary -->
+        <!-- Right: order summary -->
         <div>
+          <!-- Design proof -->
           <div class="card" style="margin-bottom:16px;">
             <div class="card-header">
+              <div class="card-icon">👁️</div>
+              <div><h2>Your Design</h2></div>
+            </div>
+            <div class="card-body" style="text-align:center;">
+              <canvas id="orderProofCanvas" style="max-width:240px;width:100%;border-radius:10px;border:1px solid var(--border);display:block;margin:0 auto;"></canvas>
+              <button class="btn-ghost" onclick="goToStep(2)" style="margin-top:10px;">✏️ Change design</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
               <div class="card-icon">🧾</div>
-              <h2>Order Summary</h2>
+              <div><h2>Order Summary</h2></div>
             </div>
             <div class="card-body">
-
-              <!-- Selected design preview -->
-              <div id="summaryDesignPreview" style="margin-bottom:16px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--off);height:160px;display:flex;align-items:center;justify-content:center;">
-                <span style="font-size:2rem;">🖼️</span>
-              </div>
-
-              <div class="order-summary">
-                <h3>Cost Breakdown</h3>
-                <div class="summary-row">
-                  <span id="summaryProductName">—</span>
-                  <span id="summaryProductCost">—</span>
-                </div>
-                <div class="summary-row">
-                  <span>Quantity</span>
-                  <span id="summaryQty">1</span>
-                </div>
-                <div class="summary-row">
-                  <span>Shipping (<span id="summaryShipMethod">Budget</span>)</span>
-                  <span id="summaryShipCost">~$3.99</span>
-                </div>
-                <div class="summary-row total">
-                  <span>Estimated Total</span>
-                  <span id="summaryTotal">—</span>
+              <div class="summary-row"><span id="summaryProductName">—</span><span id="summaryProductCost">—</span></div>
+              <div class="summary-row">
+                <span>Quantity</span>
+                <div class="qty-control">
+                  <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                  <span class="qty-display" id="qtyDisplay">1</span>
+                  <button class="qty-btn" onclick="changeQty(1)">+</button>
                 </div>
               </div>
-
-              <div class="quantity-row">
-                <span style="font-size:.85rem;font-weight:600;">Quantity:</span>
-                <button class="qty-btn" onclick="changeQty(-1)">−</button>
-                <div class="qty-display" id="qtyDisplay">1</div>
-                <button class="qty-btn" onclick="changeQty(1)">+</button>
-              </div>
-
-              <div class="alert alert-info" style="margin-bottom:16px;">
-                <div class="alert-icon">ℹ️</div>
-                <div>This order goes through <strong>Prodigi's print network</strong>. Your card is charged now; production begins in ~24h.</div>
-              </div>
-
-              <button class="btn btn-green" style="width:100%;justify-content:center;" onclick="placeOrder()" id="placeOrderBtn">
+              <div class="summary-row"><span>Shipping (<span id="summaryShipMethod">Budget</span>)</span><span id="summaryShipCost">~$3.99</span></div>
+              <div class="summary-row"><span>Total</span><span id="summaryTotal">—</span></div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:16px;padding:14px;" id="placeOrderBtn" onclick="placeOrder()">
                 🛒 Place Order
               </button>
-
-              <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:10px;" onclick="goToStep(2)">
-                ← Back to Design
-              </button>
+              <div style="text-align:center;font-size:.75rem;color:var(--sub);margin-top:10px;">
+                Printed &amp; fulfilled by Prodigi · Ships globally
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn btn-outline" onclick="goToStep(2)">← Back</button>
       </div>
     </div>
 
   </div><!-- /tab-create -->
 
-  <!-- HISTORY TAB -->
+  <!-- ══ HISTORY TAB ══ -->
   <div class="tab-panel" id="tab-history">
     <div class="card">
       <div class="card-header">
-        <div class="card-icon">📋</div>
-        <h2>Your Print Orders</h2>
+        <div class="card-icon">📦</div>
+        <div><h2>Order History</h2></div>
       </div>
       <div class="card-body" id="orderHistoryBody">
-        <div class="empty-state">
-          <div class="empty-icon">📦</div>
-          <h3>No orders yet</h3>
-          <p>Your print orders will appear here once you place one.</p>
-        </div>
+        <div style="text-align:center;padding:32px;color:var(--sub);">Loading orders…</div>
       </div>
     </div>
   </div>
 
 </div><!-- /page-wrap -->
 
-<!-- Loading overlay -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-box">
-    <div class="loading-spinner"></div>
-    <div class="loading-msg" id="loadingMsg">Generating designs…</div>
-  </div>
-</div>
-
-<!-- Toast container -->
-<div class="toast-wrap" id="toastWrap"></div>
-
 <script>
+'use strict'
+
 // ─────────────────────────────────────────────────────────────
 //  STATE
 // ─────────────────────────────────────────────────────────────
-let currentStep = 1
-let selectedProduct = null  // { sku, name, desc, type, dims, unitPrice }
-let selectedStyleType = 'bw'
-let selectedStyleId   = null
-let generatedVariants = []  // array of image URLs
-let selectedVariantIdx = null
-let currentQty = 1
+let _authToken     = null
+let _allLocations  = []
+let _activeLoc     = null
+let selectedProduct = null
+let selectedTemplateId = null
+let designMode     = 'template'   // 'template' | 'upload'
+let uploadedFile   = null
+let uploadedDataUrl = null
+let uploadedDimensions = null
+let acksComplete   = false
+let currentQty     = 1
 let selectedShipping = 'Budget'
+let _finalImageDataUrl = null    // the canvas/upload image to send to Prodigi
+
 const shippingCosts = { Budget: 3.99, Standard: 6.99, Express: 12.99 }
 
+// Product print specs (width × height in inches, dpi target)
+const PRODUCT_SPECS = {
+  'M-STI-3X4':      { w:3,   h:4,   dpiTarget:300, label:'3×4" — target 900×1200px at 300dpi' },
+  'M-STI-5_5X5_5':  { w:5.5, h:5.5, dpiTarget:300, label:'5.5×5.5" — target 1650×1650px at 300dpi' },
+  'GLOBAL-FAP-4X6':  { w:4,   h:6,   dpiTarget:300, label:'4×6" — target 1200×1800px at 300dpi' },
+  'GLOBAL-FAP-5X7':  { w:5,   h:7,   dpiTarget:300, label:'5×7" — target 1500×2100px at 300dpi' },
+}
+
 // ─────────────────────────────────────────────────────────────
-//  STYLE DEFINITIONS
+//  TEMPLATES DEFINITION
+//  Each template has: id, name, type (sticker|tent), a render(ctx, W, H, data) function
 // ─────────────────────────────────────────────────────────────
-const styleLibrary = {
-  bw: [
-    { id:'bw-bold', label:'Bold BW', cls:'minimal-bw', icon:'⬛', prompt:'bold black and white graphic design, high contrast, strong typography, QR code featured prominently, minimal clean layout' },
-    { id:'bw-sketch', label:'Sketch', cls:'minimal-bw', icon:'✏️', prompt:'black and white hand-drawn sketch style illustration, ink lines, restaurant and food theme, elegant handwriting font areas' },
-    { id:'bw-geo', label:'Geometric', cls:'minimal-bw', icon:'◼', prompt:'black and white geometric patterns, clean lines, hexagonal shapes, modern minimal design, stark contrast' },
-    { id:'bw-typo', label:'Typography', cls:'minimal-bw', icon:'Aa', prompt:'typographic black and white design, large serif font treatment, elegant letterpress style, white background' },
-  ],
-  abstract: [
-    { id:'abs-fluid', label:'Fluid',    cls:'gradient-3', icon:'🌊', prompt:'abstract fluid liquid art, vibrant blue teal purple colors, flowing organic shapes, premium quality' },
-    { id:'abs-geo',   label:'Geo',      cls:'gradient-1', icon:'🔷', prompt:'abstract geometric art, deep blue purple violet, interlocking shapes, modern premium look' },
-    { id:'abs-neon',  label:'Neon',     cls:'gradient-2', icon:'💜', prompt:'abstract neon gradient, pink magenta purple, glowing shapes, dark background, luxury feel' },
-    { id:'abs-gold',  label:'Gold',     cls:'gradient-5', icon:'✨', prompt:'abstract gold foil art, warm amber golden tones, luxury metallic texture, premium print quality' },
-  ],
-  minimal: [
-    { id:'min-clean', label:'Clean',    cls:'minimal-wht', icon:'⬜', prompt:'minimal clean white design, subtle grey lines, sophisticated typography, lots of white space, premium feel' },
-    { id:'min-sage',  label:'Sage',     cls:'gradient-4', icon:'🌿', prompt:'minimal sage green design, light natural tones, clean layout, botanical accent, calm professional' },
-    { id:'min-slate', label:'Slate',    cls:'gradient-6', icon:'🪨', prompt:'minimal slate blue grey design, muted professional tones, clean borders, refined typography' },
-    { id:'min-warm',  label:'Warm',     cls:'gradient-5', icon:'🧡', prompt:'minimal warm cream peach design, warm neutral tones, elegant simple layout, hospitality theme' },
-  ],
-  vibrant: [
-    { id:'vib-pop',   label:'Pop Art',  cls:'gradient-2', icon:'🎨', prompt:'vibrant pop art style, bold colors, energetic design, fun and inviting, restaurant or cafe theme' },
-    { id:'vib-tropic',label:'Tropical', cls:'gradient-4', icon:'🌴', prompt:'vibrant tropical theme, lush greens and blues, tropical leaves, bright energetic colors' },
-    { id:'vib-sunset',label:'Sunset',   cls:'gradient-5', icon:'🌅', prompt:'vibrant sunset gradient, warm orange pink coral, beautiful sky-inspired design, warm hospitality feel' },
-    { id:'vib-ocean', label:'Ocean',    cls:'gradient-3', icon:'🌊', prompt:'vibrant ocean blue design, deep sea teal aqua, energizing and fresh, coastal restaurant theme' },
-  ],
+const TEMPLATES = [
+  // ── STICKER: Bold B&W ──
+  {
+    id: 'stk-bold',
+    name: 'Bold B&W',
+    type: 'sticker',
+    render(ctx, W, H, d) {
+      // Background
+      ctx.fillStyle = '#111'
+      ctx.fillRect(0, 0, W, H)
+      // Top accent bar
+      ctx.fillStyle = '#FDB813'
+      ctx.fillRect(0, 0, W, H * 0.045)
+      // Bottom accent bar
+      ctx.fillRect(0, H - H * 0.045, W, H * 0.045)
+      // Business name
+      ctx.fillStyle = '#fff'
+      ctx.textAlign = 'center'
+      ctx.font = `800 ${Math.round(W * 0.12)}px 'Arial Black', Arial, sans-serif`
+      wrapText(ctx, (d.bizName || 'YOUR BUSINESS').toUpperCase(), W / 2, H * 0.22, W * 0.85, W * 0.13)
+      // QR code
+      drawQR(ctx, d.qrUrl, W * 0.5, H * 0.5, W * 0.5)
+      // Tagline
+      ctx.fillStyle = '#FDB813'
+      ctx.font = `700 ${Math.round(W * 0.065)}px Arial, sans-serif`
+      ctx.fillText((d.tagline || 'Scan to See Our Menu').toUpperCase(), W / 2, H * 0.82)
+      // Sub
+      ctx.fillStyle = 'rgba(255,255,255,.55)'
+      ctx.font = `400 ${Math.round(W * 0.045)}px Arial, sans-serif`
+      ctx.fillText(d.subtext || '', W / 2, H * 0.88)
+    }
+  },
+  // ── STICKER: Minimal White ──
+  {
+    id: 'stk-minimal',
+    name: 'Minimal',
+    type: 'sticker',
+    render(ctx, W, H, d) {
+      ctx.fillStyle = '#fff'
+      ctx.fillRect(0, 0, W, H)
+      // Border
+      ctx.strokeStyle = '#111'
+      ctx.lineWidth = W * 0.025
+      const m = W * 0.04
+      roundRect(ctx, m, m, W - m * 2, H - m * 2, W * 0.04)
+      ctx.stroke()
+      // Business name
+      ctx.fillStyle = '#111'
+      ctx.textAlign = 'center'
+      ctx.font = `700 ${Math.round(W * 0.1)}px 'Arial', sans-serif`
+      wrapText(ctx, (d.bizName || 'Your Business').toUpperCase(), W / 2, H * 0.2, W * 0.8, W * 0.11)
+      // Thin divider
+      ctx.strokeStyle = '#e0e0e0'
+      ctx.lineWidth = 1
+      ctx.beginPath(); ctx.moveTo(W * 0.25, H * 0.3); ctx.lineTo(W * 0.75, H * 0.3); ctx.stroke()
+      // QR
+      drawQR(ctx, d.qrUrl, W * 0.5, H * 0.52, W * 0.48)
+      // Tagline
+      ctx.fillStyle = '#111'
+      ctx.font = `600 ${Math.round(W * 0.06)}px Arial, sans-serif`
+      ctx.fillText(d.tagline || 'Scan for Menu', W / 2, H * 0.82)
+      ctx.fillStyle = '#888'
+      ctx.font = `400 ${Math.round(W * 0.045)}px Arial, sans-serif`
+      ctx.fillText(d.subtext || '', W / 2, H * 0.88)
+    }
+  },
+  // ── STICKER: Badge / Stamp ──
+  {
+    id: 'stk-badge',
+    name: 'Stamp',
+    type: 'sticker',
+    render(ctx, W, H, d) {
+      ctx.fillStyle = '#f5f5f0'
+      ctx.fillRect(0, 0, W, H)
+      // Outer circle
+      const cx = W / 2, cy = H * 0.48, r = W * 0.42
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2)
+      ctx.fillStyle = '#1a1a1a'; ctx.fill()
+      // Inner ring
+      ctx.beginPath(); ctx.arc(cx, cy, r * 0.88, 0, Math.PI * 2)
+      ctx.strokeStyle = '#FDB813'; ctx.lineWidth = 2; ctx.stroke()
+      // QR code inside circle
+      drawQR(ctx, d.qrUrl, cx, cy, W * 0.38, '#1a1a1a', '#fff')
+      // Arched text top
+      ctx.fillStyle = '#fff'
+      ctx.font = `800 ${Math.round(W * 0.075)}px Arial, sans-serif`
+      ctx.textAlign = 'center'
+      arcText(ctx, (d.bizName || 'YOUR BUSINESS').toUpperCase(), cx, cy, r * 0.76, -Math.PI * 0.78, Math.PI * 0.78, true)
+      // Bottom text
+      ctx.fillStyle = '#FDB813'
+      ctx.font = `700 ${Math.round(W * 0.055)}px Arial, sans-serif`
+      ctx.fillText(d.tagline || 'SCAN FOR MENU', W / 2, H * 0.88)
+    }
+  },
+  // ── TENT: Classic ──
+  {
+    id: 'tent-classic',
+    name: 'Classic',
+    type: 'tent',
+    render(ctx, W, H, d) {
+      ctx.fillStyle = '#fff'
+      ctx.fillRect(0, 0, W, H)
+      // Header band
+      ctx.fillStyle = '#1a1a1a'
+      ctx.fillRect(0, 0, W, H * 0.22)
+      // Business name in header
+      ctx.fillStyle = '#fff'
+      ctx.textAlign = 'center'
+      ctx.font = `800 ${Math.round(W * 0.085)}px 'Arial Black', Arial, sans-serif`
+      wrapText(ctx, (d.bizName || 'YOUR BUSINESS').toUpperCase(), W / 2, H * 0.12, W * 0.9, W * 0.09)
+      // Yellow accent line
+      ctx.fillStyle = '#FDB813'
+      ctx.fillRect(0, H * 0.22, W, 5)
+      // Tagline
+      ctx.fillStyle = '#333'
+      ctx.font = `600 ${Math.round(W * 0.065)}px Arial, sans-serif`
+      ctx.fillText(d.tagline || 'Scan to See Our Menu', W / 2, H * 0.34)
+      // QR
+      drawQR(ctx, d.qrUrl, W * 0.5, H * 0.58, W * 0.44)
+      // Sub text
+      ctx.fillStyle = '#888'
+      ctx.font = `400 ${Math.round(W * 0.045)}px Arial, sans-serif`
+      ctx.fillText(d.subtext || 'Leave us a review while you\'re at it!', W / 2, H * 0.86)
+      // Bottom line
+      ctx.fillStyle = '#1a1a1a'
+      ctx.fillRect(W * 0.2, H * 0.9, W * 0.6, 2)
+    }
+  },
+  // ── TENT: Dark Premium ──
+  {
+    id: 'tent-dark',
+    name: 'Dark',
+    type: 'tent',
+    render(ctx, W, H, d) {
+      // Dark gradient background
+      const grad = ctx.createLinearGradient(0, 0, 0, H)
+      grad.addColorStop(0, '#1a1a2e')
+      grad.addColorStop(1, '#16213e')
+      ctx.fillStyle = grad
+      ctx.fillRect(0, 0, W, H)
+      // Gold top bar
+      ctx.fillStyle = '#FDB813'
+      ctx.fillRect(W * 0.15, H * 0.06, W * 0.7, 3)
+      // Business name
+      ctx.fillStyle = '#FDB813'
+      ctx.textAlign = 'center'
+      ctx.font = `800 ${Math.round(W * 0.09)}px 'Arial Black', Arial, sans-serif`
+      wrapText(ctx, (d.bizName || 'YOUR BUSINESS').toUpperCase(), W / 2, H * 0.16, W * 0.85, W * 0.1)
+      // Tagline
+      ctx.fillStyle = 'rgba(255,255,255,.75)'
+      ctx.font = `400 ${Math.round(W * 0.055)}px Arial, sans-serif`
+      ctx.fillText(d.tagline || 'Scan to See Our Menu', W / 2, H * 0.29)
+      // QR (white on dark)
+      drawQR(ctx, d.qrUrl, W * 0.5, H * 0.56, W * 0.44, '#0d0d1a', '#fff')
+      // Bottom subtext
+      ctx.fillStyle = 'rgba(255,255,255,.45)'
+      ctx.font = `400 ${Math.round(W * 0.042)}px Arial, sans-serif`
+      ctx.fillText(d.subtext || '', W / 2, H * 0.86)
+      // Gold bottom bar
+      ctx.fillStyle = '#FDB813'
+      ctx.fillRect(W * 0.15, H * 0.91, W * 0.7, 3)
+    }
+  },
+]
+
+// ─────────────────────────────────────────────────────────────
+//  CANVAS DRAWING HELPERS
+// ─────────────────────────────────────────────────────────────
+
+// Draw a QR code onto a canvas context at (cx, cy) with given size
+// Uses qrcode.js to generate, then draws it pixel by pixel
+const _qrCache = {}
+function drawQR(ctx, url, cx, cy, size, darkColor = '#000', lightColor = '#fff') {
+  if (!url) {
+    // Draw placeholder box
+    ctx.fillStyle = lightColor
+    ctx.fillRect(cx - size/2, cy - size/2, size, size)
+    ctx.strokeStyle = darkColor
+    ctx.lineWidth = 2
+    ctx.strokeRect(cx - size/2, cy - size/2, size, size)
+    ctx.fillStyle = darkColor
+    ctx.font = `bold ${size * 0.12}px Arial`
+    ctx.textAlign = 'center'
+    ctx.fillText('QR CODE', cx, cy + size * 0.05)
+    return
+  }
+
+  const cacheKey = url + darkColor
+  if (_qrCache[cacheKey]) {
+    _drawQRMatrix(ctx, _qrCache[cacheKey], cx, cy, size, darkColor, lightColor)
+    return
+  }
+
+  try {
+    // Generate QR matrix using qrcode library
+    const qr = QRCode(0, 'M')
+    qr.addData(url)
+    qr.make()
+    const modules = qr.modules
+    _qrCache[cacheKey] = modules
+    _drawQRMatrix(ctx, modules, cx, cy, size, darkColor, lightColor)
+  } catch(e) {
+    // Fallback placeholder
+    ctx.fillStyle = '#eee'
+    ctx.fillRect(cx - size/2, cy - size/2, size, size)
+  }
+}
+
+function _drawQRMatrix(ctx, modules, cx, cy, size, darkColor, lightColor) {
+  const n = modules.length
+  const cell = size / n
+  const ox = cx - size / 2
+  const oy = cy - size / 2
+  // White background
+  ctx.fillStyle = lightColor
+  ctx.fillRect(ox, oy, size, size)
+  ctx.fillStyle = darkColor
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      if (modules[r][c]) {
+        ctx.fillRect(ox + c * cell, oy + r * cell, cell, cell)
+      }
+    }
+  }
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(' ')
+  let line = ''
+  let currentY = y
+  for (const word of words) {
+    const test = line ? line + ' ' + word : word
+    if (ctx.measureText(test).width > maxWidth && line) {
+      ctx.fillText(line, x, currentY)
+      line = word
+      currentY += lineHeight
+    } else {
+      line = test
+    }
+  }
+  if (line) ctx.fillText(line, x, currentY)
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+  ctx.lineTo(x + r, y + h)
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
+  ctx.closePath()
+}
+
+function arcText(ctx, text, cx, cy, radius, startAngle, endAngle, above) {
+  const chars = text.split('')
+  const totalAngle = endAngle - startAngle
+  const charAngle = totalAngle / (chars.length - 1 || 1)
+  chars.forEach((ch, i) => {
+    const angle = startAngle + i * charAngle - Math.PI / 2
+    const x = cx + radius * Math.cos(angle)
+    const y = cy + radius * Math.sin(angle)
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.rotate(angle + Math.PI / 2)
+    ctx.fillText(ch, 0, 0)
+    ctx.restore()
+  })
 }
 
 // ─────────────────────────────────────────────────────────────
 //  AUTH & INIT
 // ─────────────────────────────────────────────────────────────
-// Global token cache — set once on load, reused for all API calls
-let _authToken = null
-
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    // Always use SDK directly for reliable async session check
     const { data: sessionData } = await _getClient().auth.getSession()
     if (!sessionData?.session) {
       const returnUrl = '/print-studio' + (location.search || '')
       window.location.href = '/login?next=' + encodeURIComponent(returnUrl)
       return
     }
-    // Cache the token globally so all fetch calls can use it
     _authToken = sessionData.session.access_token
     const user = sessionData.session.user
     document.getElementById('userEmailEl').textContent = user.email
     document.getElementById('avatarEl').textContent = user.email[0].toUpperCase()
 
-    // Load user's locations from Supabase, then pre-select from URL param if present
     await loadUserLocations()
-
-    // Render initial styles
-    renderStyleSwatches()
-
-    // Load order history
     loadOrderHistory()
-
-  } catch (e) {
+  } catch(e) {
     console.error('[print-studio] init error:', e)
   }
 })
@@ -968,19 +991,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ─────────────────────────────────────────────────────────────
 //  LOCATION DROPDOWN
 // ─────────────────────────────────────────────────────────────
-let _allLocations = []
-
 async function loadUserLocations() {
   try {
-    const locations = await loadLocations()  // from supabase.js
-    _allLocations = locations || []
+    _allLocations = (await loadLocations()) || []
     const sel = document.getElementById('locationSelect')
-
     if (_allLocations.length === 0) {
       sel.innerHTML = '<option value="">No locations found — add one in your dashboard</option>'
       return
     }
-
     sel.innerHTML = '<option value="">— Select a location —</option>' +
       _allLocations.map(loc => {
         const label = loc.location_name
@@ -989,239 +1007,273 @@ async function loadUserLocations() {
         return `<option value="${loc.id}">${label}</option>`
       }).join('')
 
-    // Pre-select from URL param ?loc= or auto-select if only one
     const urlParam = new URLSearchParams(location.search).get('loc_id')
     if (urlParam && _allLocations.find(l => l.id === urlParam)) {
-      sel.value = urlParam
-      onLocationSelect(urlParam)
+      sel.value = urlParam; onLocationSelect(urlParam)
     } else if (_allLocations.length === 1) {
-      sel.value = _allLocations[0].id
-      onLocationSelect(_allLocations[0].id)
-    } else {
-      // Try to match by biz name from URL param
-      const bizParam = new URLSearchParams(location.search).get('biz')
-      if (bizParam) {
-        const match = _allLocations.find(l =>
-          (l.biz_name || '').toLowerCase() === decodeURIComponent(bizParam).toLowerCase()
-        )
-        if (match) { sel.value = match.id; onLocationSelect(match.id) }
-      }
+      sel.value = _allLocations[0].id; onLocationSelect(_allLocations[0].id)
     }
   } catch(e) {
     console.error('[loadUserLocations]', e)
-    document.getElementById('locationSelect').innerHTML =
-      '<option value="">Could not load locations</option>'
+    document.getElementById('locationSelect').innerHTML = '<option value="">Could not load locations</option>'
   }
 }
 
 function onLocationSelect(locId) {
-  const loc = _allLocations.find(l => l.id === locId)
+  _activeLoc = _allLocations.find(l => l.id === locId) || null
   const infoRow = document.getElementById('locInfoRow')
-  if (!loc) { infoRow.style.display = 'none'; return }
-
-  // Build QR URL from slug (matches how location.html builds funnel URLs)
-  const qrUrl = loc.slug
-    ? `https://happyclientele.com/r/${loc.slug}`
-    : ''
-
-  // Fill hidden inputs used by generation & order logic
-  document.getElementById('bizName').value  = loc.biz_name || ''
-  document.getElementById('locName').value  = loc.biz_name || ''   // loc name = biz name for single-location
-  document.getElementById('addr1').value    = loc.address || ''
-  document.getElementById('addrCity').value = loc.address || ''    // address is stored as full string
-  document.getElementById('qrUrl').value    = qrUrl
-
-  // Pre-fill shipping email if available
-  if (loc.email) document.getElementById('shipEmail').value = loc.email
-
-  // Show read-only display
-  document.getElementById('locBizDisplay').textContent  = loc.biz_name || '—'
-  document.getElementById('locNameDisplay').textContent = loc.location_name || loc.biz_name || '(main)'
-  document.getElementById('locAddrDisplay').textContent = loc.address || '—'
-  document.getElementById('locQrDisplay').textContent   = qrUrl || '—'
+  if (!_activeLoc) { infoRow.style.display = 'none'; return }
+  const qrUrl = _activeLoc.slug ? `https://happyclientele.com/r/${_activeLoc.slug}` : ''
+  document.getElementById('locBizDisplay').textContent  = _activeLoc.biz_name || '—'
+  document.getElementById('locAddrDisplay').textContent = _activeLoc.address  || '—'
+  document.getElementById('locQrDisplay').textContent   = qrUrl || '(no slug set)'
   infoRow.style.display = 'block'
+  if (_activeLoc.email) document.getElementById('shipEmail').value = _activeLoc.email
+  if (_activeLoc.address) document.getElementById('shipLine1').value = _activeLoc.address
+  // Re-render active template if one is selected
+  if (selectedTemplateId) rerenderTemplate()
 }
 
 // ─────────────────────────────────────────────────────────────
 //  STEPPER
 // ─────────────────────────────────────────────────────────────
 function goToStep(n) {
-  currentStep = n
-  // Update stepper
-  document.querySelectorAll('.step').forEach(s => {
-    const sn = parseInt(s.dataset.step)
-    s.classList.remove('active','done','disabled')
-    if (sn < n) s.classList.add('done')
-    else if (sn === n) s.classList.add('active')
-    else s.classList.add('disabled')
-  })
-  // Show/hide panels
   document.getElementById('step1-panel').style.display = n === 1 ? 'block' : 'none'
   document.getElementById('step2-panel').style.display = n === 2 ? 'block' : 'none'
   document.getElementById('step3-panel').style.display = n === 3 ? 'block' : 'none'
-
-  if (n === 3) updateOrderSummary()
-  window.scrollTo({top: 0, behavior:'smooth'})
+  document.querySelectorAll('.step').forEach((el, i) => {
+    const sn = i + 1
+    el.classList.toggle('active', sn === n)
+    el.classList.toggle('done',   sn < n)
+    el.classList.toggle('disabled', sn > n)
+  })
+  if (n === 2) renderTemplateGrid()
+  if (n === 3) {
+    updateOrderSummary()
+    syncProofCanvas()
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 // ─────────────────────────────────────────────────────────────
-//  PRODUCT SELECTION
+//  STEP 1 — Product
 // ─────────────────────────────────────────────────────────────
 function selectProduct(el, sku, name, desc, type, dims, unitPrice) {
   document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'))
   el.classList.add('selected')
   selectedProduct = { sku, name, desc, type, dims, unitPrice }
-  document.getElementById('nextToStep2Btn').disabled = false
+  document.getElementById('step1Next').disabled = false
+  // Update upload spec box
+  const spec = PRODUCT_SPECS[sku]
+  if (spec) document.getElementById('uploadSpecText').textContent = ' ' + spec.label
 }
 
 // ─────────────────────────────────────────────────────────────
-//  DESIGN STYLE
+//  STEP 2 — Design mode toggle
 // ─────────────────────────────────────────────────────────────
-function setDesignType(btn, type) {
-  document.querySelectorAll('.design-tab').forEach(b => b.classList.remove('active'))
-  btn.classList.add('active')
-  selectedStyleType = type
-  selectedStyleId = null
-
-  const isCustom = type === 'custom'
-  document.getElementById('styleSwatchSection').style.display = isCustom ? 'none' : 'block'
-  document.getElementById('customPromptSection').style.display = isCustom ? 'block' : 'none'
-
-  if (!isCustom) renderStyleSwatches()
+function setDesignMode(mode) {
+  designMode = mode
+  document.getElementById('modeTabTemplate').classList.toggle('active', mode === 'template')
+  document.getElementById('modeTabUpload').classList.toggle('active', mode === 'upload')
+  document.getElementById('templateMode').style.display = mode === 'template' ? 'block' : 'none'
+  document.getElementById('uploadMode').style.display   = mode === 'upload'   ? 'block' : 'none'
+  checkStep2Ready()
 }
 
-function renderStyleSwatches() {
-  const styles = styleLibrary[selectedStyleType] || []
-  const grid = document.getElementById('styleGrid')
+// ─────────────────────────────────────────────────────────────
+//  TEMPLATES
+// ─────────────────────────────────────────────────────────────
+function getTemplateSizeForProduct() {
+  if (!selectedProduct) return { W: 300, H: 400 }
+  return selectedProduct.type === 'tent' ? { W: 400, H: 560 } : { W: 300, H: 400 }
+}
+
+function getDesignData() {
+  return {
+    bizName: _activeLoc?.biz_name || 'YOUR BUSINESS',
+    qrUrl:   _activeLoc?.slug ? `https://happyclientele.com/r/${_activeLoc.slug}` : '',
+    tagline: document.getElementById('tmplTagline')?.value || '',
+    subtext: document.getElementById('tmplSubtext')?.value || '',
+  }
+}
+
+function renderTemplateGrid() {
+  const { W, H } = getTemplateSizeForProduct()
+  const type = selectedProduct?.type || 'sticker'
+  const filtered = TEMPLATES.filter(t => t.type === type)
+  const grid = document.getElementById('templateGrid')
   grid.innerHTML = ''
-  styles.forEach((s, i) => {
-    const div = document.createElement('div')
-    div.className = 'style-card' + (selectedStyleId === s.id ? ' selected' : '')
-    div.onclick = () => selectStyle(s.id)
-    div.innerHTML = `
-      <div class="style-preview ${s.cls}" style="font-size:1.8rem;color:#fff;">
-        ${s.icon}
-      </div>
-      <div class="style-label">${s.label}</div>
-    `
-    grid.appendChild(div)
-    // Auto-select first one
-    if (i === 0 && !selectedStyleId) {
-      selectedStyleId = s.id
-      div.classList.add('selected')
+  filtered.forEach(tmpl => {
+    const card = document.createElement('div')
+    card.className = 'template-card' + (tmpl.id === selectedTemplateId ? ' selected' : '')
+    card.onclick = () => selectTemplate(tmpl.id)
+    const thumb = document.createElement('div')
+    thumb.className = 'template-thumb'
+    const c = document.createElement('canvas')
+    c.width = W; c.height = H
+    const ctx = c.getContext('2d')
+    tmpl.render(ctx, W, H, getDesignData())
+    thumb.appendChild(c)
+    card.innerHTML = `<div class="template-label">${tmpl.name}</div>`
+    card.prepend(thumb)
+    grid.appendChild(card)
+  })
+}
+
+function selectTemplate(id) {
+  selectedTemplateId = id
+  document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'))
+  // Find and mark selected
+  const grid = document.getElementById('templateGrid')
+  Array.from(grid.children).forEach((card, i) => {
+    const type = selectedProduct?.type || 'sticker'
+    const filtered = TEMPLATES.filter(t => t.type === type)
+    if (filtered[i]?.id === id) card.classList.add('selected')
+  })
+  rerenderTemplate()
+  document.getElementById('templateOverrides').style.display = 'block'
+  checkStep2Ready()
+}
+
+function rerenderTemplate() {
+  if (!selectedTemplateId) return
+  const tmpl = TEMPLATES.find(t => t.id === selectedTemplateId)
+  if (!tmpl) return
+  const { W, H } = getTemplateSizeForProduct()
+  const canvas = document.getElementById('previewCanvas')
+  canvas.width = W; canvas.height = H
+  const ctx = canvas.getContext('2d')
+  tmpl.render(ctx, W, H, getDesignData())
+  document.getElementById('previewPlaceholder').style.display  = 'none'
+  document.getElementById('previewCanvasWrap').style.display   = 'block'
+  document.getElementById('previewActions').style.display      = 'flex'
+  // Cache the data URL
+  _finalImageDataUrl = canvas.toDataURL('image/png')
+}
+
+function downloadProof() {
+  if (!_finalImageDataUrl) return
+  const a = document.createElement('a')
+  a.href = _finalImageDataUrl
+  a.download = `print-proof-${selectedProduct?.sku || 'design'}.png`
+  a.click()
+}
+
+// ─────────────────────────────────────────────────────────────
+//  UPLOAD
+// ─────────────────────────────────────────────────────────────
+function handleFileDrop(e) {
+  e.preventDefault()
+  document.getElementById('uploadZone').classList.remove('drag-over')
+  const file = e.dataTransfer.files[0]
+  if (file) handleFileSelect(file)
+}
+
+function handleFileSelect(file) {
+  if (!file) return
+  if (file.size > 20 * 1024 * 1024) {
+    toast('File too large — max 20MB', 'error'); return
+  }
+  uploadedFile = file
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    uploadedDataUrl = e.target.result
+    _finalImageDataUrl = uploadedDataUrl
+
+    const img = new Image()
+    img.onload = () => {
+      uploadedDimensions = { w: img.naturalWidth, h: img.naturalHeight }
+      showUploadPreview()
+      acksComplete = false
+      document.querySelectorAll('.ack-check').forEach(cb => cb.checked = false)
+      checkStep2Ready()
     }
-  })
-}
-
-function selectStyle(id) {
-  selectedStyleId = id
-  document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'))
-  const idx = (styleLibrary[selectedStyleType] || []).findIndex(s => s.id === id)
-  if (idx >= 0) document.querySelectorAll('.style-card')[idx]?.classList.add('selected')
-}
-
-// ─────────────────────────────────────────────────────────────
-//  AI GENERATION
-// ─────────────────────────────────────────────────────────────
-async function generateDesigns() {
-  // Build prompt
-  let basePrompt = ''
-  if (selectedStyleType === 'custom') {
-    basePrompt = document.getElementById('customPrompt').value.trim()
-    if (!basePrompt) { toast('Please enter a design description', 'error'); return }
-  } else {
-    const styleObj = (styleLibrary[selectedStyleType] || []).find(s => s.id === selectedStyleId)
-    if (!styleObj) { toast('Please select a style', 'error'); return }
-    basePrompt = styleObj.prompt
+    if (file.type === 'application/pdf') {
+      // For PDFs we can't render easily — just show file info
+      uploadedDimensions = null
+      document.getElementById('uploadPreviewImg').src = ''
+      document.getElementById('uploadPreviewImg').alt = '📄 PDF file selected'
+      showUploadPreviewPDF(file)
+    } else {
+      img.src = uploadedDataUrl
+      document.getElementById('uploadPreviewImg').src = uploadedDataUrl
+    }
   }
+  reader.readAsDataURL(file)
+}
 
-  const product = selectedProduct || {}
-  const isSticker = product.type === 'sticker'
-  const productCtx = isSticker
-    ? 'vinyl sticker design, rounded corners, no bleed marks, square or portrait format'
-    : 'table tent card background artwork, landscape orientation, fold line in center, print-ready'
+function showUploadPreview() {
+  const spec = selectedProduct ? PRODUCT_SPECS[selectedProduct.sku] : null
+  const { w, h } = uploadedDimensions || { w: 0, h: 0 }
+  const targetW = spec ? spec.w * spec.dpiTarget : 900
+  const targetH = spec ? spec.h * spec.dpiTarget : 1200
+  const smaller = Math.min(w, h)
+  const targetSmaller = Math.min(targetW, targetH)
+  const ratio = smaller / targetSmaller
 
-  const bizName = document.getElementById('bizName').value.trim() || 'Restaurant'
-  const fullPrompt = `${basePrompt}. ${productCtx}. Design for "${bizName}". High resolution 300dpi print-ready artwork, no text overlay (text will be added separately), clean professional output suitable for physical printing.`
+  let quality, qualityClass, qualityText
+  if (ratio >= 0.9) { quality = 100; qualityClass = 'good'; qualityText = '✅ Excellent — great print quality' }
+  else if (ratio >= 0.6) { quality = Math.round(ratio * 100); qualityClass = 'marginal'; qualityText = '⚠️ Marginal — may print slightly soft' }
+  else { quality = Math.round(ratio * 100); qualityClass = 'poor'; qualityText = '❌ Too small — likely to print blurry' }
 
-  setLoading(true, 'Generating 4 design variants with AI…')
-  generatedVariants = []
-  selectedVariantIdx = null
-  document.getElementById('nextToStep3Btn').disabled = true
-
-  // Update variant grid to loading state
-  const vGrid = document.getElementById('variantGrid')
-  vGrid.innerHTML = [0,1,2,3].map(() => `
-    <div class="variant-thumb">
-      <div class="variant-thumb-placeholder" style="animation:pulse 1.5s ease infinite;">⏳</div>
+  document.getElementById('qualityRows').innerHTML = `
+    <div style="margin-bottom:8px;">
+      <div style="font-size:.78rem;color:var(--sub);margin-bottom:4px;">Uploaded: ${w}×${h}px</div>
+      <div style="font-size:.78rem;color:var(--sub);margin-bottom:4px;">Recommended: ${Math.round(targetW)}×${Math.round(targetH)}px</div>
+      <div class="quality-bar quality-${qualityClass}" style="width:${quality}%;"></div>
+      <div class="quality-label quality-${qualityClass}-text">${qualityText}</div>
     </div>
-  `).join('')
+    <div style="font-size:.78rem;color:var(--sub);">File: ${file_size_fmt(uploadedFile.size)}</div>
+  `
+  document.getElementById('uploadPreviewSection').style.display = 'block'
+}
 
-  try {
-    const token = _authToken || (await _getClient().auth.getSession()).data?.session?.access_token
+function showUploadPreviewPDF(file) {
+  document.getElementById('qualityRows').innerHTML = `
+    <div><div class="quality-bar quality-good" style="width:100%;"></div>
+    <div class="quality-label quality-good-text">✅ PDF accepted — will be sent as-is to Prodigi</div></div>
+    <div style="font-size:.78rem;color:var(--sub);margin-top:6px;">File: ${file.name} (${file_size_fmt(file.size)})</div>
+  `
+  document.getElementById('uploadPreviewSection').style.display = 'block'
+}
 
-    const res = await fetch('/api/generate-design', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ prompt: fullPrompt, count: 4 })
-    })
+function file_size_fmt(bytes) {
+  if (bytes > 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + ' MB'
+  return Math.round(bytes / 1024) + ' KB'
+}
 
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.error || 'Generation failed')
+function checkAcks() {
+  const all = document.querySelectorAll('.ack-check')
+  acksComplete = Array.from(all).every(cb => cb.checked)
+  checkStep2Ready()
+}
 
-    generatedVariants = data.images || []
-    renderVariantGrid()
-    toast('4 design variants generated! Click one to select it.', 'success')
-
-  } catch (e) {
-    console.error(e)
-    toast('Design generation failed: ' + e.message, 'error')
-    // Reset grid
-    vGrid.innerHTML = [0,1,2,3].map(() => `
-      <div class="variant-thumb">
-        <div class="variant-thumb-placeholder">❌</div>
-      </div>
-    `).join('')
-  } finally {
-    setLoading(false)
+// ─────────────────────────────────────────────────────────────
+//  STEP 2 NEXT BUTTON GATING
+// ─────────────────────────────────────────────────────────────
+function checkStep2Ready() {
+  const btn = document.getElementById('step2Next')
+  if (!btn) return
+  if (designMode === 'template') {
+    btn.disabled = !selectedTemplateId
+  } else {
+    btn.disabled = !(uploadedDataUrl && acksComplete)
   }
 }
 
-function renderVariantGrid() {
-  const vGrid = document.getElementById('variantGrid')
-  vGrid.innerHTML = ''
-  if (generatedVariants.length === 0) {
-    vGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--sub);font-size:.85rem;padding:20px;">No variants generated</div>'
-    return
+// ─────────────────────────────────────────────────────────────
+//  STEP 3 — Sync proof canvas
+// ─────────────────────────────────────────────────────────────
+function syncProofCanvas() {
+  const proof = document.getElementById('orderProofCanvas')
+  if (!_finalImageDataUrl) return
+  const img = new Image()
+  img.onload = () => {
+    proof.width = img.naturalWidth
+    proof.height = img.naturalHeight
+    proof.getContext('2d').drawImage(img, 0, 0)
   }
-  generatedVariants.forEach((url, i) => {
-    const div = document.createElement('div')
-    div.className = 'variant-thumb' + (selectedVariantIdx === i ? ' selected' : '')
-    div.onclick = () => selectVariant(i)
-    div.innerHTML = `<img src="${url}" alt="Design variant ${i+1}" loading="lazy">`
-    vGrid.appendChild(div)
-  })
-}
-
-function selectVariant(i) {
-  selectedVariantIdx = i
-  // Update grid
-  document.querySelectorAll('.variant-thumb').forEach((t, idx) => {
-    t.classList.toggle('selected', idx === i)
-  })
-  // Show in main canvas
-  const canvas = document.getElementById('mainCanvas')
-  canvas.innerHTML = `<img src="${generatedVariants[i]}" class="generated-image" alt="Selected design">`
-  document.getElementById('selectedPreviewLabel').style.display = 'block'
-
-  // Update summary preview
-  document.getElementById('summaryDesignPreview').innerHTML = `<img src="${generatedVariants[i]}" style="width:100%;height:100%;object-fit:cover;">`
-
-  // Enable next button
-  document.getElementById('nextToStep3Btn').disabled = false
+  img.src = _finalImageDataUrl
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1231,14 +1283,13 @@ function updateOrderSummary() {
   if (!selectedProduct) return
   const shipCost = shippingCosts[selectedShipping] || 3.99
   const total = (selectedProduct.unitPrice * currentQty + shipCost).toFixed(2)
-
   document.getElementById('summaryProductName').textContent = selectedProduct.name
   document.getElementById('summaryProductCost').textContent = `$${(selectedProduct.unitPrice * currentQty).toFixed(2)}`
   document.getElementById('summaryQty').textContent = currentQty
-  document.getElementById('summaryShipMethod').textContent = selectedShipping
-  document.getElementById('summaryShipCost').textContent = `~$${shipCost.toFixed(2)}`
-  document.getElementById('summaryTotal').textContent = `~$${total}`
-  document.getElementById('qtyDisplay').textContent = currentQty
+  document.getElementById('summaryShipMethod').textContent  = selectedShipping
+  document.getElementById('summaryShipCost').textContent    = `~$${shipCost.toFixed(2)}`
+  document.getElementById('summaryTotal').textContent       = `~$${total}`
+  document.getElementById('qtyDisplay').textContent         = currentQty
 }
 
 function changeQty(delta) {
@@ -1246,10 +1297,10 @@ function changeQty(delta) {
   updateOrderSummary()
 }
 
-function updateShipping(radio) {
-  selectedShipping = radio.value
+function updateShipping(el, val) {
+  selectedShipping = val
   document.querySelectorAll('.shipping-option').forEach(o => o.classList.remove('selected'))
-  radio.closest('.shipping-option').classList.add('selected')
+  el.classList.add('selected')
   updateOrderSummary()
 }
 
@@ -1257,67 +1308,50 @@ function updateShipping(radio) {
 //  PLACE ORDER
 // ─────────────────────────────────────────────────────────────
 async function placeOrder() {
-  // Validate
-  const name    = document.getElementById('shipName').value.trim()
-  const email   = document.getElementById('shipEmail').value.trim()
-  const line1   = document.getElementById('shipLine1').value.trim()
-  const city    = document.getElementById('shipCity').value.trim()
-  const state   = document.getElementById('shipState').value.trim()
-  const zip     = document.getElementById('shipZip').value.trim()
+  const name  = document.getElementById('shipName').value.trim()
+  const email = document.getElementById('shipEmail').value.trim()
+  const line1 = document.getElementById('shipLine1').value.trim()
+  const city  = document.getElementById('shipCity').value.trim()
+  const state = document.getElementById('shipState').value.trim()
+  const zip   = document.getElementById('shipZip').value.trim()
   const country = document.getElementById('shipCountry').value
 
   if (!name || !email || !line1 || !city || !state || !zip) {
-    toast('Please fill in all shipping fields', 'error')
-    return
+    toast('Please fill in all shipping fields', 'error'); return
   }
-  if (selectedVariantIdx === null) {
-    toast('Please select a design variant first', 'error')
-    return
+  if (!_finalImageDataUrl) {
+    toast('No design selected — go back to step 2', 'error'); return
   }
 
-  const imageUrl = generatedVariants[selectedVariantIdx]
-  if (!imageUrl) {
-    toast('No design image selected', 'error')
-    return
-  }
-
-  setLoading(true, 'Placing order with Prodigi…')
+  setLoading(true, 'Uploading design & placing order…')
   document.getElementById('placeOrderBtn').disabled = true
 
   try {
     const token = _authToken || (await _getClient().auth.getSession()).data?.session?.access_token
-
     const res = await fetch('/api/create-print-order', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({
         sku: selectedProduct.sku,
         copies: currentQty,
         shippingMethod: selectedShipping,
-        imageUrl,
-        businessName: document.getElementById('bizName').value.trim(),
-        locationName: document.getElementById('locName').value.trim(),
-        qrUrl: document.getElementById('qrUrl').value.trim(),
-        recipient: { name, email,
+        imageUrl: _finalImageDataUrl,   // base64 data URL — Prodigi accepts this
+        businessName: _activeLoc?.biz_name || '',
+        locationName: _activeLoc?.biz_name || '',
+        qrUrl: _activeLoc?.slug ? `https://happyclientele.com/r/${_activeLoc.slug}` : '',
+        recipient: {
+          name, email,
           address: {
             line1, line2: document.getElementById('shipLine2').value.trim(),
-            postalOrZipCode: zip, countryCode: country,
-            townOrCity: city, stateOrCounty: state
+            postalOrZipCode: zip, countryCode: country, townOrCity: city, stateOrCounty: state
           }
         }
       })
     })
-
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Order failed')
 
     toast('🎉 Order placed! Prodigi ID: ' + data.orderId, 'success')
-    setLoading(false)
-
-    // Show success state
     document.getElementById('step3-panel').innerHTML = `
       <div class="card">
         <div class="card-body" style="text-align:center;padding:48px;">
@@ -1325,18 +1359,16 @@ async function placeOrder() {
           <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;">Order Placed!</h2>
           <p style="color:var(--sub);margin-bottom:6px;">Prodigi Order ID: <strong>${data.orderId}</strong></p>
           <p style="color:var(--sub);font-size:.85rem;margin-bottom:24px;">
-            Your materials will be printed and shipped to ${name}.<br>
-            Expected delivery: ${selectedShipping === 'Express' ? '2–3' : selectedShipping === 'Standard' ? '4–7' : '7–14'} business days.
+            Printed &amp; shipped to ${name}.<br>
+            Est. delivery: ${selectedShipping === 'Express' ? '2–3' : selectedShipping === 'Standard' ? '4–7' : '7–14'} business days.
           </p>
           <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
             <button class="btn btn-outline" onclick="switchMainTab('history')">View Order History</button>
             <button class="btn btn-primary" onclick="location.reload()">Create Another</button>
           </div>
         </div>
-      </div>
-    `
-
-  } catch (e) {
+      </div>`
+  } catch(e) {
     console.error(e)
     toast('Order failed: ' + e.message, 'error')
     document.getElementById('placeOrderBtn').disabled = false
@@ -1351,66 +1383,51 @@ async function placeOrder() {
 async function loadOrderHistory() {
   try {
     const token = _authToken || (await _getClient().auth.getSession()).data?.session?.access_token
-    const res = await fetch('/api/print-orders', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
+    const res = await fetch('/api/print-orders', { headers: { 'Authorization': `Bearer ${token}` } })
     const data = await res.json()
-    if (!res.ok || !data.orders || data.orders.length === 0) return
-
-    const tbody = data.orders.map(o => {
-      const statusClass = {
-        InProgress: 'status-inprogress', Complete: 'status-complete',
-        Cancelled: 'status-cancelled', Draft: 'status-pending'
-      }[o.status?.stage] || 'status-pending'
-      return `
-        <tr>
-          <td><strong>${o.id}</strong></td>
-          <td>${o.merchantReference || '—'}</td>
-          <td>${o.items?.[0]?.sku || '—'}</td>
-          <td>${o.items?.[0]?.copies || 1}×</td>
-          <td>${o.shippingMethod}</td>
-          <td><span class="status-badge ${statusClass}">${o.status?.stage || 'Unknown'}</span></td>
-          <td>${new Date(o.created).toLocaleDateString()}</td>
-        </tr>
-      `
+    if (!res.ok || !data.orders?.length) {
+      document.getElementById('orderHistoryBody').innerHTML =
+        '<div style="text-align:center;padding:32px;color:var(--sub);">No orders yet — create your first one above!</div>'
+      return
+    }
+    const rows = data.orders.map(o => {
+      const sc = { InProgress:'status-inprogress', Complete:'status-complete', Cancelled:'status-cancelled', Draft:'status-pending' }
+      return `<tr>
+        <td><strong>${o.id}</strong></td>
+        <td>${o.merchantReference||'—'}</td>
+        <td>${o.items?.[0]?.sku||'—'}</td>
+        <td>${o.items?.[0]?.copies||1}×</td>
+        <td>${o.shippingMethod}</td>
+        <td><span class="status-badge ${sc[o.status?.stage]||'status-pending'}">${o.status?.stage||'Unknown'}</span></td>
+        <td>${new Date(o.created).toLocaleDateString()}</td>
+      </tr>`
     }).join('')
-
     document.getElementById('orderHistoryBody').innerHTML = `
       <div style="overflow-x:auto;">
         <table class="order-table">
-          <thead>
-            <tr>
-              <th>Order ID</th><th>Reference</th><th>SKU</th><th>Qty</th>
-              <th>Shipping</th><th>Status</th><th>Date</th>
-            </tr>
-          </thead>
-          <tbody>${tbody}</tbody>
+          <thead><tr><th>Order ID</th><th>Ref</th><th>SKU</th><th>Qty</th><th>Shipping</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>${rows}</tbody>
         </table>
-      </div>
-    `
-  } catch (e) {
-    console.warn('Could not load order history', e)
+      </div>`
+  } catch(e) {
+    console.warn('[orderHistory]', e)
   }
 }
 
 // ─────────────────────────────────────────────────────────────
-//  TABS
+//  TABS / UTILS
 // ─────────────────────────────────────────────────────────────
 function switchMainTab(tab) {
   document.querySelectorAll('.tab-btn').forEach((b, i) => {
     b.classList.toggle('active', (i === 0 && tab === 'create') || (i === 1 && tab === 'history'))
   })
-  document.getElementById('tab-create').classList.toggle('active', tab === 'create')
+  document.getElementById('tab-create').classList.toggle('active',  tab === 'create')
   document.getElementById('tab-history').classList.toggle('active', tab === 'history')
   if (tab === 'history') loadOrderHistory()
 }
 
-// ─────────────────────────────────────────────────────────────
-//  UTILS
-// ─────────────────────────────────────────────────────────────
 function setLoading(active, msg) {
-  const overlay = document.getElementById('loadingOverlay')
-  overlay.classList.toggle('active', active)
+  document.getElementById('loadingOverlay').classList.toggle('active', active)
   if (msg) document.getElementById('loadingMsg').textContent = msg
 }
 
@@ -1420,7 +1437,7 @@ function toast(msg, type = '') {
   el.className = 'toast' + (type ? ' ' + type : '')
   el.textContent = msg
   wrap.appendChild(el)
-  setTimeout(() => el.remove(), 4000)
+  setTimeout(() => el.remove(), 4500)
 }
 </script>
 </body>
