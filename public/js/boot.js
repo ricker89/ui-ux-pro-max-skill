@@ -17,8 +17,8 @@ async function bootWelcomePage() {
   log('boot.js running');
 
   // 1. Get session token directly from localStorage
-  const SUPA_URL = 'https://dbbryatmoxlzifsurxrm.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemlmc3VyeHJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NDUzNTMsImV4cCI6MjA4ODUyMTM1M30.b_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk';
+  const SUPA_URL = 'https://dbbryatmoxlzibfsurxrm.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYnJ5YXRtb3hsemliZnN1cnhybSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzQ2NDkzNTg4LCJleHAiOjIwNjIwNjk1ODh9.N_Ge4bNFu3nCxXuP10ZEdmFbdVtTn2ZS98nyXoBRfAk';
 
   // Find the session — try every possible key format
   let token = null;
