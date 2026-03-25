@@ -656,7 +656,7 @@ let _authToken     = null
 let _allLocations  = []
 let _activeLoc     = null
 let selectedProduct = null
-let selectedTemplateId = null
+let selectedTemplateId = 'stk-menu-card'  // default: matches dashboard design
 let designMode     = 'template'   // 'template' | 'upload'
 let uploadedFile   = null
 let uploadedDataUrl = null
@@ -679,6 +679,57 @@ const PRODUCT_SPECS = {
 //  Each template has: id, name, type (sticker|tent), a render(ctx, W, H, data) function
 // ─────────────────────────────────────────────────────────────
 const TEMPLATES = [
+  // ── STICKER: Menu Card (matches dashboard design — DEFAULT) ──
+  {
+    id: 'stk-menu-card',
+    name: 'Menu Card',
+    type: 'sticker',
+    render(ctx, W, H, d) {
+      const radius = W * 0.08
+      // White background with rounded corners
+      ctx.fillStyle = '#ffffff'
+      roundRect(ctx, 0, 0, W, H, radius)
+      ctx.fill()
+      // Subtle border
+      ctx.strokeStyle = '#e5e7eb'
+      ctx.lineWidth = Math.max(1, W * 0.008)
+      roundRect(ctx, ctx.lineWidth/2, ctx.lineWidth/2, W - ctx.lineWidth, H - ctx.lineWidth, radius)
+      ctx.stroke()
+      // Clipboard emoji at top
+      ctx.textAlign = 'center'
+      ctx.font = `${Math.round(W * 0.13)}px serif`
+      ctx.fillText('📋', W / 2, H * 0.16)
+      // Headline
+      ctx.fillStyle = '#111827'
+      ctx.font = `700 ${Math.round(W * 0.082)}px Arial, sans-serif`
+      wrapText(ctx, d.tagline || 'Tap to view our menu', W / 2, H * 0.275, W * 0.85, W * 0.09)
+      // Sub text
+      ctx.fillStyle = '#9ca3af'
+      ctx.font = `400 ${Math.round(W * 0.058)}px Arial, sans-serif`
+      ctx.fillText('Scan to access', W / 2, H * 0.36)
+      // QR code (white padded box)
+      const qrSize = W * 0.65
+      const qrX = W / 2
+      const qrY = H * 0.585
+      // White QR background box
+      const boxPad = W * 0.04
+      ctx.fillStyle = '#ffffff'
+      ctx.shadowColor = 'rgba(0,0,0,0.08)'
+      ctx.shadowBlur = W * 0.04
+      roundRect(ctx, qrX - qrSize/2 - boxPad, qrY - qrSize/2 - boxPad, qrSize + boxPad*2, qrSize + boxPad*2, W * 0.04)
+      ctx.fill()
+      ctx.shadowBlur = 0
+      drawQR(ctx, d.qrUrl, qrX, qrY, qrSize)
+      // Business name
+      ctx.fillStyle = '#111827'
+      ctx.font = `700 ${Math.round(W * 0.065)}px Arial, sans-serif`
+      ctx.fillText(d.bizName || 'YOUR BUSINESS', W / 2, H * 0.87)
+      // Powered by footer
+      ctx.fillStyle = '#d1d5db'
+      ctx.font = `400 ${Math.round(W * 0.042)}px Arial, sans-serif`
+      ctx.fillText('Powered by HappyClientele.', W / 2, H * 0.94)
+    }
+  },
   // ── STICKER: Bold B&W ──
   {
     id: 'stk-bold',
@@ -994,10 +1045,11 @@ async function loadUserLocations() {
     }
     sel.innerHTML = '<option value="">— Select a location —</option>' +
       _allLocations.map(loc => {
-        const label = loc.location_name
+        const name = loc.location_name
           ? `${loc.biz_name || 'My Business'} — ${loc.location_name}`
           : (loc.biz_name || 'My Business')
-        return `<option value="${loc.id}">${label}</option>`
+        const addr = loc.address ? ` (${loc.address})` : ''
+        return `<option value="${loc.id}">${name}${addr}</option>`
       }).join('')
 
     const urlParam = new URLSearchParams(location.search).get('loc_id')
@@ -1012,8 +1064,14 @@ async function loadUserLocations() {
   }
 }
 
+function checkStep1Ready() {
+  const ok = !!_activeLoc && !!selectedProduct
+  document.getElementById('step1Next').disabled = !ok
+}
+
 function onLocationSelect(locId) {
   _activeLoc = _allLocations.find(l => l.id === locId) || null
+  checkStep1Ready()
   const infoRow = document.getElementById('locInfoRow')
   if (!_activeLoc) { infoRow.style.display = 'none'; return }
   const qrUrl = _activeLoc.slug ? `https://happyclientele.com/r/${_activeLoc.slug}` : ''
@@ -1086,7 +1144,7 @@ function selectProduct(el, sku, name, desc, type, dims, unitPrice) {
   document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'))
   if (card) card.classList.add('selected')
   selectedProduct = { sku, name, desc, type, dims, unitPrice }
-  document.getElementById('step1Next').disabled = false
+  checkStep1Ready()
   // Update upload spec box
   const spec = PRODUCT_SPECS[sku]
   if (spec) document.getElementById('uploadSpecText').textContent = ' ' + spec.label
@@ -1161,10 +1219,16 @@ function renderTemplateGrid() {
     })
   }
 
-  if (qrUrl && !_qrCanvasCache[qrUrl]) {
-    prewarmQR(qrUrl, doRender)
-  } else {
+  const afterRender = () => {
     doRender()
+    // Auto-render the preview for the default/selected template
+    if (selectedTemplateId) rerenderTemplate()
+  }
+
+  if (qrUrl && !_qrCanvasCache[qrUrl]) {
+    prewarmQR(qrUrl, afterRender)
+  } else {
+    afterRender()
   }
 }
 
