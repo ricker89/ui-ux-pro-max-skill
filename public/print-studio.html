@@ -89,8 +89,8 @@
     .template-card:hover { border-color:var(--yellow); transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.1); }
     .template-card.selected { border-color:var(--yellow); box-shadow:0 0 0 3px rgba(253,184,19,.25); }
     .template-card.selected::after { content:'✓'; position:absolute; top:8px; right:8px; width:22px; height:22px; background:var(--yellow); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:800; z-index:2; }
-    .template-thumb { width:100%; aspect-ratio:3/4; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .template-thumb canvas { width:100%; height:100%; object-fit:contain; }
+    .template-thumb { width:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .template-thumb canvas { width:100%; height:auto; display:block; }
     .template-label { padding:8px 10px; font-size:.75rem; font-weight:600; text-align:center; border-top:1px solid var(--border); }
 
     /* ─── Live preview ─── */
@@ -1121,9 +1121,24 @@ function setDesignMode(mode) {
 // ─────────────────────────────────────────────────────────────
 //  TEMPLATES
 // ─────────────────────────────────────────────────────────────
+// Returns canvas pixel dimensions that exactly match each product's print aspect ratio.
+// Longest edge is capped at 400px so thumbnails stay crisp without being huge.
 function getTemplateSizeForProduct() {
-  if (!selectedProduct) return { W: 300, H: 400 }
-  return selectedProduct.type === 'tent' ? { W: 400, H: 560 } : { W: 300, H: 400 }
+  const sku = selectedProduct?.sku
+  const L = 400  // longest edge (px)
+  // Each entry: [w_inches, h_inches] — canvas H = L, W = L * (w/h)
+  const ratio = {
+    'M-STI-3X4':      [3,   4  ],   // portrait  → W=300 H=400
+    'M-STI-5_5X5_5':  [5.5, 5.5],  // square    → W=400 H=400
+    'GLOBAL-FAP-4X6': [4,   6  ],   // portrait  → W≈267 H=400
+    'GLOBAL-FAP-5X7': [5,   7  ],   // portrait  → W≈286 H=400
+  }
+  const r = ratio[sku]
+  if (r) return { W: Math.round(L * r[0] / r[1]), H: L }
+  // Fallback by type
+  return selectedProduct?.type === 'tent'
+    ? { W: Math.round(L * 4/6), H: L }
+    : { W: Math.round(L * 3/4), H: L }
 }
 
 function getDesignData() {
