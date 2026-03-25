@@ -315,23 +315,11 @@
               <div class="product-dims">3×4" vinyl kiss-cut</div>
               <div class="product-price">~$6.95 ea</div>
             </div>
-            <div class="product-card" onclick="selectProduct(this,'M-STI-5_5X5_5','Table Sticker (Large)','Larger kiss-cut vinyl sticker','sticker','5.5x5.5in',9.95)">
-              <div class="product-emoji">🏷️</div>
-              <div class="product-name">Table Sticker</div>
-              <div class="product-dims">5.5×5.5" vinyl kiss-cut</div>
-              <div class="product-price">~$9.95 ea</div>
-            </div>
             <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-4X6','Table Tent Card (4x6)','Fold in half for a 4x3in standing tent card','tent','4x6in',4.95)">
               <div class="product-emoji">🗂️</div>
               <div class="product-name">Tent Card (4×6)</div>
               <div class="product-dims">4×6" matte art print</div>
               <div class="product-price">~$4.95 ea</div>
-            </div>
-            <div class="product-card" onclick="selectProduct(this,'GLOBAL-FAP-5X7','Table Tent Card (5x7)','Fold in half for a 5x3.5in standing tent card','tent','5x7in',5.95)">
-              <div class="product-emoji">🗂️</div>
-              <div class="product-name">Tent Card (5×7)</div>
-              <div class="product-dims">5×7" matte art print</div>
-              <div class="product-price">~$5.95 ea</div>
             </div>
           </div>
         </div>
@@ -682,10 +670,8 @@ const shippingCosts = { Budget: 3.99, Standard: 6.99, Express: 12.99 }
 
 // Product print specs (width × height in inches, dpi target)
 const PRODUCT_SPECS = {
-  'M-STI-3X4':      { w:3,   h:4,   dpiTarget:300, label:'3×4" — target 900×1200px at 300dpi' },
-  'M-STI-5_5X5_5':  { w:5.5, h:5.5, dpiTarget:300, label:'5.5×5.5" — target 1650×1650px at 300dpi' },
-  'GLOBAL-FAP-4X6':  { w:4,   h:6,   dpiTarget:300, label:'4×6" — target 1200×1800px at 300dpi' },
-  'GLOBAL-FAP-5X7':  { w:5,   h:7,   dpiTarget:300, label:'5×7" — target 1500×2100px at 300dpi' },
+  'M-STI-3X4':      { w:3, h:4, dpiTarget:300, label:'3×4" — target 900×1200px at 300dpi' },
+  'GLOBAL-FAP-4X6':  { w:4, h:6, dpiTarget:300, label:'4×6" — target 1200×1800px at 300dpi' },
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1128,10 +1114,8 @@ function getTemplateSizeForProduct() {
   const L = 400  // longest edge (px)
   // Each entry: [w_inches, h_inches] — canvas H = L, W = L * (w/h)
   const ratio = {
-    'M-STI-3X4':      [3,   4  ],   // portrait  → W=300 H=400
-    'M-STI-5_5X5_5':  [5.5, 5.5],  // square    → W=400 H=400
-    'GLOBAL-FAP-4X6': [4,   6  ],   // portrait  → W≈267 H=400
-    'GLOBAL-FAP-5X7': [5,   7  ],   // portrait  → W≈286 H=400
+    'M-STI-3X4':      [3, 4],  // portrait → W=300 H=400
+    'GLOBAL-FAP-4X6': [4, 6],  // portrait → W≈267 H=400
   }
   const r = ratio[sku]
   if (r) return { W: Math.round(L * r[0] / r[1]), H: L }
